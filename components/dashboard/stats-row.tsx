@@ -6,7 +6,10 @@ import { useMeritStore } from '@/lib/store';
 import { parseISO, isWithinInterval, startOfWeek, endOfWeek, subWeeks, format, subDays } from 'date-fns';
 
 // SSR-safe dynamic import for the sparkline
-const SparklineChart = dynamic(() => import('./sparkline-chart'), { ssr: false });
+const SparklineChart = dynamic(() => import('./sparkline-chart'), {
+  ssr: false,
+  loading: () => <div className="h-10 w-full" />,
+});
 
 interface StatCardProps {
   label: string;

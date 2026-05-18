@@ -46,8 +46,7 @@ export default function ProfilePage() {
     },
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async function onSubmit(data: any) {
+  async function onSubmit(data: FormData) {
     setSaving(true);
     await new Promise((r) => setTimeout(r, 600));
     updateUser(data);
