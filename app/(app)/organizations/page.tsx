@@ -1,1 +1,84 @@
-export default function Page() { return null; }
+'use client';
+
+import { useState, useMemo } from 'react';
+import Link from 'next/link';
+import { Search, Building2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { OrgCard } from '@/components/orgs/org-card';
+import { useMeritStore } from '@/lib/store';
+import { cn } from '@/lib/utils';
+import type { OrgCategory } from '@/lib/types';
+
+const CATEGORIES: (OrgCategory | 'All')[] = [
+  'All', 'Community', 'Education', 'Health', 'Animal welfare',
+  'Environment', 'Social services', 'Other',
+];
+
+export default function OrganizationsPage() {
+  const organizations = useMeritStore((s) => s.organizations);
+  const sessions = useMeritStore((s) => s.sessions);
+  const [query, setQuery] = useState('');
+  const [category, setCategory] = useState<OrgCategory | 'All'>('All');
+
+  const filtered = useMemo(() => {
+    let orgs = organizations;
+    if (category !== 'All') orgs = orgs.filter((o) => o.category === category);
+    if (query) {
+      const q = query.toLowerCase();
+      orgs = orgs.filter((o) => o.name.toLowerCase().includes(q));
+    }
+    return orgs;
+  }, [organizations, category, query]);
+
+  return (
+    <div className="px-8 py-8">
+      {/* Search + filter */}
+      <div className="flex items-center gap-3 mb-6 flex-wrap">
+        <div className="relative flex-1 min-w-56 max-w-sm">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-400 pointer-events-none" />
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search organizations..."
+            className="pl-9 h-9 text-[13px]"
+          />
+        </div>
+        <div className="flex items-center gap-1 flex-wrap">
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setCategory(cat)}
+              className={cn(
+                'px-3 py-1.5 rounded-lg text-[12px] font-medium transition-colors',
+                category === cat
+                  ? 'bg-ink-900 text-white'
+                  : 'bg-ink-100 text-ink-600 hover:bg-ink-200'
+              )}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Grid */}
+      {filtered.length === 0 ? (
+        <div className="flex flex-col items-center py-20 text-center">
+          <Building2 size={32} className="text-ink-300 mb-3" />
+          <p className="text-[15px] font-semibold text-ink-900 mb-1">No organizations found.</p>
+          <p className="text-small text-ink-500">
+            {query || category !== 'All'
+              ? 'Try a different search or category.'
+              : 'Organizations you log hours at will appear here.'}
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filtered.map((org) => (
+            <OrgCard key={org.id} org={org} sessions={sessions} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
