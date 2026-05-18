@@ -1,0 +1,210 @@
+'use client';
+
+import { useState, useMemo } from 'react';
+import { PDFViewer, PDFDownloadLink } from '@react-pdf/renderer';
+import { Lock, Download, FileText } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { MeritPdfDocument } from '@/lib/pdf-template';
+import { useMeritStore } from '@/lib/store';
+import { cn } from '@/lib/utils';
+
+type Template = 'classic' | 'modern' | 'nhs-formal';
+type DateRange = 'all' | 'school-year' | 'custom';
+
+const TEMPLATES: { key: Template; label: string; premium: boolean }[] = [
+  { key: 'classic',    label: 'Classic',    premium: false },
+  { key: 'modern',     label: 'Modern',     premium: true },
+  { key: 'nhs-formal', label: 'NHS-formal', premium: true },
+];
+
+export default function PdfExportInner() {
+  const user = useMeritStore((s) => s.user);
+  const sessions = useMeritStore((s) => s.sessions);
+
+  const [includeCover,      setIncludeCover]      = useState(true);
+  const [includeStats,      setIncludeStats]      = useState(true);
+  const [includeLog,        setIncludeLog]        = useState(true);
+  const [includeVerify,     setIncludeVerify]     = useState(true);
+  const [template,          setTemplate]          = useState<Template>('classic');
+  const [dateRange,         setDateRange]         = useState<DateRange>('all');
+  const [format,            setFormat]            = useState<'pdf' | 'csv'>('pdf');
+
+  const isPremium = user.plan === 'premium';
+
+  const filteredSessions = useMemo(() => {
+    if (dateRange === 'school-year') {
+      const now = new Date();
+      const cutoff = now.getMonth() >= 8
+        ? new Date(now.getFullYear(), 8, 1)
+        : new Date(now.getFullYear() - 1, 8, 1);
+      return sessions.filter((s) => new Date(s.date) >= cutoff);
+    }
+    return sessions;
+  }, [sessions, dateRange]);
+
+  const hasVerified = filteredSessions.some((s) => s.status === 'verified');
+
+  const dateRangeLabel =
+    dateRange === 'all' ? 'All time' :
+    dateRange === 'school-year' ? 'This school year' : 'Custom range';
+
+  const pdfDoc = (
+    <MeritPdfDocument
+      user={user}
+      sessions={filteredSessions}
+      includeStats={includeStats}
+      includeSupervisor={includeVerify}
+      dateRange={dateRangeLabel}
+    />
+  );
+
+  const fileName = `merit-${user.firstName.toLowerCase()}-${user.lastName.toLowerCase()}-${new Date().getFullYear()}.pdf`;
+
+  return (
+    <div className="flex gap-8 items-start">
+      {/* ── LEFT: Options panel ───────────────────────────────────────────── */}
+      <div className="w-72 shrink-0 space-y-5">
+
+        {/* What to include */}
+        <div className="bg-white rounded-xl border border-ink-200 p-5 space-y-3">
+          <p className="text-h3 text-ink-900">What to include</p>
+          {([
+            { label: 'Summary stats',       value: includeStats,  set: setIncludeStats },
+            { label: 'Full session log',    value: includeLog,    set: setIncludeLog },
+            { label: 'Verification details',value: includeVerify, set: setIncludeVerify },
+          ] as const).map(({ label, value, set }) => (
+            <label key={label} className="flex items-center gap-2.5 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={value}
+                onChange={(e) => set(e.target.checked)}
+                className="h-4 w-4 rounded border-ink-200 accent-merit-blue-600"
+              />
+              <span className="text-[13px] text-ink-700">{label}</span>
+            </label>
+          ))}
+        </div>
+
+        {/* Date range */}
+        <div className="bg-white rounded-xl border border-ink-200 p-5 space-y-2.5">
+          <p className="text-h3 text-ink-900">Time range</p>
+          {([
+            { key: 'all',         label: 'All time' },
+            { key: 'school-year', label: 'This school year' },
+          ] as const).map(({ key, label }) => (
+            <label key={key} className="flex items-center gap-2.5 cursor-pointer">
+              <input
+                type="radio"
+                name="dateRange"
+                value={key}
+                checked={dateRange === key}
+                onChange={() => setDateRange(key)}
+                className="accent-merit-blue-600"
+              />
+              <span className="text-[13px] text-ink-700">{label}</span>
+            </label>
+          ))}
+        </div>
+
+        {/* Template picker */}
+        <div className="bg-white rounded-xl border border-ink-200 p-5 space-y-2.5">
+          <p className="text-h3 text-ink-900">Template</p>
+          <div className="space-y-2">
+            {TEMPLATES.map(({ key, label, premium }) => {
+              const locked = premium && !isPremium;
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => !locked && setTemplate(key)}
+                  className={cn(
+                    'w-full flex items-center justify-between px-3 py-2.5 rounded-lg border text-left transition-colors',
+                    template === key && !locked
+                      ? 'border-merit-blue-600 bg-merit-blue-50'
+                      : 'border-ink-200 hover:bg-ink-50',
+                    locked && 'opacity-60 cursor-not-allowed'
+                  )}
+                >
+                  <span className="text-[13px] text-ink-900">{label}</span>
+                  {locked && <Lock size={12} className="text-ink-400" />}
+                  {!locked && template === key && (
+                    <span className="h-2 w-2 rounded-full bg-merit-blue-600" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+          {!isPremium && (
+            <p className="text-[11px] text-ink-500 mt-1">Modern & NHS-formal require Premium.</p>
+          )}
+        </div>
+
+        {/* Format */}
+        <div className="bg-white rounded-xl border border-ink-200 p-5 space-y-2.5">
+          <p className="text-h3 text-ink-900">Format</p>
+          {(['pdf', 'csv'] as const).map((f) => (
+            <label key={f} className="flex items-center gap-2.5 cursor-pointer">
+              <input
+                type="radio"
+                name="format"
+                value={f}
+                checked={format === f}
+                onChange={() => setFormat(f)}
+                className="accent-merit-blue-600"
+              />
+              <span className="text-[13px] text-ink-700 uppercase">{f}</span>
+            </label>
+          ))}
+        </div>
+
+        {/* Download button */}
+        {hasVerified ? (
+          <PDFDownloadLink document={pdfDoc} fileName={fileName}>
+            {({ loading }) => (
+              <button
+                className="w-full flex items-center justify-center gap-2 bg-merit-blue-600 hover:bg-merit-blue-700 active:scale-[0.98] text-white text-[13px] font-medium px-4 py-2.5 rounded-lg transition-all"
+              >
+                <Download size={14} />
+                {loading ? 'Preparing...' : 'Download'}
+              </button>
+            )}
+          </PDFDownloadLink>
+        ) : (
+          <button
+            disabled
+            className="w-full flex items-center justify-center gap-2 bg-ink-200 text-ink-500 text-[13px] font-medium px-4 py-2.5 rounded-lg cursor-not-allowed"
+          >
+            <Download size={14} />
+            Download
+          </button>
+        )}
+        {!hasVerified && (
+          <p className="text-[11px] text-ink-500 text-center -mt-3">
+            You need at least one verified session to export.
+          </p>
+        )}
+      </div>
+
+      {/* ── RIGHT: Live PDF preview ────────────────────────────────────────── */}
+      <div className="flex-1 min-w-0">
+        <p className="text-h3 text-ink-900 mb-3">Preview</p>
+        {filteredSessions.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-[600px] bg-white rounded-xl border border-ink-200">
+            <FileText size={32} className="text-ink-300 mb-3" />
+            <p className="text-[14px] font-medium text-ink-900 mb-1">Nothing to preview.</p>
+            <p className="text-small text-ink-500">Adjust your date range or log some sessions.</p>
+          </div>
+        ) : (
+          <PDFViewer
+            width="100%"
+            height={700}
+            style={{ border: 'none', borderRadius: '12px', overflow: 'hidden' }}
+          >
+            {pdfDoc}
+          </PDFViewer>
+        )}
+      </div>
+    </div>
+  );
+}

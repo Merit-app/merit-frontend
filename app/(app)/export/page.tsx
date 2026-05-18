@@ -1,1 +1,18 @@
-export default function Page() { return null; }
+import type { Metadata } from 'next';
+import { PdfExportClient } from '@/components/export/pdf-export-client';
+
+export const metadata: Metadata = { title: 'Export' };
+
+export default function ExportPage() {
+  return (
+    <div className="px-8 py-8">
+      <div className="mb-6">
+        <h1 className="text-h1 text-ink-900">Export</h1>
+        <p className="text-small text-ink-500 mt-1">
+          Download a verified PDF of your hours for NHS, scholarships, or college applications.
+        </p>
+      </div>
+      <PdfExportClient />
+    </div>
+  );
+}
