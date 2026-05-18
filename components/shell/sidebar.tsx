@@ -12,7 +12,6 @@ import {
   CircleHelp,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useMeritStore } from '@/lib/store';
 import { UserMenu } from './user-menu';
 
 const primaryNav = [
@@ -39,12 +38,12 @@ export function Sidebar() {
     <aside className="fixed inset-y-0 left-0 z-30 flex w-60 flex-col bg-ink-50 border-r border-ink-200">
       {/* Logo */}
       <div className="flex h-14 items-center px-5 border-b border-ink-200">
-        <div>
-          <span className="text-[18px] font-semibold tracking-tight text-ink-900">
+        <Link href="/dashboard" className="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merit-blue-600 rounded-md">
+          <span className="text-[18px] font-semibold tracking-tight text-ink-900 group-hover:text-ink-700 transition-colors">
             merit<span className="text-merit-blue-600">.</span>
           </span>
           <p className="text-micro text-ink-500 mt-0.5">Service hours · 2024–25</p>
-        </div>
+        </Link>
       </div>
 
       <nav className="flex flex-1 flex-col gap-1 px-3 py-4 overflow-y-auto">

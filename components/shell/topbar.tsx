@@ -1,6 +1,6 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Bell, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useMeritStore } from '@/lib/store';
@@ -34,6 +34,7 @@ function getPageTitle(pathname: string): string {
 export function Topbar() {
   const pathname = usePathname();
   const user = useMeritStore((s) => s.user);
+  const router = useRouter();
   const { open } = useCommandPalette();
 
   const title = getPageTitle(pathname);
@@ -63,10 +64,11 @@ export function Topbar() {
 
         {/* Notifications */}
         <button
+          onClick={() => router.push('/settings/notifications')}
           className={cn(
             'relative flex h-8 w-8 items-center justify-center rounded-lg',
             'text-ink-500 hover:bg-ink-100 hover:text-ink-700',
-            'transition-colors duration-100',
+            'transition-colors duration-100 cursor-pointer',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merit-blue-600'
           )}
           title="Notifications"
