@@ -1,5 +1,155 @@
-import { redirect } from 'next/navigation';
+import Link from 'next/link';
+import { CheckCircle, ShieldCheck, FileText, Clock } from 'lucide-react';
 
-export default function RootPage() {
-  redirect('/login');
+const FEATURES = [
+  {
+    icon: ShieldCheck,
+    title: 'SMS-verified hours',
+    body: "Text your supervisor's number. They reply YES. Your hour is verified — no paperwork, no chasing emails.",
+  },
+  {
+    icon: Clock,
+    title: 'Track every session',
+    body: 'Log the date, organization, activity, and duration in under a minute. Every session is timestamped and stored.',
+  },
+  {
+    icon: FileText,
+    title: 'Export a signed PDF',
+    body: 'Generate a clean, credentialed PDF of your record whenever you need it — NHS submissions, scholarships, applications.',
+  },
+  {
+    icon: CheckCircle,
+    title: 'NHS-ready by design',
+    body: "Merit tracks verified vs. pending hours separately so you always know exactly where you stand against your chapter's goal.",
+  },
+];
+
+const SOCIAL_PROOF = [
+  { name: 'Maya T.', school: 'Burnaby North Secondary', quote: 'I used to keep a spreadsheet. Merit replaced it in a week.' },
+  { name: 'Jordan K.', school: 'Eric Hamber Secondary', quote: 'My NHS advisor asked me to recommend this to the whole chapter.' },
+  { name: 'Priya S.', school: 'Lord Byng Secondary', quote: 'The PDF export is exactly what UBC wanted for my scholarship application.' },
+];
+
+export default function LandingPage() {
+  return (
+    <div className="min-h-screen bg-[#FAFAF9]">
+      {/* Nav */}
+      <nav className="flex items-center justify-between px-8 py-5 border-b border-ink-200 bg-white">
+        <span className="text-[18px] font-bold text-ink-900 tracking-tight">
+          merit<span className="text-merit-blue-600">.</span>
+        </span>
+        <div className="flex items-center gap-4">
+          <Link
+            href="/login"
+            className="text-[13px] font-medium text-ink-600 hover:text-ink-900 transition-colors"
+          >
+            Sign in
+          </Link>
+          <Link
+            href="/signup"
+            className="text-[13px] font-medium text-white bg-merit-blue-600 hover:bg-merit-blue-700 px-4 py-2 rounded-lg transition-colors"
+          >
+            Get started free
+          </Link>
+        </div>
+      </nav>
+
+      {/* Hero */}
+      <section className="max-w-3xl mx-auto px-8 pt-20 pb-16 text-center">
+        <p className="text-[12px] font-semibold text-merit-blue-600 uppercase tracking-widest mb-4">
+          For high school students
+        </p>
+        <h1 className="text-[40px] font-bold text-ink-900 leading-tight tracking-tight mb-5">
+          Service hours you can actually prove.
+        </h1>
+        <p className="text-[16px] text-ink-500 leading-relaxed mb-8 max-w-xl mx-auto">
+          Merit logs your volunteer sessions, verifies them with your supervisor by SMS, and generates a signed PDF record — ready for NHS, scholarships, and college apps.
+        </p>
+        <div className="flex items-center justify-center gap-3 flex-wrap">
+          <Link
+            href="/signup"
+            className="text-[14px] font-semibold text-white bg-merit-blue-600 hover:bg-merit-blue-700 px-6 py-3 rounded-lg transition-colors"
+          >
+            Start tracking for free
+          </Link>
+          <Link
+            href="/login"
+            className="text-[14px] font-medium text-ink-600 hover:text-ink-900 border border-ink-200 bg-white hover:bg-ink-50 px-6 py-3 rounded-lg transition-colors"
+          >
+            Sign in
+          </Link>
+        </div>
+        <p className="text-[12px] text-ink-400 mt-4">No credit card. No app download. Works in your browser.</p>
+      </section>
+
+      {/* Feature grid */}
+      <section className="max-w-3xl mx-auto px-8 pb-20">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {FEATURES.map(({ icon: Icon, title, body }) => (
+            <div key={title} className="bg-white rounded-xl border border-ink-200 p-6">
+              <div className="flex items-center gap-2.5 mb-3">
+                <Icon size={16} className="text-merit-blue-600 shrink-0" />
+                <p className="text-[14px] font-semibold text-ink-900">{title}</p>
+              </div>
+              <p className="text-[13px] text-ink-500 leading-relaxed">{body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Social proof */}
+      <section className="border-t border-ink-200 bg-white">
+        <div className="max-w-3xl mx-auto px-8 py-16">
+          <p className="text-[11px] font-semibold text-ink-400 uppercase tracking-widest text-center mb-8">
+            What students say
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            {SOCIAL_PROOF.map(({ name, school, quote }) => (
+              <div key={name} className="rounded-xl border border-ink-200 p-5">
+                <p className="text-[13px] text-ink-700 leading-relaxed mb-4">
+                  &ldquo;{quote}&rdquo;
+                </p>
+                <div>
+                  <p className="text-[12px] font-semibold text-ink-900">{name}</p>
+                  <p className="text-[11px] text-ink-400">{school}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA banner */}
+      <section className="bg-merit-blue-600">
+        <div className="max-w-3xl mx-auto px-8 py-14 text-center">
+          <h2 className="text-[26px] font-bold text-white mb-3">
+            Your NHS advisor will notice the difference.
+          </h2>
+          <p className="text-[14px] text-merit-blue-100 mb-6">
+            Stop tracking hours in a spreadsheet. Start with Merit today — it takes two minutes.
+          </p>
+          <Link
+            href="/signup"
+            className="inline-flex text-[14px] font-semibold text-merit-blue-600 bg-white hover:bg-merit-blue-50 px-6 py-3 rounded-lg transition-colors"
+          >
+            Create your free account
+          </Link>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-ink-200 bg-white">
+        <div className="max-w-3xl mx-auto px-8 py-8 flex items-center justify-between text-[12px] text-ink-400">
+          <span>
+            merit<span className="text-merit-blue-600">.</span>
+            {' '}— Service hour tracking for students
+          </span>
+          <div className="flex items-center gap-5">
+            <Link href="/login" className="hover:text-ink-700 transition-colors">Sign in</Link>
+            <a href="mailto:hello@merit.app" className="hover:text-ink-700 transition-colors">hello@merit.app</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
 }
