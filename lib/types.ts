@@ -101,4 +101,5 @@ export interface MeritStore {
   addOrganization: (org: Organization) => void;
   updateUser: (patch: Partial<User>) => void;
   updateNotifications: (patch: Partial<NotificationPreferences>) => void;
+  clearSessions: () => void;
 }

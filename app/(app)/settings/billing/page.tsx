@@ -27,7 +27,7 @@ export default function BillingPage() {
   const isPremium = user.plan === 'premium';
 
   return (
-    <div className="px-8 py-8 max-w-2xl">
+    <div className="max-w-2xl">
       <div className="mb-6">
         <h2 className="text-h1 text-ink-900">Plan & billing</h2>
         <p className="text-small text-ink-500 mt-1">Manage your subscription and payment details.</p>

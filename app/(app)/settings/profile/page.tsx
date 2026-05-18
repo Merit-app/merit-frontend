@@ -58,7 +58,7 @@ export default function ProfilePage() {
   const initials = `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
 
   return (
-    <div className="px-8 py-8 max-w-2xl">
+    <div className="max-w-2xl">
       <div className="mb-6">
         <h2 className="text-h1 text-ink-900">Profile</h2>
         <p className="text-small text-ink-500 mt-1">Your personal details and school information.</p>

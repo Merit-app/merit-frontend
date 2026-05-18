@@ -51,6 +51,8 @@ export const useMeritStore = create<MeritStore>()(
         set((state) => ({
           notifications: { ...state.notifications, ...patch },
         })),
+
+      clearSessions: () => set({ sessions: [] }),
     }),
     {
       name: 'merit-store',
