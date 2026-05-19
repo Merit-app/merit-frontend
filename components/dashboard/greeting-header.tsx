@@ -43,7 +43,7 @@ export function GreetingHeader() {
 
   return (
     <div className="mb-8">
-      <h1 className="text-display text-ink-900">Hey {user.firstName} —</h1>
+      <h1 className="text-[26px] font-semibold leading-tight tracking-tight md:text-[36px] text-ink-900">Hey {user.firstName} —</h1>
       <p className="mt-1.5 text-[16px] text-ink-500 leading-snug">{subtext}</p>
     </div>
   );

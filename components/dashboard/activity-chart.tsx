@@ -76,7 +76,8 @@ export default function ActivityChart() {
   return (
     <div className="bg-white rounded-xl border border-ink-200 p-6 mb-6">
       <h3 className="text-h3 text-ink-900 mb-5">Activity</h3>
-      <div className="h-44">
+      <div className="overflow-x-auto -mx-2">
+      <div className="min-w-[320px] h-[200px] md:h-44 px-2">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={data}
@@ -108,6 +109,7 @@ export default function ActivityChart() {
             </Bar>
           </BarChart>
         </ResponsiveContainer>
+      </div>
       </div>
     </div>
   );

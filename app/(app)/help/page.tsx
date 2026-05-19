@@ -30,7 +30,7 @@ const FAQS = [
 
 export default function HelpPage() {
   return (
-    <div className="px-8 py-8 max-w-2xl">
+    <div className="px-4 py-4 md:px-8 md:py-6 max-w-2xl">
       <div className="mb-8">
         <h1 className="text-h1 text-ink-900">Help</h1>
         <p className="text-small text-ink-500 mt-1">Answers to common questions about Merit.</p>

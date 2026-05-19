@@ -77,7 +77,7 @@ export default function HoursPage() {
   }
 
   return (
-    <div className="px-8 py-8">
+    <div className="px-4 py-4 md:px-8 md:py-6">
       {/* Top bar */}
       <div className="flex items-center justify-between mb-6">
         {/* Filter chips */}
@@ -139,7 +139,7 @@ export default function HoursPage() {
           </Link>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-ink-200 overflow-hidden">
+        <div className="bg-white rounded-xl border border-ink-200 overflow-hidden overflow-x-auto">
           {/* Header row */}
           <div className="grid grid-cols-[120px_1fr_1fr_80px_140px_100px_40px] gap-3 px-4 py-2.5 border-b border-ink-200 bg-ink-50">
             {([

@@ -32,7 +32,7 @@ export default function OrgDetailPage({ params }: { params: Promise<{ slug: stri
   const hoursStr = totalHours % 1 === 0 ? `${totalHours}` : totalHours.toFixed(1);
 
   return (
-    <div className="px-8 py-8">
+    <div className="px-4 py-4 md:px-8 md:py-6">
       {/* Breadcrumb */}
       <p className="text-small text-ink-500 mb-4">
         <Link href="/organizations" className="hover:text-ink-700 transition-colors">
@@ -42,7 +42,7 @@ export default function OrgDetailPage({ params }: { params: Promise<{ slug: stri
         <span className="text-ink-700">{org.name}</span>
       </p>
 
-      <div className="flex gap-8 items-start">
+      <div className="flex flex-col md:flex-row gap-8 items-start">
         {/* ── LEFT: Session list ───────────────────────────────────────────── */}
         <div className="flex-1 min-w-0">
           {/* Header */}
@@ -98,7 +98,7 @@ export default function OrgDetailPage({ params }: { params: Promise<{ slug: stri
         </div>
 
         {/* ── RIGHT: Org sidebar ───────────────────────────────────────────── */}
-        <div className="w-64 shrink-0 space-y-4">
+        <div className="w-full md:w-64 md:shrink-0 space-y-4">
           {/* Stats */}
           <div className="bg-white rounded-xl border border-ink-200 p-5 space-y-3">
             <p className="text-h3 text-ink-900">Summary</p>

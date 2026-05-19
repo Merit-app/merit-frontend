@@ -111,7 +111,7 @@ export function StatsRow() {
     : `${stats.weekDelta > 0 ? '+' : ''}${stats.weekDelta % 1 === 0 ? stats.weekDelta : stats.weekDelta.toFixed(1)} hrs vs last week`;
 
   return (
-    <div className="grid grid-cols-3 gap-4 mb-6">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
       <StatCard
         label="This week"
         value={`${weekHoursStr} hrs`}

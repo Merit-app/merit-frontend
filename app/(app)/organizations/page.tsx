@@ -31,7 +31,7 @@ export default function OrganizationsPage() {
   }, [organizations, category, query]);
 
   return (
-    <div className="px-8 py-8">
+    <div className="px-4 py-4 md:px-8 md:py-6">
       {/* Search + filter */}
       <div className="flex items-center gap-3 mb-6 flex-wrap">
         <div className="relative flex-1 min-w-56 max-w-sm">

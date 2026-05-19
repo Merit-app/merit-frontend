@@ -101,14 +101,14 @@ export default function LogPage() {
 
   if (success) {
     return (
-      <div className="px-8 py-8">
+      <div className="px-4 py-4 md:px-8 md:py-6">
         <SuccessState supervisorName={submittedSupervisor} onLogAnother={handleLogAnother} />
       </div>
     );
   }
 
   return (
-    <div className="px-8 py-8">
+    <div className="px-4 py-4 md:px-8 md:py-6">
       <div className="mb-6">
         <h1 className="text-h1 text-ink-900">Log hours</h1>
         <p className="text-small text-ink-500 mt-1">
@@ -116,7 +116,7 @@ export default function LogPage() {
         </p>
       </div>
 
-      <div className="flex gap-8 items-start">
+      <div className="flex flex-col md:flex-row gap-8 items-start">
         {/* ── LEFT: Form (60%) ────────────────────────────────────────────── */}
         <div className="flex-[3] min-w-0 space-y-5">
 
@@ -302,7 +302,7 @@ export default function LogPage() {
         </div>
 
         {/* ── RIGHT: SMS Preview (40%) ─────────────────────────────────────── */}
-        <div className="flex-[2] min-w-0 sticky top-6">
+        <div className="w-full md:flex-[2] md:min-w-0 md:sticky md:top-6">
           <SmsPreview
             supervisorName={watchedValues.supervisorName}
             studentName={`${user.firstName} ${user.lastName}`}
