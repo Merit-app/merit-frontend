@@ -28,7 +28,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <CommandPalette />
 
       {/* Main content area */}
-      <div className="flex flex-col flex-1 md:ml-60 min-h-screen overflow-hidden">
+      <div className="flex flex-col flex-1 md:ml-60 overflow-hidden">
         <Topbar />
         {/* pt-14 for topbar, pb-14 md:pb-0 for mobile nav */}
         <main className="flex-1 overflow-y-auto pt-14 pb-14 md:pb-0">

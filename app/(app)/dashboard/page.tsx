@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: 'Dashboard' };
 
 export default function DashboardPage() {
   return (
-    <div className="px-4 py-4 md:px-8 md:py-6 max-w-4xl">
+    <div className="w-full px-4 py-4 md:px-8 md:py-6 max-w-4xl mx-auto">
       <GreetingHeader />
       <GoalProgressCard />
       <StatsRow />
