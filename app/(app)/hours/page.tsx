@@ -139,55 +139,58 @@ export default function HoursPage() {
           </Link>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-ink-200 overflow-hidden overflow-x-auto">
-          {/* Header row */}
-          <div className="grid grid-cols-[120px_1fr_1fr_80px_140px_100px_40px] gap-3 px-4 py-2.5 border-b border-ink-200 bg-ink-50">
-            {([
-              { key: 'date',   label: 'Date' },
-              { key: 'org',    label: 'Organization' },
-              { label: 'Activity', noSort: true },
-              { key: 'hours',  label: 'Hours' },
-              { label: 'Tier', noSort: true },
-              { key: 'status', label: 'Status' },
-              { label: '',     noSort: true },
-            ] as { key?: SortKey; label: string; noSort?: boolean }[]).map(({ key, label, noSort }) => (
-              <button
-                key={label || 'actions'}
-                type="button"
-                onClick={() => key && toggleSort(key)}
-                disabled={noSort}
-                className={cn(
-                  'flex items-center text-[11px] font-semibold uppercase tracking-wide text-ink-500 text-left',
-                  !noSort && 'hover:text-ink-700 cursor-pointer',
-                  noSort && 'cursor-default'
-                )}
-              >
-                {label}
-                {key && <SortIcon col={key} />}
-              </button>
-            ))}
-          </div>
+        <div className="bg-white rounded-xl border border-ink-200 overflow-x-auto">
+          {/* min-w wrapper ensures header and rows share the same width context */}
+          <div className="min-w-[780px]">
+            {/* Header row */}
+            <div className="grid grid-cols-[120px_1fr_1fr_80px_140px_100px_40px] gap-3 px-4 py-2.5 border-b border-ink-200 bg-ink-50">
+              {([
+                { key: 'date',   label: 'Date' },
+                { key: 'org',    label: 'Organization' },
+                { label: 'Activity', noSort: true },
+                { key: 'hours',  label: 'Hours' },
+                { label: 'Tier', noSort: true },
+                { key: 'status', label: 'Status' },
+                { label: '',     noSort: true },
+              ] as { key?: SortKey; label: string; noSort?: boolean }[]).map(({ key, label, noSort }) => (
+                <button
+                  key={label || 'actions'}
+                  type="button"
+                  onClick={() => key && toggleSort(key)}
+                  disabled={noSort}
+                  className={cn(
+                    'flex items-center text-[11px] font-semibold uppercase tracking-wide text-ink-500 text-left',
+                    !noSort && 'hover:text-ink-700 cursor-pointer',
+                    noSort && 'cursor-default'
+                  )}
+                >
+                  {label}
+                  {key && <SortIcon col={key} />}
+                </button>
+              ))}
+            </div>
 
-          {/* Rows */}
-          {filtered.map((session) => {
-            const hoursStr = session.hours % 1 === 0 ? `${session.hours}` : session.hours.toFixed(1);
-            return (
-              <button
-                key={session.id}
-                type="button"
-                onClick={() => { setSelectedSession(session); setSheetOpen(true); }}
-                className="w-full grid grid-cols-[120px_1fr_1fr_80px_140px_100px_40px] gap-3 px-4 py-3.5 border-b border-ink-100 last:border-0 hover:bg-ink-50 transition-colors duration-100 text-left items-center cursor-pointer"
-              >
-                <span className="text-[13px] text-ink-500 tabular-nums">{formatSessionDate(session.date)}</span>
-                <span className="text-[13px] font-medium text-ink-900 truncate">{session.org}</span>
-                <span className="text-[12px] text-ink-500 truncate">{session.activity}</span>
-                <span className="text-[13px] font-medium text-ink-900 tabular-nums">{hoursStr} hrs</span>
-                <span><TierBadge tier={session.tier} /></span>
-                <span><StatusBadge status={session.status} /></span>
-                <span className="text-ink-300 text-[18px] leading-none select-none">›</span>
-              </button>
-            );
-          })}
+            {/* Rows */}
+            {filtered.map((session) => {
+              const hoursStr = session.hours % 1 === 0 ? `${session.hours}` : session.hours.toFixed(1);
+              return (
+                <button
+                  key={session.id}
+                  type="button"
+                  onClick={() => { setSelectedSession(session); setSheetOpen(true); }}
+                  className="w-full grid grid-cols-[120px_1fr_1fr_80px_140px_100px_40px] gap-3 px-4 py-3.5 border-b border-ink-100 last:border-0 hover:bg-ink-50 transition-colors duration-100 text-left items-center cursor-pointer"
+                >
+                  <span className="text-[13px] text-ink-500 tabular-nums">{formatSessionDate(session.date)}</span>
+                  <span className="text-[13px] font-medium text-ink-900 truncate">{session.org}</span>
+                  <span className="text-[12px] text-ink-500 truncate">{session.activity}</span>
+                  <span className="text-[13px] font-medium text-ink-900 tabular-nums">{hoursStr} hrs</span>
+                  <span><TierBadge tier={session.tier} /></span>
+                  <span><StatusBadge status={session.status} /></span>
+                  <span className="text-ink-300 text-[18px] leading-none select-none">›</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       )}
 

@@ -62,9 +62,9 @@ export default function PdfExportInner() {
   const fileName = `merit-${user.firstName.toLowerCase()}-${user.lastName.toLowerCase()}-${new Date().getFullYear()}.pdf`;
 
   return (
-    <div className="flex gap-8 items-start">
+    <div className="flex flex-col lg:flex-row gap-8 items-start">
       {/* ── LEFT: Options panel ───────────────────────────────────────────── */}
-      <div className="w-72 shrink-0 space-y-5">
+      <div className="w-full lg:w-72 lg:shrink-0 space-y-5">
 
         {/* What to include */}
         <div className="bg-white rounded-xl border border-ink-200 p-5 space-y-3">
@@ -199,7 +199,7 @@ export default function PdfExportInner() {
           <PDFViewer
             width="100%"
             height={700}
-            style={{ border: 'none', borderRadius: '12px', overflow: 'hidden' }}
+            style={{ border: 'none', borderRadius: '12px' }}
           >
             {pdfDoc}
           </PDFViewer>
