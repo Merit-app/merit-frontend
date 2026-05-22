@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useMeritStore } from '@/lib/store';
+import { authApi, mapUser, ApiError } from '@/lib/api';
 import { cn } from '@/lib/utils';
 
 const schema = z.object({
@@ -25,6 +26,7 @@ export default function LoginPage() {
   const router = useRouter();
   const login = useMeritStore((s) => s.login);
   const [loading, setLoading] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const {
     register,
@@ -32,13 +34,33 @@ export default function LoginPage() {
     formState: { errors },
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
-  async function onSubmit() {
+  async function onSubmit(data: FormData) {
     setLoading(true);
-    // Simulate network delay
-    await new Promise((r) => setTimeout(r, 700));
-    login();
-    toast.success('Welcome back, Kai.');
-    router.replace('/dashboard');
+    setServerError(null);
+    try {
+      const res = await authApi.login(data.email, data.password);
+      const { user: rawUser, session } = res.data;
+      login(mapUser(rawUser), {
+        accessToken: session.accessToken,
+        refreshToken: session.refreshToken,
+        expiresAt: session.expiresAt,
+      });
+      router.replace('/dashboard');
+    } catch (err) {
+      if (err instanceof ApiError) {
+        if (err.status === 401) {
+          setServerError('Incorrect email or password.');
+        } else if (err.status === 423) {
+          setServerError('Account temporarily locked. Try again in 15 minutes.');
+        } else {
+          setServerError(err.message || 'Something went wrong. Try again.');
+        }
+      } else {
+        setServerError('Could not reach the server. Check your connection.');
+      }
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -55,6 +77,13 @@ export default function LoginPage() {
         {/* Card */}
         <div className="bg-white rounded-xl border border-ink-200 p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            {/* Server error */}
+            {serverError && (
+              <div className="rounded-lg bg-danger/8 border border-danger/20 px-3 py-2.5">
+                <p className="text-[13px] text-danger">{serverError}</p>
+              </div>
+            )}
+
             {/* Email */}
             <div className="space-y-1.5">
               <Label htmlFor="email" className="text-[13px] font-medium text-ink-900">
@@ -79,13 +108,12 @@ export default function LoginPage() {
                 <Label htmlFor="password" className="text-[13px] font-medium text-ink-900">
                   Password
                 </Label>
-                <button
-                  type="button"
+                <Link
+                  href="/forgot-password"
                   className="text-[13px] text-merit-blue-600 hover:text-merit-blue-700 transition-colors"
-                  onClick={() => toast.info('Password reset is coming soon.')}
                 >
                   Forgot password?
-                </button>
+                </Link>
               </div>
               <Input
                 id="password"
@@ -116,28 +144,6 @@ export default function LoginPage() {
               )}
             </Button>
           </form>
-
-          {/* Divider */}
-          <div className="my-5 flex items-center gap-3">
-            <div className="flex-1 h-px bg-ink-200" />
-            <span className="text-micro text-ink-400">or</span>
-            <div className="flex-1 h-px bg-ink-200" />
-          </div>
-
-          {/* Demo shortcut */}
-          <Button
-            variant="outline"
-            className="w-full border-ink-200 text-ink-700 hover:bg-ink-50 font-medium"
-            onClick={async () => {
-              setLoading(true);
-              await new Promise((r) => setTimeout(r, 400));
-              login();
-              toast.success('Signed in as Kai Johnson.');
-              router.replace('/dashboard');
-            }}
-          >
-            Continue as Kai (demo)
-          </Button>
         </div>
 
         <p className="mt-5 text-center text-small text-ink-500">

@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { useMeritStore } from '@/lib/store';
+import { usersApi, mapUser, ApiError } from '@/lib/api';
 import { cn } from '@/lib/utils';
 
 const schema = z.object({
@@ -17,7 +18,7 @@ const schema = z.object({
   lastName: z.string().min(1, 'Required'),
   school: z.string().min(1, 'Required'),
   grade: z.number().min(9).max(12),
-  graduationYear: z.number().min(2025).max(2030),
+  graduationYear: z.number().min(2025).max(2035),
   email: z.string().email('Enter a valid email'),
   phone: z.string().optional(),
 });
@@ -48,13 +49,28 @@ export default function ProfilePage() {
 
   async function onSubmit(data: FormData) {
     setSaving(true);
-    await new Promise((r) => setTimeout(r, 600));
-    updateUser(data);
-    setSaving(false);
-    toast.success('Profile saved.');
+    try {
+      const res = await usersApi.update({
+        name: `${data.firstName} ${data.lastName}`.trim(),
+        school: data.school,
+        grade: data.grade,
+        graduationYear: data.graduationYear,
+        phone: data.phone || undefined,
+      });
+      updateUser(mapUser(res.data.user));
+      toast.success('Profile saved.');
+    } catch (err) {
+      if (err instanceof ApiError) {
+        toast.error(err.message || 'Failed to save. Try again.');
+      } else {
+        toast.error('Could not reach the server.');
+      }
+    } finally {
+      setSaving(false);
+    }
   }
 
-  const initials = `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
+  const initials = `${user.firstName?.[0] ?? ''}${user.lastName?.[0] ?? ''}`.toUpperCase() || '??';
 
   return (
     <div className="max-w-2xl">
@@ -105,21 +121,21 @@ export default function ProfilePage() {
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <Label className="text-[13px] font-medium text-ink-900">Grade</Label>
-            <Input type="number" min={9} max={12} {...register('grade')} />
+            <Input type="number" min={9} max={12} {...register('grade', { valueAsNumber: true })} />
           </div>
           <div className="space-y-1.5">
             <Label className="text-[13px] font-medium text-ink-900">Graduation year</Label>
-            <Input type="number" min={2025} max={2030} {...register('graduationYear')} />
+            <Input type="number" min={2025} max={2035} {...register('graduationYear', { valueAsNumber: true })} />
           </div>
         </div>
 
         <Separator className="bg-ink-200" />
 
-        {/* Email */}
+        {/* Email (display only — email changes require a separate flow) */}
         <div className="space-y-1.5">
           <Label className="text-[13px] font-medium text-ink-900">Email</Label>
-          <Input type="email" {...register('email')} className={cn(errors.email && 'border-danger')} />
-          {errors.email && <p className="text-[13px] text-danger">{errors.email.message}</p>}
+          <Input type="email" disabled value={user.email} className="opacity-60 cursor-not-allowed" />
+          <p className="text-[12px] text-ink-500">Email changes are not yet supported.</p>
         </div>
 
         {/* Phone */}

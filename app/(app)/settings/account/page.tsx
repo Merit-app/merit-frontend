@@ -7,34 +7,53 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useMeritStore } from '@/lib/store';
+import { authApi, usersApi, ApiError } from '@/lib/api';
 
 export default function AccountPage() {
   const user = useMeritStore((s) => s.user);
   const logout = useMeritStore((s) => s.logout);
-  const clearSessions = useMeritStore((s) => s.clearSessions);
   const router = useRouter();
 
   const [confirmClear, setConfirmClear] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
-  function handleLogout() {
+  async function handleLogout() {
+    try {
+      await authApi.logout();
+    } catch {
+      // Ignore — logout locally regardless
+    }
     logout();
     router.replace('/login');
   }
 
   function handleClearSessions() {
     if (!confirmClear) { setConfirmClear(true); return; }
-    clearSessions();
+    // Clear local store only — the canonical record is on the server
+    useMeritStore.getState().clearSessions();
     setConfirmClear(false);
-    toast.success('All session data cleared.');
+    toast.success('Session data cleared locally. Server records are unchanged.');
   }
 
-  function handleDeleteAccount() {
+  async function handleDeleteAccount() {
     if (!confirmDelete) { setConfirmDelete(true); return; }
-    clearSessions();
-    logout();
-    toast.success('Account deleted. Goodbye.');
-    router.replace('/login');
+    setDeleting(true);
+    try {
+      await usersApi.delete();
+      logout();
+      toast.success("Account deletion scheduled. You'll receive a confirmation email.");
+      router.replace('/login');
+    } catch (err) {
+      if (err instanceof ApiError) {
+        toast.error(err.message || 'Failed to delete account. Try again.');
+      } else {
+        toast.error('Could not reach the server.');
+      }
+    } finally {
+      setDeleting(false);
+      setConfirmDelete(false);
+    }
   }
 
   return (
@@ -65,12 +84,12 @@ export default function AccountPage() {
           <p className="text-[13px] font-semibold text-danger">Danger zone</p>
         </div>
 
-        {/* Clear sessions */}
+        {/* Clear sessions (local only) */}
         <div className="px-5 py-4 border-t border-ink-100 flex items-center justify-between gap-6">
           <div>
-            <p className="text-[13px] font-medium text-ink-900">Clear all session data</p>
+            <p className="text-[13px] font-medium text-ink-900">Clear local session cache</p>
             <p className="text-small text-ink-500 mt-0.5">
-              Permanently removes all logged hours and sessions from this device. Your account remains active.
+              Clears your local cache. Data is still safe on the server and will reload on next visit.
             </p>
           </div>
           <div className="shrink-0">
@@ -95,7 +114,7 @@ export default function AccountPage() {
                 onClick={handleClearSessions}
                 className="text-[13px] font-medium text-danger border border-danger/40 hover:bg-danger/5 px-3 py-1.5 rounded-lg transition-colors"
               >
-                Clear data
+                Clear cache
               </button>
             )}
           </div>
@@ -106,7 +125,7 @@ export default function AccountPage() {
           <div>
             <p className="text-[13px] font-medium text-ink-900">Delete account</p>
             <p className="text-small text-ink-500 mt-0.5">
-              Wipes all data and signs you out. This cannot be undone.
+              Schedules your account for deletion in 30 days. You'll get a confirmation email.
             </p>
           </div>
           <div className="shrink-0">
@@ -120,10 +139,11 @@ export default function AccountPage() {
                 </button>
                 <button
                   onClick={handleDeleteAccount}
-                  className="flex items-center gap-1.5 text-[13px] font-medium text-white bg-danger hover:bg-danger/90 px-3 py-1.5 rounded-lg transition-colors"
+                  disabled={deleting}
+                  className="flex items-center gap-1.5 text-[13px] font-medium text-white bg-danger hover:bg-danger/90 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-60"
                 >
                   <Trash2 size={13} />
-                  Yes, delete
+                  {deleting ? 'Deleting...' : 'Yes, delete'}
                 </button>
               </div>
             ) : (

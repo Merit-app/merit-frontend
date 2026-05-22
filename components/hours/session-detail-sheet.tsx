@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { StatusBadge } from './status-badge';
 import { TierBadge } from './tier-badge';
 import { useMeritStore } from '@/lib/store';
+import { sessionsApi, ApiError } from '@/lib/api';
 import { formatLongDate, formatRelativeTime, formatPhone } from '@/lib/utils';
 import type { Session } from '@/lib/types';
 
@@ -33,7 +34,6 @@ function Row({ label, value }: { label: string; value: React.ReactNode }) {
 }
 
 export function SessionDetailSheet({ session, open, onClose }: Props) {
-  const updateSession = useMeritStore((s) => s.updateSession);
   const deleteSession = useMeritStore((s) => s.deleteSession);
   const [deleting, setDeleting] = useState(false);
   const [resending, setResending] = useState(false);
@@ -42,19 +42,37 @@ export function SessionDetailSheet({ session, open, onClose }: Props) {
 
   async function handleResend() {
     setResending(true);
-    await new Promise((r) => setTimeout(r, 800));
-    toast.success(`Verification re-sent to ${session!.supervisor}.`);
-    setResending(false);
+    try {
+      await sessionsApi.resend(session!.id);
+      toast.success(`Verification re-sent to ${session!.supervisor}.`);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        toast.error(err.message || 'Failed to resend. Try again.');
+      } else {
+        toast.error('Could not reach the server.');
+      }
+    } finally {
+      setResending(false);
+    }
   }
 
   async function handleDelete() {
     if (!confirm(`Delete this session at ${session!.org}? This can't be undone.`)) return;
     setDeleting(true);
-    await new Promise((r) => setTimeout(r, 400));
-    deleteSession(session!.id);
-    toast.success('Session deleted.');
-    setDeleting(false);
-    onClose();
+    try {
+      await sessionsApi.delete(session!.id);
+      deleteSession(session!.id);
+      toast.success('Session deleted.');
+      onClose();
+    } catch (err) {
+      if (err instanceof ApiError) {
+        toast.error(err.message || 'Failed to delete. Try again.');
+      } else {
+        toast.error('Could not reach the server.');
+      }
+    } finally {
+      setDeleting(false);
+    }
   }
 
   const hoursStr = session.hours % 1 === 0 ? `${session.hours}` : session.hours.toFixed(1);

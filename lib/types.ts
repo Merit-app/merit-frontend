@@ -84,6 +84,9 @@ export interface MeritStore {
   // Auth
   isAuthed: boolean;
   user: User;
+  accessToken: string | null;
+  refreshToken: string | null;
+  expiresAt: number | null;  // Unix seconds (Supabase format)
 
   // Data
   sessions: Session[];
@@ -93,8 +96,11 @@ export interface MeritStore {
   notifications: NotificationPreferences;
 
   // Actions
-  login: () => void;
+  login: (user: User, tokens: { accessToken: string; refreshToken: string; expiresAt: number }) => void;
   logout: () => void;
+  setTokens: (accessToken: string, refreshToken: string, expiresAt: number) => void;
+  setSessions: (sessions: Session[]) => void;
+  setOrganizations: (organizations: Organization[]) => void;
   addSession: (session: Session) => void;
   updateSession: (id: string, patch: Partial<Session>) => void;
   deleteSession: (id: string) => void;

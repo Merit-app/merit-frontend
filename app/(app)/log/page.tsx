@@ -17,8 +17,9 @@ import { OrgCombobox } from '@/components/log/org-combobox';
 import { SmsPreview } from '@/components/log/sms-preview';
 import { SuccessState } from '@/components/log/success-state';
 import { useMeritStore } from '@/lib/store';
+import { sessionsApi, mapSession, ApiError } from '@/lib/api';
 import { cn } from '@/lib/utils';
-import type { Organization, Session } from '@/lib/types';
+import type { Organization } from '@/lib/types';
 
 const schema = z.object({
   date: z.string().min(1, 'Select a date'),
@@ -68,27 +69,40 @@ export default function LogPage() {
   async function onSubmit(data: FormData) {
     if (!org) { setOrgError(true); return; }
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 900));
 
-    const session: Session = {
-      id: `s-${Date.now()}`,
-      org: org.name,
-      orgSlug: org.slug,
-      date: data.date,
-      hours: data.hours,
-      activity: data.activity,
-      supervisor: data.supervisorName,
-      supervisorPhone: data.supervisorPhone,
-      supervisorEmail: data.supervisorEmail || undefined,
-      status: 'pending',
-      tier: null,
-    };
+    try {
+      // Build the session payload — use orgId for existing orgs, newOrg for brand-new ones
+      const orgPayload = org.id
+        ? { orgId: org.id }
+        : { newOrg: { name: org.name } };
 
-    addSession(session);
-    setSubmittedSupervisor(data.supervisorName);
-    toast.success(`Hours logged. ${data.supervisorName} will get a text shortly.`);
-    setLoading(false);
-    setSuccess(true);
+      const res = await sessionsApi.create({
+        ...orgPayload,
+        date: data.date,
+        hours: data.hours,
+        activity: data.activity,
+        supervisorName: data.supervisorName,
+        supervisorPhone: data.supervisorPhone || undefined,
+        supervisorEmail: data.supervisorEmail || undefined,
+      });
+
+      const session = mapSession(res.data.session);
+      addSession(session);
+      setSubmittedSupervisor(data.supervisorName);
+      setSuccess(true);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        if (err.code === 'invalid_phone') {
+          toast.error('That phone number doesn\'t look right. Include the area code.');
+        } else {
+          toast.error(err.message || 'Failed to log session. Try again.');
+        }
+      } else {
+        toast.error('Could not reach the server. Check your connection.');
+      }
+    } finally {
+      setLoading(false);
+    }
   }
 
   function handleLogAnother() {
@@ -305,7 +319,7 @@ export default function LogPage() {
         <div className="w-full md:flex-[2] md:min-w-0 md:sticky md:top-6">
           <SmsPreview
             supervisorName={watchedValues.supervisorName}
-            studentName={`${user.firstName} ${user.lastName}`}
+            studentName={`${user.firstName} ${user.lastName}`.trim() || 'You'}
             hours={watchedValues.hours}
             org={org?.name ?? ''}
             date={watchedValues.date}

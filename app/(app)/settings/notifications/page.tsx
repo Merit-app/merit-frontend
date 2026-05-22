@@ -3,6 +3,7 @@
 import { toast } from 'sonner';
 import { Separator } from '@/components/ui/separator';
 import { useMeritStore } from '@/lib/store';
+import { usersApi, ApiError } from '@/lib/api';
 import type { NotificationKey } from '@/lib/types';
 
 const NOTIFICATION_OPTIONS: { key: NotificationKey; label: string; description: string }[] = [
@@ -32,10 +33,24 @@ export default function NotificationsPage() {
   const notifications = useMeritStore((s) => s.notifications);
   const updateNotifications = useMeritStore((s) => s.updateNotifications);
 
-  function toggle(key: NotificationKey) {
+  async function toggle(key: NotificationKey) {
     const next = !notifications[key];
+    // Optimistic update
     updateNotifications({ [key]: next });
-    toast.success(next ? 'Notification turned on.' : 'Notification turned off.');
+    try {
+      await usersApi.update({
+        notifications: { ...notifications, [key]: next },
+      });
+      toast.success(next ? 'Notification turned on.' : 'Notification turned off.');
+    } catch (err) {
+      // Rollback on failure
+      updateNotifications({ [key]: !next });
+      if (err instanceof ApiError) {
+        toast.error(err.message || 'Failed to save notification preference.');
+      } else {
+        toast.error('Could not reach the server.');
+      }
+    }
   }
 
   return (

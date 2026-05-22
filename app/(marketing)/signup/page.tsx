@@ -1,46 +1,115 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useMeritStore } from '@/lib/store';
+import { authApi, mapUser, ApiError } from '@/lib/api';
 import { cn } from '@/lib/utils';
 
 const schema = z.object({
   firstName: z.string().min(1, 'First name is required.'),
   lastName: z.string().min(1, 'Last name is required.'),
   school: z.string().min(1, 'School name is required.'),
+  dateOfBirth: z.string().min(1, 'Date of birth is required.'),
   email: z.string().email('Enter a valid email address.'),
   password: z.string().min(8, 'Password must be at least 8 characters.'),
+  parentEmail: z.string().email('Enter a valid parent email.').optional().or(z.literal('')),
 });
 
 type FormData = z.infer<typeof schema>;
+
+function calcAge(dob: string): number | null {
+  if (!dob) return null;
+  const d = new Date(dob);
+  if (isNaN(d.getTime())) return null;
+  const today = new Date();
+  let age = today.getFullYear() - d.getFullYear();
+  const m = today.getMonth() - d.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < d.getDate())) age--;
+  return age;
+}
 
 export default function SignupPage() {
   const router = useRouter();
   const login = useMeritStore((s) => s.login);
   const [loading, setLoading] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
-  async function onSubmit() {
+  const dobValue = useWatch({ control, name: 'dateOfBirth' });
+  const age = calcAge(dobValue);
+  const isMinor = age !== null && age >= 13 && age < 18;
+  const underThirteen = age !== null && age < 13;
+
+  async function onSubmit(data: FormData) {
+    if (underThirteen) {
+      setServerError('Users must be 13 or older to create an account.');
+      return;
+    }
+    if (isMinor && !data.parentEmail) {
+      setServerError('A parent or guardian email is required for users under 18.');
+      return;
+    }
+
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 800));
-    login();
-    toast.success('Account created. Welcome to Merit.');
-    router.replace('/dashboard');
+    setServerError(null);
+
+    try {
+      // 1. Create account
+      await authApi.signup({
+        email: data.email,
+        password: data.password,
+        name: `${data.firstName} ${data.lastName}`.trim(),
+        dateOfBirth: data.dateOfBirth,
+        school: data.school,
+        goalProgram: 'NHS',
+        goalHours: 75,
+        parentEmail: isMinor ? (data.parentEmail || undefined) : undefined,
+      });
+
+      // 2. Auto-login to get tokens
+      const loginRes = await authApi.login(data.email, data.password);
+      const { user: rawUser, session } = loginRes.data;
+      login(mapUser(rawUser), {
+        accessToken: session.accessToken,
+        refreshToken: session.refreshToken,
+        expiresAt: session.expiresAt,
+      });
+
+      router.replace('/dashboard');
+    } catch (err) {
+      if (err instanceof ApiError) {
+        if (err.code === 'email_taken') {
+          setServerError('An account with this email already exists.');
+        } else if (err.code === 'weak_password') {
+          setServerError('Password is too weak. Try something harder to guess.');
+        } else if (err.code === 'age_restricted') {
+          setServerError('Users must be 13 or older to create an account.');
+        } else if (err.code === 'parental_email_required') {
+          setServerError('A parent or guardian email is required for users under 18.');
+        } else {
+          setServerError(err.message || 'Something went wrong. Try again.');
+        }
+      } else {
+        setServerError('Could not reach the server. Check your connection.');
+      }
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -57,6 +126,13 @@ export default function SignupPage() {
         {/* Card */}
         <div className="bg-white rounded-xl border border-ink-200 p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {/* Server error */}
+            {serverError && (
+              <div className="rounded-lg bg-danger/8 border border-danger/20 px-3 py-2.5">
+                <p className="text-[13px] text-danger">{serverError}</p>
+              </div>
+            )}
+
             {/* Name row */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
@@ -105,6 +181,48 @@ export default function SignupPage() {
               )}
             </div>
 
+            {/* Date of Birth */}
+            <div className="space-y-1.5">
+              <Label htmlFor="dateOfBirth" className="text-[13px] font-medium text-ink-900">
+                Date of birth
+              </Label>
+              <Input
+                id="dateOfBirth"
+                type="date"
+                max={new Date().toISOString().split('T')[0]}
+                {...register('dateOfBirth')}
+                className={cn(errors.dateOfBirth && 'border-danger')}
+              />
+              {errors.dateOfBirth && (
+                <p className="text-[13px] text-danger">{errors.dateOfBirth.message}</p>
+              )}
+              {underThirteen && (
+                <p className="text-[13px] text-danger">You must be at least 13 to create an account.</p>
+              )}
+            </div>
+
+            {/* Parent email for minors */}
+            {isMinor && (
+              <div className="space-y-1.5">
+                <Label htmlFor="parentEmail" className="text-[13px] font-medium text-ink-900">
+                  Parent or guardian email
+                </Label>
+                <Input
+                  id="parentEmail"
+                  type="email"
+                  placeholder="parent@example.com"
+                  {...register('parentEmail')}
+                  className={cn(errors.parentEmail && 'border-danger')}
+                />
+                <p className="text-[12px] text-ink-500">
+                  Required for users under 18. They'll receive a consent link.
+                </p>
+                {errors.parentEmail && (
+                  <p className="text-[12px] text-danger">{errors.parentEmail.message}</p>
+                )}
+              </div>
+            )}
+
             {/* Email */}
             <div className="space-y-1.5">
               <Label htmlFor="email" className="text-[13px] font-medium text-ink-900">
@@ -144,8 +262,8 @@ export default function SignupPage() {
             {/* Submit */}
             <Button
               type="submit"
-              disabled={loading}
-              className="w-full mt-1 bg-merit-blue-600 hover:bg-merit-blue-700 active:scale-[0.98] text-white font-medium transition-all duration-100"
+              disabled={loading || underThirteen}
+              className="w-full mt-1 bg-merit-blue-600 hover:bg-merit-blue-700 active:scale-[0.98] text-white font-medium transition-all duration-100 disabled:opacity-50"
             >
               {loading ? (
                 <>

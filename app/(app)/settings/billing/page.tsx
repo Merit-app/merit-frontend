@@ -1,9 +1,11 @@
 'use client';
 
-import { Check, Zap, Lock } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Check, Zap, Lock, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useMeritStore } from '@/lib/store';
+import { billingApi, ApiError } from '@/lib/api';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -22,9 +24,85 @@ const PREMIUM_FEATURES = [
   'Priority support',
 ];
 
+const PREMIUM_PRICE_ID = process.env.NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID ?? '';
+
+interface BillingInfo {
+  plan: string;
+  status: string | null;
+  currentPeriodEnd: string | null;
+  cancelAtPeriodEnd: boolean;
+  paymentMethod: { brand: string; last4: string; expMonth: number; expYear: number } | null;
+}
+
 export default function BillingPage() {
   const user = useMeritStore((s) => s.user);
+  const updateUser = useMeritStore((s) => s.updateUser);
   const isPremium = user.plan === 'premium';
+
+  const [billing, setBilling] = useState<BillingInfo | null>(null);
+  const [loadingBilling, setLoadingBilling] = useState(true);
+  const [upgrading, setUpgrading] = useState(false);
+  const [openingPortal, setOpeningPortal] = useState(false);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await billingApi.subscription();
+        setBilling(res.data);
+      } catch {
+        // Non-fatal — show static plan info
+      } finally {
+        setLoadingBilling(false);
+      }
+    }
+    load();
+  }, []);
+
+  async function handleUpgrade() {
+    setUpgrading(true);
+    try {
+      const res = await billingApi.createCheckout(PREMIUM_PRICE_ID || 'price_placeholder');
+      if (res.data?.url) {
+        window.location.href = res.data.url;
+      } else {
+        toast.error('Could not start checkout. Try again.');
+      }
+    } catch (err) {
+      if (err instanceof ApiError) {
+        toast.error(err.message || 'Checkout failed. Try again.');
+      } else {
+        toast.error('Could not reach the server.');
+      }
+    } finally {
+      setUpgrading(false);
+    }
+  }
+
+  async function handleManage() {
+    setOpeningPortal(true);
+    try {
+      const res = await billingApi.createPortal();
+      if (res.data?.url) {
+        window.location.href = res.data.url;
+      } else {
+        toast.error('Could not open billing portal. Try again.');
+      }
+    } catch (err) {
+      if (err instanceof ApiError) {
+        toast.error(err.message || 'Could not open billing portal.');
+      } else {
+        toast.error('Could not reach the server.');
+      }
+    } finally {
+      setOpeningPortal(false);
+    }
+  }
+
+  const nextBillingDate = billing?.currentPeriodEnd
+    ? new Date(billing.currentPeriodEnd).toLocaleDateString('en-US', {
+        year: 'numeric', month: 'long', day: 'numeric',
+      })
+    : null;
 
   return (
     <div className="max-w-2xl">
@@ -43,15 +121,34 @@ export default function BillingPage() {
         <div>
           <p className="text-[13px] font-medium text-ink-900 capitalize">{user.plan} plan</p>
           <p className="text-small text-ink-500 mt-0.5">
-            {isPremium ? 'Next billing date: Jul 1, 2025' : 'Free forever for core features'}
+            {isPremium && nextBillingDate
+              ? `Next billing date: ${nextBillingDate}`
+              : isPremium
+              ? 'Active subscription'
+              : 'Free forever for core features'}
           </p>
         </div>
-        {!isPremium && (
+        {isPremium ? (
+          <Button
+            variant="outline"
+            className="border-merit-blue-200 text-merit-blue-700 hover:bg-merit-blue-100 font-medium text-[13px]"
+            disabled={openingPortal}
+            onClick={handleManage}
+          >
+            {openingPortal ? <Loader2 size={14} className="animate-spin mr-1.5" /> : null}
+            Manage subscription
+          </Button>
+        ) : (
           <Button
             className="bg-merit-blue-600 hover:bg-merit-blue-700 text-white font-medium text-[13px]"
-            onClick={() => toast.info('Upgrade flow coming soon.')}
+            onClick={handleUpgrade}
+            disabled={upgrading}
           >
-            <Zap size={14} className="mr-1.5" />
+            {upgrading ? (
+              <Loader2 size={14} className="animate-spin mr-1.5" />
+            ) : (
+              <Zap size={14} className="mr-1.5" />
+            )}
             Upgrade to Premium
           </Button>
         )}
@@ -110,15 +207,20 @@ export default function BillingPage() {
           {!isPremium && (
             <Button
               className="w-full mt-5 bg-merit-blue-600 hover:bg-merit-blue-700 text-white font-medium text-[13px]"
-              onClick={() => toast.info('Upgrade flow coming soon.')}
+              onClick={handleUpgrade}
+              disabled={upgrading}
             >
+              {upgrading ? (
+                <Loader2 size={14} className="animate-spin mr-1.5" />
+              ) : null}
               Upgrade — $4/mo
             </Button>
           )}
         </div>
       </div>
 
-      {isPremium && (
+      {/* Payment method (premium only, from Stripe) */}
+      {isPremium && billing?.paymentMethod && (
         <>
           <Separator className="my-8 bg-ink-200" />
           <div>
@@ -129,20 +231,26 @@ export default function BillingPage() {
                   <Lock size={12} className="text-ink-400" />
                 </div>
                 <div>
-                  <p className="text-[13px] font-medium text-ink-900">Visa ending in 4242</p>
-                  <p className="text-[12px] text-ink-500">Expires 08 / 27</p>
+                  <p className="text-[13px] font-medium text-ink-900 capitalize">
+                    {billing.paymentMethod.brand} ending in {billing.paymentMethod.last4}
+                  </p>
+                  <p className="text-[12px] text-ink-500">
+                    Expires {billing.paymentMethod.expMonth} / {String(billing.paymentMethod.expYear).slice(2)}
+                  </p>
                 </div>
               </div>
               <button
                 className="text-[13px] text-merit-blue-600 hover:text-merit-blue-700 font-medium"
-                onClick={() => toast.info('Payment management coming soon.')}
+                onClick={handleManage}
+                disabled={openingPortal}
               >
                 Update
               </button>
             </div>
             <button
               className="mt-4 text-[13px] text-danger hover:text-danger/80 font-medium"
-              onClick={() => toast.error('To cancel, contact support@merit.app')}
+              onClick={handleManage}
+              disabled={openingPortal}
             >
               Cancel subscription
             </button>

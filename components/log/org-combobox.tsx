@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { Check, ChevronsUpDown, Plus, X } from 'lucide-react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { Check, ChevronsUpDown, Plus, X, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useMeritStore } from '@/lib/store';
+import { orgsApi, mapOrg } from '@/lib/api';
 import type { Organization } from '@/lib/types';
-import { slugify } from '@/lib/utils';
 
 interface Props {
   value: Organization | null;
@@ -20,19 +19,15 @@ const CATEGORY_OPTIONS = [
 export function OrgCombobox({ value, onChange }: Props) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const [results, setResults] = useState<Organization[]>([]);
+  const [searching, setSearching] = useState(false);
   const [creatingNew, setCreatingNew] = useState(false);
   const [newOrgName, setNewOrgName] = useState('');
   const [newOrgCategory, setNewOrgCategory] = useState<string>('Community');
   const [justVerified, setJustVerified] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-
-  const organizations = useMeritStore((s) => s.organizations);
-  const addOrganization = useMeritStore((s) => s.addOrganization);
-
-  const filtered = organizations.filter((o) =>
-    o.name.toLowerCase().includes(query.toLowerCase())
-  );
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (open) inputRef.current?.focus();
@@ -49,11 +44,36 @@ export function OrgCombobox({ value, onChange }: Props) {
     return () => document.removeEventListener('mousedown', onClickOutside);
   }, []);
 
+  // Debounced API search
+  const search = useCallback((q: string) => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (!q.trim()) {
+      setResults([]);
+      setSearching(false);
+      return;
+    }
+    setSearching(true);
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const res = await orgsApi.search(q);
+        setResults((res.data ?? []).map(mapOrg));
+      } catch {
+        setResults([]);
+      } finally {
+        setSearching(false);
+      }
+    }, 300);
+  }, []);
+
+  useEffect(() => {
+    search(query);
+  }, [query, search]);
+
   function selectOrg(org: Organization) {
     onChange(org);
     setOpen(false);
     setQuery('');
-    // Flash verified check if registered/institutional
+    setResults([]);
     if (org.registrationStatus !== 'unregistered') {
       setJustVerified(true);
       setTimeout(() => setJustVerified(false), 1500);
@@ -62,14 +82,14 @@ export function OrgCombobox({ value, onChange }: Props) {
 
   function createOrg() {
     if (!newOrgName.trim()) return;
+    // Pass id='' to signal a new org; log/page.tsx passes it as newOrg to the API
     const org: Organization = {
-      id: `org-${Date.now()}`,
-      slug: slugify(newOrgName),
+      id: '',
+      slug: '',
       name: newOrgName.trim(),
       category: newOrgCategory as Organization['category'],
       registrationStatus: 'unregistered',
     };
-    addOrganization(org);
     selectOrg(org);
     setCreatingNew(false);
     setNewOrgName('');
@@ -116,21 +136,25 @@ export function OrgCombobox({ value, onChange }: Props) {
         >
           {!creatingNew ? (
             <>
-              <div className="px-3 pt-3 pb-2">
+              <div className="px-3 pt-3 pb-2 flex items-center gap-2">
                 <input
                   ref={inputRef}
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Type to search..."
-                  className="w-full text-[13px] text-ink-900 placeholder:text-ink-400 outline-none"
+                  className="flex-1 text-[13px] text-ink-900 placeholder:text-ink-400 outline-none"
                 />
+                {searching && <Loader2 size={13} className="text-ink-400 animate-spin shrink-0" />}
               </div>
               <div className="border-t border-ink-100" />
               <div className="max-h-52 overflow-y-auto py-1">
-                {filtered.length === 0 && (
+                {!searching && query && results.length === 0 && (
                   <p className="px-3 py-2 text-[13px] text-ink-500">No results for "{query}"</p>
                 )}
-                {filtered.map((org) => (
+                {!query && (
+                  <p className="px-3 py-2 text-[13px] text-ink-500">Start typing to search…</p>
+                )}
+                {results.map((org) => (
                   <button
                     key={org.id}
                     type="button"
@@ -153,7 +177,7 @@ export function OrgCombobox({ value, onChange }: Props) {
                   className="flex w-full items-center gap-2 px-3 py-2.5 text-[13px] font-medium text-merit-blue-600 hover:bg-merit-blue-50 transition-colors"
                 >
                   <Plus size={14} />
-                  Create new organization
+                  Not listed? Add it
                 </button>
               </div>
             </>
