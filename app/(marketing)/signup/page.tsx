@@ -42,6 +42,7 @@ export default function SignupPage() {
   const login = useMeritStore((s) => s.login);
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+  const [emailTaken, setEmailTaken] = useState(false);
 
   const {
     register,
@@ -67,6 +68,7 @@ export default function SignupPage() {
 
     setLoading(true);
     setServerError(null);
+    setEmailTaken(false);
 
     try {
       // 1. Create account
@@ -94,6 +96,7 @@ export default function SignupPage() {
     } catch (err) {
       if (err instanceof ApiError) {
         if (err.code === 'email_taken') {
+          setEmailTaken(true);
           setServerError('An account with this email already exists.');
         } else if (err.code === 'weak_password') {
           setServerError('Password is too weak. Try something harder to guess.');
@@ -129,7 +132,20 @@ export default function SignupPage() {
             {/* Server error */}
             {serverError && (
               <div className="rounded-lg bg-danger/8 border border-danger/20 px-3 py-2.5">
-                <p className="text-[13px] text-danger">{serverError}</p>
+                <p className="text-[13px] text-danger">
+                  {serverError}
+                  {emailTaken && (
+                    <>
+                      {' '}
+                      <Link
+                        href="/login"
+                        className="underline font-medium hover:text-danger/80 transition-colors"
+                      >
+                        Sign in instead →
+                      </Link>
+                    </>
+                  )}
+                </p>
               </div>
             )}
 
