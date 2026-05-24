@@ -113,7 +113,8 @@ export function mapUser(raw: any): User {
     phone: raw.phone ?? undefined,
     phoneVerified: raw.phone_verified ?? false,
     plan: raw.plan ?? 'free',
-    nhsGoalHours: raw.goal_hours ?? 75,
+    goalProgram: raw.goal_program ?? undefined,
+    nhsGoalHours: raw.goal_hours ?? 0,
     // Use account creation date as goal start date
     nhsGoalStartDate: raw.created_at ? raw.created_at.split('T')[0] : '',
     nhsGoalDeadline: '',
@@ -192,6 +193,9 @@ export const authApi = {
 
   requestPasswordReset: (email: string) =>
     request<{ data: { message: string } }>('POST', '/auth/request-password-reset', { email }, true),
+
+  changePassword: (currentPassword: string, newPassword: string) =>
+    request<{ data: { message: string } }>('POST', '/auth/change-password', { currentPassword, newPassword }),
 };
 
 // ─── Sessions API ────────────────────────────────────────────────────────────
@@ -214,6 +218,13 @@ export const sessionsApi = {
     supervisorPhone?: string;
     supervisorEmail?: string;
   }) => request<{ data: { session: any } }>('POST', '/sessions', body),
+
+  update: (id: string, body: {
+    activity?: string;
+    supervisorName?: string;
+    supervisorPhone?: string;
+    supervisorEmail?: string;
+  }) => request<{ data: any }>('PATCH', `/sessions/${id}`, body),
 
   delete: (id: string) => request<{ data: any }>('DELETE', `/sessions/${id}`),
 
@@ -238,6 +249,7 @@ export const usersApi = {
 
   update: (body: {
     name?: string;
+    email?: string;
     school?: string;
     grade?: number;
     graduationYear?: number;
@@ -249,6 +261,8 @@ export const usersApi = {
   }) => request<{ data: { user: any } }>('PATCH', '/users/me', body),
 
   delete: () => request<{ data: { scheduledFor: string } }>('DELETE', '/users/me'),
+
+  exportData: () => request<any>('GET', '/users/me/export'),
 };
 
 // ─── Stats API ───────────────────────────────────────────────────────────────

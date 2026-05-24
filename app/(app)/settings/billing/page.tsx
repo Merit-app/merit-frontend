@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Check, Zap, Lock, Loader2 } from 'lucide-react';
+import { Check, Lock, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useMeritStore } from '@/lib/store';
@@ -9,14 +9,25 @@ import { billingApi, ApiError } from '@/lib/api';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
+const PRICE_IDS = {
+  pro: {
+    monthly: process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID ?? 'price_pro_monthly',
+    yearly:  process.env.NEXT_PUBLIC_STRIPE_PRO_YEARLY_PRICE_ID  ?? 'price_pro_yearly',
+  },
+  premium: {
+    monthly: process.env.NEXT_PUBLIC_STRIPE_PREMIUM_MONTHLY_PRICE_ID ?? 'price_premium_monthly',
+    yearly:  process.env.NEXT_PUBLIC_STRIPE_PREMIUM_YEARLY_PRICE_ID  ?? 'price_premium_yearly',
+  },
+};
+
 const FREE_FEATURES = [
   'Log unlimited service sessions',
-  'SMS supervisor verification',
+  'SMS & email supervisor verification',
   'Classic PDF export',
   'Up to 5 organizations',
 ];
 
-const PREMIUM_FEATURES = [
+const PRO_FEATURES = [
   'Everything in Free',
   'Modern & NHS-formal PDF templates',
   'Unlimited organizations',
@@ -24,7 +35,13 @@ const PREMIUM_FEATURES = [
   'Priority support',
 ];
 
-const PREMIUM_PRICE_ID = process.env.NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID ?? '';
+const PREMIUM_FEATURES = [
+  'Everything in Pro',
+  'Advanced fraud analytics',
+  'Bulk session import',
+  'API access',
+  'Dedicated account support',
+];
 
 interface BillingInfo {
   plan: string;
@@ -34,14 +51,123 @@ interface BillingInfo {
   paymentMethod: { brand: string; last4: string; expMonth: number; expYear: number } | null;
 }
 
+interface PlanCardProps {
+  name: string;
+  monthlyPrice: string;
+  yearlyPrice: string;
+  yearlyMonthly: string;
+  features: string[];
+  isCurrent: boolean;
+  isHighlighted: boolean;
+  cadence: 'monthly' | 'yearly';
+  onUpgrade: () => void;
+  upgrading: boolean;
+  badge?: string;
+}
+
+function PlanCard({
+  name,
+  monthlyPrice,
+  yearlyPrice,
+  yearlyMonthly,
+  features,
+  isCurrent,
+  isHighlighted,
+  cadence,
+  onUpgrade,
+  upgrading,
+  badge,
+}: PlanCardProps) {
+  const showFree = name === 'Free';
+
+  return (
+    <div className={cn(
+      'rounded-xl border p-5 flex flex-col',
+      isCurrent && isHighlighted
+        ? 'border-merit-blue-300 bg-merit-blue-50'
+        : isCurrent
+        ? 'border-ink-300 bg-white'
+        : isHighlighted
+        ? 'border-merit-blue-200 bg-white'
+        : 'border-ink-200 bg-white',
+    )}>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-1">
+        <p className="text-h3 text-ink-900">{name}</p>
+        <div className="flex items-center gap-1.5">
+          {badge && !isCurrent && (
+            <span className="text-[11px] font-medium text-merit-blue-700 bg-merit-blue-100 px-2 py-0.5 rounded-full">
+              {badge}
+            </span>
+          )}
+          {isCurrent && (
+            <span className="text-[11px] font-medium text-merit-blue-600 bg-merit-blue-50 border border-merit-blue-200 px-2 py-0.5 rounded-full">
+              Current
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Price */}
+      {showFree ? (
+        <p className="text-display text-ink-900 mb-1">$0</p>
+      ) : cadence === 'monthly' ? (
+        <div className="mb-1">
+          <span className="text-display text-ink-900">{monthlyPrice}</span>
+          <span className="text-[14px] text-ink-500">/mo</span>
+        </div>
+      ) : (
+        <div className="mb-0.5">
+          <span className="text-display text-ink-900">{yearlyMonthly}</span>
+          <span className="text-[14px] text-ink-500">/mo</span>
+        </div>
+      )}
+      {!showFree && cadence === 'yearly' && (
+        <p className="text-[12px] text-ink-400 mb-1">{yearlyPrice}/yr — billed annually</p>
+      )}
+
+      {/* Features */}
+      <ul className="space-y-2.5 mt-3 mb-5 flex-1">
+        {features.map((f) => (
+          <li key={f} className="flex items-start gap-2 text-[13px] text-ink-700">
+            <Check
+              size={14}
+              className={cn(
+                'mt-0.5 shrink-0',
+                isHighlighted ? 'text-merit-blue-600' : 'text-success',
+              )}
+            />
+            {f}
+          </li>
+        ))}
+      </ul>
+
+      {/* CTA */}
+      {!isCurrent && !showFree && (
+        <Button
+          className="w-full bg-merit-blue-600 hover:bg-merit-blue-700 text-white font-medium text-[13px]"
+          onClick={onUpgrade}
+          disabled={upgrading}
+        >
+          {upgrading ? <Loader2 size={14} className="animate-spin mr-1.5" /> : null}
+          Upgrade to {name}
+        </Button>
+      )}
+      {isCurrent && !showFree && (
+        <p className="text-[12px] text-center text-ink-400 mt-auto pt-1">Your current plan</p>
+      )}
+    </div>
+  );
+}
+
 export default function BillingPage() {
   const user = useMeritStore((s) => s.user);
-  const updateUser = useMeritStore((s) => s.updateUser);
-  const isPremium = user.plan === 'premium';
+  const plan = user.plan ?? 'free';
 
+  const [cadence, setCadence] = useState<'monthly' | 'yearly'>('monthly');
   const [billing, setBilling] = useState<BillingInfo | null>(null);
   const [loadingBilling, setLoadingBilling] = useState(true);
-  const [upgrading, setUpgrading] = useState(false);
+  const [upgrading, setUpgrading] = useState<string | null>(null);
   const [openingPortal, setOpeningPortal] = useState(false);
 
   useEffect(() => {
@@ -58,10 +184,11 @@ export default function BillingPage() {
     load();
   }, []);
 
-  async function handleUpgrade() {
-    setUpgrading(true);
+  async function handleUpgrade(tier: 'pro' | 'premium') {
+    const priceId = PRICE_IDS[tier][cadence];
+    setUpgrading(tier);
     try {
-      const res = await billingApi.createCheckout(PREMIUM_PRICE_ID || 'price_placeholder');
+      const res = await billingApi.createCheckout(priceId);
       if (res.data?.url) {
         window.location.href = res.data.url;
       } else {
@@ -74,7 +201,7 @@ export default function BillingPage() {
         toast.error('Could not reach the server.');
       }
     } finally {
-      setUpgrading(false);
+      setUpgrading(null);
     }
   }
 
@@ -98,6 +225,7 @@ export default function BillingPage() {
     }
   }
 
+  const isPaid = plan === 'pro' || plan === 'premium';
   const nextBillingDate = billing?.currentPeriodEnd
     ? new Date(billing.currentPeriodEnd).toLocaleDateString('en-US', {
         year: 'numeric', month: 'long', day: 'numeric',
@@ -111,24 +239,15 @@ export default function BillingPage() {
         <p className="text-small text-ink-500 mt-1">Manage your subscription and payment details.</p>
       </div>
 
-      {/* Current plan banner */}
-      <div className={cn(
-        'rounded-xl border p-5 mb-8 flex items-center justify-between',
-        isPremium
-          ? 'border-merit-blue-200 bg-merit-blue-50'
-          : 'border-ink-200 bg-white'
-      )}>
-        <div>
-          <p className="text-[13px] font-medium text-ink-900 capitalize">{user.plan} plan</p>
-          <p className="text-small text-ink-500 mt-0.5">
-            {isPremium && nextBillingDate
-              ? `Next billing date: ${nextBillingDate}`
-              : isPremium
-              ? 'Active subscription'
-              : 'Free forever for core features'}
-          </p>
-        </div>
-        {isPremium ? (
+      {/* Current plan banner (paid users only) */}
+      {isPaid && (
+        <div className="rounded-xl border border-merit-blue-200 bg-merit-blue-50 p-5 mb-8 flex items-center justify-between">
+          <div>
+            <p className="text-[13px] font-medium text-ink-900 capitalize">{plan} plan</p>
+            <p className="text-small text-ink-500 mt-0.5">
+              {nextBillingDate ? `Next billing date: ${nextBillingDate}` : 'Active subscription'}
+            </p>
+          </div>
           <Button
             variant="outline"
             className="border-merit-blue-200 text-merit-blue-700 hover:bg-merit-blue-100 font-medium text-[13px]"
@@ -138,89 +257,83 @@ export default function BillingPage() {
             {openingPortal ? <Loader2 size={14} className="animate-spin mr-1.5" /> : null}
             Manage subscription
           </Button>
-        ) : (
-          <Button
-            className="bg-merit-blue-600 hover:bg-merit-blue-700 text-white font-medium text-[13px]"
-            onClick={handleUpgrade}
-            disabled={upgrading}
+        </div>
+      )}
+
+      {/* Monthly / Yearly toggle */}
+      <div className="flex items-center justify-center mb-6">
+        <div className="inline-flex items-center rounded-lg border border-ink-200 bg-ink-50 p-0.5 gap-0.5">
+          <button
+            onClick={() => setCadence('monthly')}
+            className={cn(
+              'px-4 py-1.5 rounded-md text-[13px] font-medium transition-colors',
+              cadence === 'monthly'
+                ? 'bg-white text-ink-900 shadow-sm border border-ink-200'
+                : 'text-ink-500 hover:text-ink-700',
+            )}
           >
-            {upgrading ? (
-              <Loader2 size={14} className="animate-spin mr-1.5" />
-            ) : (
-              <Zap size={14} className="mr-1.5" />
+            Monthly
+          </button>
+          <button
+            onClick={() => setCadence('yearly')}
+            className={cn(
+              'px-4 py-1.5 rounded-md text-[13px] font-medium transition-colors flex items-center gap-1.5',
+              cadence === 'yearly'
+                ? 'bg-white text-ink-900 shadow-sm border border-ink-200'
+                : 'text-ink-500 hover:text-ink-700',
             )}
-            Upgrade to Premium
-          </Button>
-        )}
-      </div>
-
-      {/* Plan comparison */}
-      <div className="grid grid-cols-2 gap-4">
-        {/* Free */}
-        <div className={cn(
-          'rounded-xl border p-5',
-          !isPremium ? 'border-ink-300 bg-white' : 'border-ink-200 bg-white opacity-60'
-        )}>
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-h3 text-ink-900">Free</p>
-            {!isPremium && (
-              <span className="text-[11px] font-medium text-merit-blue-600 bg-merit-blue-50 px-2 py-0.5 rounded-full">
-                Current
-              </span>
-            )}
-          </div>
-          <p className="text-display text-ink-900 mb-4">$0</p>
-          <ul className="space-y-2.5">
-            {FREE_FEATURES.map((f) => (
-              <li key={f} className="flex items-start gap-2 text-[13px] text-ink-700">
-                <Check size={14} className="text-success mt-0.5 shrink-0" />
-                {f}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Premium */}
-        <div className={cn(
-          'rounded-xl border p-5',
-          isPremium ? 'border-merit-blue-300 bg-merit-blue-50' : 'border-ink-200 bg-white'
-        )}>
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-h3 text-ink-900">Premium</p>
-            {isPremium && (
-              <span className="text-[11px] font-medium text-merit-blue-600 bg-merit-blue-100 px-2 py-0.5 rounded-full">
-                Current
-              </span>
-            )}
-          </div>
-          <p className="text-display text-ink-900 mb-4">
-            $4<span className="text-[16px] font-normal text-ink-500">/mo</span>
-          </p>
-          <ul className="space-y-2.5">
-            {PREMIUM_FEATURES.map((f) => (
-              <li key={f} className="flex items-start gap-2 text-[13px] text-ink-700">
-                <Check size={14} className="text-merit-blue-600 mt-0.5 shrink-0" />
-                {f}
-              </li>
-            ))}
-          </ul>
-          {!isPremium && (
-            <Button
-              className="w-full mt-5 bg-merit-blue-600 hover:bg-merit-blue-700 text-white font-medium text-[13px]"
-              onClick={handleUpgrade}
-              disabled={upgrading}
-            >
-              {upgrading ? (
-                <Loader2 size={14} className="animate-spin mr-1.5" />
-              ) : null}
-              Upgrade — $4/mo
-            </Button>
-          )}
+          >
+            Yearly
+            <span className="text-[11px] font-semibold text-success bg-success/10 px-1.5 py-0.5 rounded-full">
+              Save 40%
+            </span>
+          </button>
         </div>
       </div>
 
-      {/* Payment method (premium only, from Stripe) */}
-      {isPremium && billing?.paymentMethod && (
+      {/* Plan cards */}
+      <div className="grid grid-cols-3 gap-4">
+        <PlanCard
+          name="Free"
+          monthlyPrice="$0"
+          yearlyPrice="$0"
+          yearlyMonthly="$0"
+          features={FREE_FEATURES}
+          isCurrent={plan === 'free'}
+          isHighlighted={false}
+          cadence={cadence}
+          onUpgrade={() => {}}
+          upgrading={false}
+        />
+        <PlanCard
+          name="Pro"
+          monthlyPrice="$4.99"
+          yearlyPrice="$34.99"
+          yearlyMonthly="$2.92"
+          features={PRO_FEATURES}
+          isCurrent={plan === 'pro'}
+          isHighlighted={plan !== 'premium'}
+          cadence={cadence}
+          onUpgrade={() => handleUpgrade('pro')}
+          upgrading={upgrading === 'pro'}
+          badge="Popular"
+        />
+        <PlanCard
+          name="Premium"
+          monthlyPrice="$9.99"
+          yearlyPrice="$79.99"
+          yearlyMonthly="$6.67"
+          features={PREMIUM_FEATURES}
+          isCurrent={plan === 'premium'}
+          isHighlighted={plan === 'premium'}
+          cadence={cadence}
+          onUpgrade={() => handleUpgrade('premium')}
+          upgrading={upgrading === 'premium'}
+        />
+      </div>
+
+      {/* Payment method (paid users, from Stripe) */}
+      {isPaid && billing?.paymentMethod && (
         <>
           <Separator className="my-8 bg-ink-200" />
           <div>

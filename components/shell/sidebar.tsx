@@ -10,9 +10,14 @@ import {
   FileDown,
   Settings,
   CircleHelp,
+  Zap,
+  X,
+  ChevronUp,
 } from 'lucide-react';
+import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { UserMenu } from './user-menu';
+import { useMeritStore } from '@/lib/store';
 
 const primaryNav = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -25,6 +30,102 @@ const secondaryNav = [
   { href: '/settings/profile', label: 'Settings', icon: Settings },
   { href: '/help', label: 'Help', icon: CircleHelp },
 ] as const;
+
+const UPGRADE_PLANS = [
+  {
+    name: 'Pro',
+    price: '$4.99',
+    description: 'PDF templates, CSV export, unlimited orgs',
+    href: '/settings/billing',
+  },
+  {
+    name: 'Premium',
+    price: '$9.99',
+    description: 'Analytics, bulk import, API access',
+    href: '/settings/billing',
+  },
+];
+
+function UpgradePrompt() {
+  const user = useMeritStore((s) => s.user);
+  const [dismissed, setDismissed] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  if (dismissed || (user.plan && user.plan !== 'free')) return null;
+
+  return (
+    <div className="relative px-3 pb-2">
+      {/* Dropdown panel */}
+      {open && (
+        <div className="absolute bottom-full left-0 right-0 mx-3 mb-2 rounded-xl border border-ink-200 bg-white shadow-lg overflow-hidden">
+          <div className="px-4 pt-3.5 pb-2">
+            <p className="text-[12px] font-semibold text-ink-500 uppercase tracking-wide mb-2.5">
+              Upgrade your plan
+            </p>
+            <div className="space-y-2">
+              {UPGRADE_PLANS.map((plan) => (
+                <Link
+                  key={plan.name}
+                  href={plan.href}
+                  onClick={() => setOpen(false)}
+                  className="flex items-start gap-2.5 rounded-lg px-3 py-2.5 hover:bg-ink-50 transition-colors group"
+                >
+                  <div className="mt-0.5 h-5 w-5 rounded-full bg-merit-blue-100 flex items-center justify-center shrink-0">
+                    <Zap size={11} className="text-merit-blue-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[13px] font-medium text-ink-900">{plan.name}</span>
+                      <span className="text-[12px] text-ink-500">{plan.price}/mo</span>
+                    </div>
+                    <p className="text-[12px] text-ink-400 mt-0.5 leading-snug">{plan.description}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+          <div className="border-t border-ink-100 px-4 py-2.5">
+            <Link
+              href="/settings/billing"
+              onClick={() => setOpen(false)}
+              className="text-[12px] text-merit-blue-600 hover:text-merit-blue-700 font-medium"
+            >
+              See all plans →
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* Pill */}
+      <div className="flex items-center gap-1.5 rounded-lg border border-ink-200 bg-white px-3 py-2">
+        <Zap size={13} className="text-merit-blue-600 shrink-0" />
+        <button
+          onClick={() => setOpen((v) => !v)}
+          className="flex-1 text-left text-[12px] font-medium text-ink-700 hover:text-ink-900 transition-colors"
+        >
+          Upgrade for more features
+        </button>
+        <button
+          onClick={() => setOpen((v) => !v)}
+          aria-label="Toggle upgrade options"
+          className="text-ink-400 hover:text-ink-600 transition-colors"
+        >
+          <ChevronUp
+            size={13}
+            className={cn('transition-transform duration-150', !open && 'rotate-180')}
+          />
+        </button>
+        <button
+          onClick={() => setDismissed(true)}
+          aria-label="Dismiss"
+          className="text-ink-300 hover:text-ink-500 transition-colors"
+        >
+          <X size={13} />
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -74,6 +175,9 @@ export function Sidebar() {
           <NavItem key={href} href={href} label={label} icon={Icon} active={isActive(href)} small />
         ))}
       </nav>
+
+      {/* Upgrade prompt (free users only) */}
+      <UpgradePrompt />
 
       {/* User card */}
       <div className="border-t border-ink-200 px-3 py-3">

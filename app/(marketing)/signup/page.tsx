@@ -14,6 +14,18 @@ import { useMeritStore } from '@/lib/store';
 import { authApi, mapUser, ApiError } from '@/lib/api';
 import { cn } from '@/lib/utils';
 
+const MONTHS = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
+
+const CURRENT_YEAR = new Date().getFullYear();
+
+function getDaysInMonth(month: string, year: string): number {
+  if (!month || !year) return 31;
+  return new Date(parseInt(year), parseInt(month), 0).getDate();
+}
+
 const schema = z.object({
   firstName: z.string().min(1, 'First name is required.'),
   lastName: z.string().min(1, 'Last name is required.'),
@@ -37,6 +49,14 @@ function calcAge(dob: string): number | null {
   return age;
 }
 
+const selectClass = [
+  'flex h-10 w-full rounded-lg border bg-white px-3 text-[14px] text-ink-900',
+  'focus:outline-none transition-colors appearance-none',
+  'border-ink-200 hover:border-ink-300',
+].join(' ');
+
+const selectErrorClass = 'border-danger';
+
 export default function SignupPage() {
   const router = useRouter();
   const login = useMeritStore((s) => s.login);
@@ -44,17 +64,43 @@ export default function SignupPage() {
   const [serverError, setServerError] = useState<string | null>(null);
   const [emailTaken, setEmailTaken] = useState(false);
 
+  // DOB dropdown state
+  const [dobMonth, setDobMonth] = useState('');
+  const [dobDay, setDobDay] = useState('');
+  const [dobYear, setDobYear] = useState('');
+
   const {
     register,
     handleSubmit,
     control,
+    setValue,
     formState: { errors },
   } = useForm<FormData>({ resolver: zodResolver(schema) });
+
+  // Clamp day when month/year changes
+  useEffect(() => {
+    if (!dobDay) return;
+    const max = getDaysInMonth(dobMonth, dobYear);
+    if (parseInt(dobDay) > max) setDobDay('');
+  }, [dobMonth, dobYear]);
+
+  // Combine dropdowns → ISO date string
+  useEffect(() => {
+    if (dobMonth && dobDay && dobYear) {
+      const iso = `${dobYear}-${dobMonth}-${dobDay.padStart(2, '0')}`;
+      setValue('dateOfBirth', iso, { shouldValidate: true, shouldDirty: true });
+    } else {
+      setValue('dateOfBirth', '');
+    }
+  }, [dobMonth, dobDay, dobYear, setValue]);
 
   const dobValue = useWatch({ control, name: 'dateOfBirth' });
   const age = calcAge(dobValue);
   const isMinor = age !== null && age >= 13 && age < 18;
   const underThirteen = age !== null && age < 13;
+
+  const daysInMonth = getDaysInMonth(dobMonth, dobYear);
+  const dobError = !!errors.dateOfBirth;
 
   async function onSubmit(data: FormData) {
     if (underThirteen) {
@@ -71,15 +117,13 @@ export default function SignupPage() {
     setEmailTaken(false);
 
     try {
-      // 1. Create account
+      // 1. Create account (no NHS defaults — user sets goal on dashboard)
       await authApi.signup({
         email: data.email,
         password: data.password,
         name: `${data.firstName} ${data.lastName}`.trim(),
         dateOfBirth: data.dateOfBirth,
         school: data.school,
-        goalProgram: 'NHS',
-        goalHours: 75,
         parentEmail: isMinor ? (data.parentEmail || undefined) : undefined,
       });
 
@@ -157,7 +201,7 @@ export default function SignupPage() {
                 </Label>
                 <Input
                   id="firstName"
-                  placeholder="Kai"
+                  placeholder="First name"
                   {...register('firstName')}
                   className={cn(errors.firstName && 'border-danger')}
                 />
@@ -171,7 +215,7 @@ export default function SignupPage() {
                 </Label>
                 <Input
                   id="lastName"
-                  placeholder="Johnson"
+                  placeholder="Last name"
                   {...register('lastName')}
                   className={cn(errors.lastName && 'border-danger')}
                 />
@@ -188,7 +232,7 @@ export default function SignupPage() {
               </Label>
               <Input
                 id="school"
-                placeholder="Lord Byng Secondary"
+                placeholder="Your school"
                 {...register('school')}
                 className={cn(errors.school && 'border-danger')}
               />
@@ -197,23 +241,66 @@ export default function SignupPage() {
               )}
             </div>
 
-            {/* Date of Birth */}
+            {/* Date of Birth — three dropdowns */}
             <div className="space-y-1.5">
-              <Label htmlFor="dateOfBirth" className="text-[13px] font-medium text-ink-900">
+              <Label className="text-[13px] font-medium text-ink-900">
                 Date of birth
               </Label>
-              <Input
-                id="dateOfBirth"
-                type="date"
-                max={new Date().toISOString().split('T')[0]}
-                {...register('dateOfBirth')}
-                className={cn(errors.dateOfBirth && 'border-danger')}
-              />
-              {errors.dateOfBirth && (
-                <p className="text-[13px] text-danger">{errors.dateOfBirth.message}</p>
+              {/* Hidden field that react-hook-form owns */}
+              <input type="hidden" {...register('dateOfBirth')} />
+              <div className="grid grid-cols-3 gap-2">
+                {/* Month */}
+                <select
+                  value={dobMonth}
+                  onChange={(e) => setDobMonth(e.target.value)}
+                  className={cn(selectClass, dobError && !dobMonth && selectErrorClass)}
+                >
+                  <option value="">Month</option>
+                  {MONTHS.map((m, i) => (
+                    <option key={i} value={String(i + 1).padStart(2, '0')}>
+                      {m}
+                    </option>
+                  ))}
+                </select>
+
+                {/* Day */}
+                <select
+                  value={dobDay}
+                  onChange={(e) => setDobDay(e.target.value)}
+                  className={cn(selectClass, dobError && !dobDay && selectErrorClass)}
+                >
+                  <option value="">Day</option>
+                  {Array.from({ length: daysInMonth }, (_, i) => (
+                    <option key={i + 1} value={String(i + 1)}>
+                      {i + 1}
+                    </option>
+                  ))}
+                </select>
+
+                {/* Year */}
+                <select
+                  value={dobYear}
+                  onChange={(e) => setDobYear(e.target.value)}
+                  className={cn(selectClass, dobError && !dobYear && selectErrorClass)}
+                >
+                  <option value="">Year</option>
+                  {Array.from({ length: CURRENT_YEAR - 1990 + 1 }, (_, i) => {
+                    const y = CURRENT_YEAR - i;
+                    return (
+                      <option key={y} value={String(y)}>
+                        {y}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+              {dobError && !dobValue && (
+                <p className="text-[13px] text-danger">{errors.dateOfBirth?.message}</p>
               )}
               {underThirteen && (
-                <p className="text-[13px] text-danger">You must be at least 13 to create an account.</p>
+                <p className="text-[13px] text-danger">
+                  You must be at least 13 to create an account.
+                </p>
               )}
             </div>
 
@@ -247,7 +334,7 @@ export default function SignupPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="kai@student.vsb.bc.ca"
+                placeholder="you@example.com"
                 autoComplete="email"
                 {...register('email')}
                 className={cn(errors.email && 'border-danger')}
@@ -295,12 +382,16 @@ export default function SignupPage() {
 
         <p className="mt-5 text-center text-small text-ink-500">
           Already have an account?{' '}
-          <Link
-            href="/login"
-            className="text-merit-blue-600 hover:text-merit-blue-700 font-medium transition-colors"
-          >
+          <Link href="/login" className="text-merit-blue-600 hover:text-merit-blue-700 font-medium transition-colors">
             Sign in
           </Link>
+        </p>
+
+        <p className="mt-4 text-center text-[11px] text-ink-400">
+          By creating an account you agree to our{' '}
+          <Link href="/terms" className="hover:text-ink-600 underline transition-colors">Terms</Link>
+          {' '}and{' '}
+          <Link href="/privacy" className="hover:text-ink-600 underline transition-colors">Privacy Policy</Link>.
         </p>
       </div>
     </div>

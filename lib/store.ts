@@ -2,6 +2,12 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { MeritStore, Session, Organization, User, NotificationPreferences } from './types';
 
+// ── Hydration flag — separate tiny store so it never gets persisted ────────────
+export const useHydrationStore = create<{ hydrated: boolean; setHydrated: () => void }>((set) => ({
+  hydrated: false,
+  setHydrated: () => set({ hydrated: true }),
+}));
+
 const defaultNotifications: NotificationPreferences = {
   smsVerification: true,
   weeklyProgress: true,
@@ -21,7 +27,8 @@ const emptyUser: User = {
   phone: undefined,
   phoneVerified: false,
   plan: 'free',
-  nhsGoalHours: 75,
+  goalProgram: undefined,
+  nhsGoalHours: 0,
   nhsGoalStartDate: '',
   nhsGoalDeadline: '',
 };

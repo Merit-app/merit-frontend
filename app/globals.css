@@ -139,6 +139,13 @@ body {
   outline-offset: 2px;
 }
 
+/* Remove browser default outline on inputs — styled focus is handled by
+   Tailwind's focus-visible:ring-* classes on each component */
+input:focus,
+input:focus-visible {
+  outline: none;
+}
+
 /* ─── Scrollbar (subtle) ───────────────────────────────────────────────────── */
 
 ::-webkit-scrollbar {

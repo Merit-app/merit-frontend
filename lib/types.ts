@@ -51,10 +51,11 @@ export interface User {
   graduationYear: number;
   phone?: string;
   phoneVerified: boolean;
-  plan: 'free' | 'premium' | 'institutional';
-  nhsGoalHours: number;
-  nhsGoalStartDate: string;  // ISO date
-  nhsGoalDeadline: string;   // ISO date
+  plan: 'free' | 'pro' | 'premium' | 'institutional';
+  goalProgram?: string;       // e.g. 'NHS', 'IB CAS', 'Custom'
+  nhsGoalHours: number;       // 0 = no goal set yet
+  nhsGoalStartDate: string;   // ISO date
+  nhsGoalDeadline: string;    // ISO date
 }
 
 export interface Goal {

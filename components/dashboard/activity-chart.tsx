@@ -3,6 +3,7 @@
 import {
   BarChart,
   Bar,
+  CartesianGrid,
   XAxis,
   YAxis,
   Tooltip,
@@ -84,6 +85,7 @@ export default function ActivityChart() {
             barCategoryGap="30%"
             onMouseLeave={() => setHoveredIndex(null)}
           >
+            <CartesianGrid vertical={false} stroke="#e5e7eb" />
             <XAxis
               dataKey="label"
               axisLine={false}

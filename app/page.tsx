@@ -38,11 +38,14 @@ export default function LandingPage() {
         <span className="text-[18px] font-bold text-ink-900 tracking-tight">
           merit<span className="text-merit-blue-600">.</span>
         </span>
-        <div className="flex items-center gap-4">
-          <Link
-            href="/login"
-            className="text-[13px] font-medium text-ink-600 hover:text-ink-900 transition-colors"
-          >
+        <div className="flex items-center gap-5">
+          <Link href="/pricing" className="text-[13px] font-medium text-ink-600 hover:text-ink-900 transition-colors">
+            Pricing
+          </Link>
+          <Link href="/faq" className="text-[13px] font-medium text-ink-600 hover:text-ink-900 transition-colors">
+            FAQ
+          </Link>
+          <Link href="/login" className="text-[13px] font-medium text-ink-600 hover:text-ink-900 transition-colors">
             Sign in
           </Link>
           <Link
@@ -139,14 +142,20 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="border-t border-ink-200 bg-white">
-        <div className="max-w-3xl mx-auto px-8 py-8 flex items-center justify-between text-[12px] text-ink-400">
-          <span>
-            merit<span className="text-merit-blue-600">.</span>
-            {' '}— Service hour tracking for students
-          </span>
-          <div className="flex items-center gap-5">
-            <Link href="/login" className="hover:text-ink-700 transition-colors">Sign in</Link>
-            <a href="mailto:hello@merit.app" className="hover:text-ink-700 transition-colors">hello@merit.app</a>
+        <div className="max-w-3xl mx-auto px-8 py-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-[12px] text-ink-400">
+            <span>
+              merit<span className="text-merit-blue-600">.</span>
+              {' '}— Service hour tracking for students
+            </span>
+            <div className="flex flex-wrap items-center gap-4">
+              <Link href="/pricing" className="hover:text-ink-700 transition-colors">Pricing</Link>
+              <Link href="/faq" className="hover:text-ink-700 transition-colors">FAQ</Link>
+              <Link href="/terms" className="hover:text-ink-700 transition-colors">Terms</Link>
+              <Link href="/privacy" className="hover:text-ink-700 transition-colors">Privacy</Link>
+              <Link href="/login" className="hover:text-ink-700 transition-colors">Sign in</Link>
+              <a href="mailto:hello@merit.app" className="hover:text-ink-700 transition-colors">hello@merit.app</a>
+            </div>
           </div>
         </div>
       </footer>

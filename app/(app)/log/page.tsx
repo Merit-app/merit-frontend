@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Loader2, Minus, Plus } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
@@ -185,39 +185,16 @@ export default function LogPage() {
           {/* Hours */}
           <div className="space-y-1.5">
             <Label className="text-[13px] font-medium text-ink-900">Hours worked</Label>
-            <Controller
-              name="hours"
-              control={control}
-              render={({ field }) => (
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => field.onChange(Math.max(0.5, +(field.value - 0.5).toFixed(1)))}
-                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-ink-200 hover:bg-ink-50 transition-colors"
-                    aria-label="Decrease hours"
-                  >
-                    <Minus size={14} className="text-ink-700" />
-                  </button>
-                  <Input
-                    type="number"
-                    step={0.5}
-                    min={0.5}
-                    max={12}
-                    value={field.value}
-                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0.5)}
-                    className="text-center font-medium"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => field.onChange(Math.min(12, +(field.value + 0.5).toFixed(1)))}
-                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-ink-200 hover:bg-ink-50 transition-colors"
-                    aria-label="Increase hours"
-                  >
-                    <Plus size={14} className="text-ink-700" />
-                  </button>
-                </div>
-              )}
+            <Input
+              type="number"
+              min={0.5}
+              max={12}
+              step={0.5}
+              placeholder="e.g. 3"
+              {...register('hours', { valueAsNumber: true })}
+              className={cn(errors.hours && 'border-danger')}
             />
+            <p className="text-[12px] text-ink-400">Max 12 hrs per session</p>
             {errors.hours && <p className="text-[13px] text-danger">{errors.hours.message}</p>}
           </div>
 
