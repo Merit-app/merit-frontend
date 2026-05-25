@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import Link from 'next/link';
 import { useMeritStore } from '@/lib/store';
 import { getDynamicGreeting, formatHours } from '@/lib/utils';
 import { parseISO, isWithinInterval, subWeeks, startOfWeek, endOfWeek } from 'date-fns';
@@ -35,16 +36,30 @@ export function GreetingHeader() {
       user.nhsGoalHours,
       lastSessionDate,
       weekHours,
-      prevWeekHours
+      prevWeekHours,
+      user.goalProgram ?? null,
     );
 
     return { totalVerified, weekHours, prevWeekHours, lastSessionDate, subtext };
-  }, [sessions, user.nhsGoalHours]);
+  }, [sessions, user.nhsGoalHours, user.goalProgram]);
 
   return (
     <div className="mb-8">
-      <h1 className="text-[26px] font-semibold leading-tight tracking-tight md:text-[36px] text-ink-900">Hey {user.firstName} —</h1>
-      <p className="mt-1.5 text-[16px] text-ink-500 leading-snug">{subtext}</p>
+      <h1 className="text-[26px] font-semibold leading-tight tracking-tight md:text-[36px] text-ink-900">
+        Hey {user.firstName} —
+      </h1>
+      {subtext === null ? (
+        <p className="mt-1.5 text-[16px] text-ink-500 leading-snug">
+          <Link
+            href="/settings/profile"
+            className="text-merit-blue-600 hover:text-merit-blue-700 transition-colors"
+          >
+            Set up your hours goal →
+          </Link>
+        </p>
+      ) : (
+        <p className="mt-1.5 text-[16px] text-ink-500 leading-snug">{subtext}</p>
+      )}
     </div>
   );
 }

@@ -11,12 +11,12 @@ import { cn } from '@/lib/utils';
 
 const PRICE_IDS = {
   pro: {
-    monthly: process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID ?? 'price_pro_monthly',
-    yearly:  process.env.NEXT_PUBLIC_STRIPE_PRO_YEARLY_PRICE_ID  ?? 'price_pro_yearly',
+    monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_MONTHLY ?? '',
+    yearly:  process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_YEARLY  ?? '',
   },
   premium: {
-    monthly: process.env.NEXT_PUBLIC_STRIPE_PREMIUM_MONTHLY_PRICE_ID ?? 'price_premium_monthly',
-    yearly:  process.env.NEXT_PUBLIC_STRIPE_PREMIUM_YEARLY_PRICE_ID  ?? 'price_premium_yearly',
+    monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PREMIUM_MONTHLY ?? '',
+    yearly:  process.env.NEXT_PUBLIC_STRIPE_PRICE_PREMIUM_YEARLY  ?? '',
   },
 };
 

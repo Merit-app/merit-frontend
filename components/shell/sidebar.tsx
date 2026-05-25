@@ -54,10 +54,10 @@ function UpgradePrompt() {
   if (dismissed || (user.plan && user.plan !== 'free')) return null;
 
   return (
-    <div className="relative px-3 pb-2">
+    <div className="relative z-10 px-3 pb-2">
       {/* Dropdown panel */}
       {open && (
-        <div className="absolute bottom-full left-0 right-0 mx-3 mb-2 rounded-xl border border-ink-200 bg-white shadow-lg overflow-hidden">
+        <div className="absolute bottom-full left-0 right-0 mx-3 mb-2 rounded-xl border border-ink-200 bg-white shadow-lg overflow-hidden z-50">
           <div className="px-4 pt-3.5 pb-2">
             <p className="text-[12px] font-semibold text-ink-500 uppercase tracking-wide mb-2.5">
               Upgrade your plan

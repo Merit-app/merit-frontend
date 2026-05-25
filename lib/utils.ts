@@ -61,22 +61,41 @@ export function formatSchoolYear(startDateStr: string): string {
 
 // ─── Greeting copy ────────────────────────────────────────────────────────────
 
+/** Map DB-stored goal_program values to user-facing display names */
+export const GOAL_PROGRAM_DISPLAY: Record<string, string> = {
+  NHS: 'NHS',
+  IB: 'IB CAS',
+  graduation: 'Graduation',
+  scholarship: 'Scholarship',
+  personal: 'Personal',
+  other: 'Other',
+};
+
+/** Returns null when no goal is set (caller should show a setup link instead). */
 export function getDynamicGreeting(
   totalHours: number,
   goalHours: number,
   lastSessionDate: string | null,
   weekHours: number,
-  prevWeekHours: number
-): string {
+  prevWeekHours: number,
+  goalProgram?: string | null,
+): string | null {
+  // No goal configured yet — signal caller to show the setup link
+  if (!goalHours) return null;
+
+  const programLabel = goalProgram
+    ? (GOAL_PROGRAM_DISPLAY[goalProgram] ?? goalProgram)
+    : 'service';
+
   const remaining = goalHours - totalHours;
   const percent = Math.round((totalHours / goalHours) * 100);
 
   if (remaining <= 0) {
-    return `You've hit your NHS goal. Time to think about what's next.`;
+    return `You've hit your ${programLabel} goal. Time to think about what's next.`;
   }
 
   if (remaining <= 20) {
-    return `You're ${percent}% of the way to your NHS goal. ${formatHours(remaining)} to go.`;
+    return `You're ${percent}% of the way to your ${programLabel} goal. ${formatHours(remaining)} to go.`;
   }
 
   if (lastSessionDate) {
@@ -96,7 +115,7 @@ export function getDynamicGreeting(
     return `You logged ${formatHours(weekHours)} this week. Keep it up.`;
   }
 
-  return `You're ${percent}% of the way to your NHS goal. ${formatHours(remaining)} to go.`;
+  return `You're ${percent}% of the way to your ${programLabel} goal. ${formatHours(remaining)} to go.`;
 }
 
 // ─── Slug helpers ─────────────────────────────────────────────────────────────
