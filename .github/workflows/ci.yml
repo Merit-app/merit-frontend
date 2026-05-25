@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  ci:
+  build:
     name: Typecheck & Build
     runs-on: ubuntu-latest
 
@@ -28,3 +28,73 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          NODE_OPTIONS: '--max-old-space-size=4096'
+
+  smoke:
+    name: Production Smoke Test
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+
+    env:
+      BASE: https://merit-frontend-nine.vercel.app
+
+    steps:
+      - name: Home page
+        run: |
+          echo "→ GET $BASE"
+          curl -f --silent --show-error --max-time 20 \
+            -o /dev/null -w "HTTP %{http_code}  %{url_effective}\n" \
+            "$BASE"
+          echo "✓ / OK"
+
+      - name: Login page
+        run: |
+          echo "→ GET $BASE/login"
+          curl -f --silent --show-error --max-time 20 \
+            -o /dev/null -w "HTTP %{http_code}  %{url_effective}\n" \
+            "$BASE/login"
+          echo "✓ /login OK"
+
+      - name: Pricing page
+        run: |
+          echo "→ GET $BASE/pricing"
+          curl -f --silent --show-error --max-time 20 \
+            -o /dev/null -w "HTTP %{http_code}  %{url_effective}\n" \
+            "$BASE/pricing"
+          echo "✓ /pricing OK"
+
+      - name: Terms page
+        run: |
+          echo "→ GET $BASE/terms"
+          curl -f --silent --show-error --max-time 20 \
+            -o /dev/null -w "HTTP %{http_code}  %{url_effective}\n" \
+            "$BASE/terms"
+          echo "✓ /terms OK"
+
+      - name: Privacy page
+        run: |
+          echo "→ GET $BASE/privacy"
+          curl -f --silent --show-error --max-time 20 \
+            -o /dev/null -w "HTTP %{http_code}  %{url_effective}\n" \
+            "$BASE/privacy"
+          echo "✓ /privacy OK"
+
+      - name: FAQ page
+        run: |
+          echo "→ GET $BASE/faq"
+          curl -f --silent --show-error --max-time 20 \
+            -o /dev/null -w "HTTP %{http_code}  %{url_effective}\n" \
+            "$BASE/faq"
+          echo "✓ /faq OK"
+
+      - name: Report failure
+        if: failure()
+        run: |
+          echo ""
+          echo "╔══════════════════════════════════════════════╗"
+          echo "║  SMOKE TEST FAILED — see step above          ║"
+          echo "║  Check Vercel: https://vercel.com/dashboard  ║"
+          echo "╚══════════════════════════════════════════════╝"
+          exit 1
