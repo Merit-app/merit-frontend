@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { Search, Building2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { OrgCard } from '@/components/orgs/org-card';
-import { useMeritStore } from '@/lib/store';
+import { useMeritStore, useHydrationStore } from '@/lib/store';
+import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import type { OrgCategory } from '@/lib/types';
 
@@ -15,6 +16,7 @@ const CATEGORIES: (OrgCategory | 'All')[] = [
 ];
 
 export default function OrganizationsPage() {
+  const hydrated = useHydrationStore((s) => s.hydrated);
   const organizations = useMeritStore((s) => s.organizations);
   const sessions = useMeritStore((s) => s.sessions);
   const [query, setQuery] = useState('');
@@ -62,7 +64,18 @@ export default function OrganizationsPage() {
       </div>
 
       {/* Grid */}
-      {filtered.length === 0 ? (
+      {!hydrated ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="bg-white rounded-xl border border-ink-200 p-5 space-y-3">
+              <Skeleton className="h-4 w-40" />
+              <Skeleton className="h-3 w-24" />
+              <Skeleton className="h-3 w-full" />
+              <Skeleton className="h-3 w-3/4" />
+            </div>
+          ))}
+        </div>
+      ) : filtered.length === 0 ? (
         <div className="flex flex-col items-center py-20 text-center">
           <Building2 size={32} className="text-ink-300 mb-3" />
           <p className="text-[15px] font-semibold text-ink-900 mb-1">No organizations found.</p>

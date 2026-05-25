@@ -2,7 +2,8 @@
 
 import { useMemo } from 'react';
 import dynamic from 'next/dynamic';
-import { useMeritStore } from '@/lib/store';
+import { useMeritStore, useHydrationStore } from '@/lib/store';
+import { Skeleton } from '@/components/ui/skeleton';
 import { parseISO, isWithinInterval, startOfWeek, endOfWeek, subWeeks, format, subDays } from 'date-fns';
 
 // SSR-safe dynamic import for the sparkline
@@ -36,8 +37,28 @@ function StatCard({ label, value, sub, subPositive, sparkData }: StatCardProps) 
   );
 }
 
+function StatsRowSkeleton() {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      {[0, 1, 2].map((i) => (
+        <div key={i} className="bg-white rounded-xl border border-ink-200 p-5 flex flex-col gap-3">
+          <Skeleton className="h-3 w-20" />
+          <div className="space-y-1.5">
+            <Skeleton className="h-7 w-24" />
+            <Skeleton className="h-3 w-32" />
+          </div>
+          <Skeleton className="h-8 w-full" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function StatsRow() {
+  const hydrated = useHydrationStore((s) => s.hydrated);
   const sessions = useMeritStore((s) => s.sessions);
+
+  if (!hydrated) return <StatsRowSkeleton />;
 
   const stats = useMemo(() => {
     const verified = sessions.filter((s) => s.status === 'verified');

@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -22,11 +22,13 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const params = useSearchParams();
   const login = useMeritStore((s) => s.login);
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+  const passwordUpdated = params.get('message') === 'password-updated';
 
   const {
     register,
@@ -77,6 +79,13 @@ export default function LoginPage() {
         {/* Card */}
         <div className="bg-white rounded-xl border border-ink-200 p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            {/* Password updated banner */}
+            {passwordUpdated && (
+              <div className="rounded-lg bg-success/8 border border-success/20 px-3 py-2.5">
+                <p className="text-[13px] text-success">Password updated. Sign in with your new password.</p>
+              </div>
+            )}
+
             {/* Server error */}
             {serverError && (
               <div className="rounded-lg bg-danger/8 border border-danger/20 px-3 py-2.5">
@@ -92,7 +101,7 @@ export default function LoginPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="kai@student.vsb.bc.ca"
+                placeholder="you@example.com"
                 autoComplete="email"
                 {...register('email')}
                 className={cn(errors.email && 'border-danger')}
@@ -157,5 +166,13 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
   );
 }

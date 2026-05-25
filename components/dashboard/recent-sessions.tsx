@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Clock, Plus } from 'lucide-react';
-import { useMeritStore } from '@/lib/store';
+import { useMeritStore, useHydrationStore } from '@/lib/store';
+import { Skeleton } from '@/components/ui/skeleton';
 import { formatSessionDate } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 
@@ -13,9 +14,35 @@ const STATUS_STYLES: Record<string, { label: string; className: string }> = {
   disputed: { label: 'Disputed', className: 'text-danger bg-danger-bg'  },
 };
 
+function RecentSessionsSkeleton() {
+  return (
+    <div className="bg-white rounded-xl border border-ink-200 p-6 mb-6">
+      <div className="flex items-center justify-between mb-5">
+        <Skeleton className="h-4 w-32" />
+      </div>
+      <div className="divide-y divide-ink-100">
+        {[0, 1, 2, 3, 4].map((i) => (
+          <div key={i} className="flex items-center gap-4 py-3">
+            <Skeleton className="h-3 w-10 shrink-0" />
+            <div className="flex-1 space-y-1.5">
+              <Skeleton className="h-3 w-36" />
+              <Skeleton className="h-3 w-24" />
+            </div>
+            <Skeleton className="h-3 w-12 shrink-0" />
+            <Skeleton className="h-5 w-16 rounded-full shrink-0" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function RecentSessions() {
   const router = useRouter();
+  const hydrated = useHydrationStore((s) => s.hydrated);
   const sessions = useMeritStore((s) => s.sessions);
+
+  if (!hydrated) return <RecentSessionsSkeleton />;
 
   const recent = [...sessions]
     .sort((a, b) => b.date.localeCompare(a.date))
