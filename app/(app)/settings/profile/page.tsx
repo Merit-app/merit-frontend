@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -10,8 +10,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { useMeritStore } from '@/lib/store';
-import { usersApi, authApi, mapUser, ApiError } from '@/lib/api';
+import { usersApi, authApi, mapUser, ApiError, profilesApi } from '@/lib/api';
 import { cn } from '@/lib/utils';
+import { UsernameEditor } from './_components/username-editor';
+import { PrivacyToggle } from './_components/privacy-toggle';
+import { TopBadgesPicker } from './_components/top-badges-picker';
 
 const GOAL_PRESETS: Record<string, number> = {
   NHS: 75,
@@ -240,7 +243,120 @@ export default function ProfilePage() {
 
       <Separator className="my-8 bg-ink-200" />
 
+      <PublicProfileSection />
+
+      <Separator className="my-8 bg-ink-200" />
+
       <ChangePasswordSection />
+    </div>
+  );
+}
+
+function PublicProfileSection() {
+  const user = useMeritStore((s) => s.user);
+  const [profile, setProfile] = useState<{
+    profilePublic: boolean;
+    bio: string | null;
+    topBadgeIds: string[];
+  } | null>(null);
+  const [bio, setBio] = useState('');
+  const [savingBio, setSavingBio] = useState(false);
+  const [bioError, setBioError] = useState<string | null>(null);
+
+  useEffect(() => {
+    profilesApi.me().then((res) => {
+      const p = res.data.profile;
+      setProfile({
+        profilePublic: p.profilePublic ?? true,
+        bio: p.bio ?? null,
+        topBadgeIds: p.topBadgeIds ?? [],
+      });
+      setBio(p.bio ?? '');
+    }).catch(() => {
+      setProfile({ profilePublic: true, bio: null, topBadgeIds: [] });
+    });
+  }, []);
+
+  async function saveBio() {
+    setSavingBio(true);
+    setBioError(null);
+    try {
+      await profilesApi.update({ bio: bio.trim() || undefined });
+      toast.success('Bio saved.');
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setBioError(err.message || 'Failed to save bio.');
+      } else {
+        setBioError('Could not reach the server.');
+      }
+    } finally {
+      setSavingBio(false);
+    }
+  }
+
+  return (
+    <div>
+      <div className="mb-5">
+        <h3 className="text-[15px] font-semibold text-ink-900">Public profile</h3>
+        <p className="text-[12px] text-ink-500 mt-0.5">
+          Control how you appear on Merit&apos;s public directory.
+        </p>
+      </div>
+
+      <div className="space-y-6 max-w-lg">
+        {/* Privacy toggle */}
+        {profile && (
+          <PrivacyToggle
+            isPublic={profile.profilePublic}
+            username={user.username}
+          />
+        )}
+
+        <Separator className="bg-ink-200" />
+
+        {/* Username */}
+        <UsernameEditor />
+
+        <Separator className="bg-ink-200" />
+
+        {/* Bio */}
+        <div className="space-y-2">
+          <Label className="text-[13px] font-medium text-ink-900">Bio</Label>
+          <p className="text-[12px] text-ink-500">
+            A short description shown on your public profile. Max 200 characters.
+          </p>
+          <textarea
+            value={bio}
+            onChange={(e) => setBio(e.target.value.slice(0, 200))}
+            rows={3}
+            placeholder="Tell the world what you're passionate about…"
+            className="flex w-full rounded-lg border border-ink-200 bg-white px-3 py-2 text-[14px] text-ink-900 placeholder:text-ink-400 focus:outline-none hover:border-ink-300 resize-none transition-colors"
+          />
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] text-ink-400">{bio.length}/200</span>
+            {bioError && <p className="text-[12px] text-danger">{bioError}</p>}
+            <button
+              type="button"
+              onClick={saveBio}
+              disabled={savingBio}
+              className={cn(
+                'px-3 py-1.5 rounded-lg bg-merit-blue-600 hover:bg-merit-blue-700 text-white text-[12px] font-medium transition-all',
+                savingBio && 'opacity-60 cursor-not-allowed',
+              )}
+            >
+              {savingBio ? 'Saving…' : 'Save bio'}
+            </button>
+          </div>
+        </div>
+
+        <Separator className="bg-ink-200" />
+
+        {/* Pinned badges */}
+        <div>
+          <p className="text-[13px] font-medium text-ink-900 mb-1">Pinned badges</p>
+          {profile && <TopBadgesPicker initialTopBadgeIds={profile.topBadgeIds} />}
+        </div>
+      </div>
     </div>
   );
 }

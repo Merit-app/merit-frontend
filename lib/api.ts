@@ -282,6 +282,40 @@ export const statsApi = {
   weekly: (weeks = 12) => request<{ data: any[] }>('GET', `/stats/weekly?weeks=${weeks}`),
 };
 
+// ─── Profiles API ────────────────────────────────────────────────────────────
+
+export const profilesApi = {
+  me: () =>
+    request<{ data: { profile: any } }>('GET', '/profiles/me'),
+
+  update: (body: {
+    username?: string;
+    bio?: string;
+    profilePublic?: boolean;
+    topBadgeIds?: string[];
+  }) => request<{ data: { profile: any } }>('PATCH', '/profiles/me', body),
+
+  checkUsername: (username: string) =>
+    request<{ data: { available: boolean; reason?: string } }>(
+      'POST', '/profiles/check-username', { username }, true,
+    ),
+};
+
+// ─── Badges API ───────────────────────────────────────────────────────────────
+
+export const badgesApi = {
+  all: () =>
+    request<{ data: { badges: any[] } }>('GET', '/badges', undefined, true),
+
+  me: () =>
+    request<{ data: { badges: Array<{ badge: any; earned: boolean; earnedAt?: string }> } }>(
+      'GET', '/badges/me',
+    ),
+
+  refresh: () =>
+    request<{ data: { earned: number; badges: any[] } }>('POST', '/badges/refresh', {}),
+};
+
 // ─── Onboarding API ──────────────────────────────────────────────────────────
 
 export const onboardingApi = {
