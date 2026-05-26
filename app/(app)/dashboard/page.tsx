@@ -6,6 +6,7 @@ import { ActivityChartClient } from '@/components/dashboard/activity-chart-clien
 import { RecentSessions } from '@/components/dashboard/recent-sessions';
 import { QuickActions } from '@/components/dashboard/quick-actions';
 import { WelcomeBanner } from '@/components/dashboard/welcome-banner';
+import { BadgeStrip } from '@/components/dashboard/badge-strip';
 
 export const metadata: Metadata = { title: 'Dashboard' };
 
@@ -16,6 +17,7 @@ export default function DashboardPage() {
       <WelcomeBanner />
       <GoalProgressCard />
       <StatsRow />
+      <BadgeStrip />
       <ActivityChartClient />
       <RecentSessions />
       <QuickActions />

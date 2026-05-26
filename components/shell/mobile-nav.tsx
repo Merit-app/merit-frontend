@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Plus, Clock, Building2, MoreHorizontal, FileDown, Settings, CircleHelp, X } from 'lucide-react';
+import { LayoutDashboard, Plus, Clock, Building2, MoreHorizontal, FileDown, Settings, CircleHelp, X, Award } from 'lucide-react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { useMeritStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
@@ -15,6 +15,7 @@ const PRIMARY_NAV = [
 ] as const;
 
 const MORE_NAV = [
+  { href: '/badges', label: 'Badges', icon: Award },
   { href: '/export', label: 'Export', icon: FileDown },
   { href: '/settings/profile', label: 'Settings', icon: Settings },
   { href: '/help', label: 'Help', icon: CircleHelp },
