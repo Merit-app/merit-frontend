@@ -58,6 +58,8 @@ export interface User {
   nhsGoalDeadline: string;    // ISO date
   isMinor?: boolean;
   consentAccepted?: boolean;
+  onboardingCompleted?: boolean;
+  username?: string;
 }
 
 export interface Goal {

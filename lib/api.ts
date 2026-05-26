@@ -120,6 +120,8 @@ export function mapUser(raw: any): User {
     nhsGoalDeadline: '',
     isMinor: raw.is_minor ?? false,
     consentAccepted: raw.parental_consent_received ?? true,
+    onboardingCompleted: raw.onboarding_completed ?? false,
+    username: raw.username ?? undefined,
   };
 }
 
@@ -278,6 +280,19 @@ export const statsApi = {
   dashboard: () => request<{ data: any }>('GET', '/stats/dashboard'),
 
   weekly: (weeks = 12) => request<{ data: any[] }>('GET', `/stats/weekly?weeks=${weeks}`),
+};
+
+// ─── Onboarding API ──────────────────────────────────────────────────────────
+
+export const onboardingApi = {
+  status: () =>
+    request<{ data: { onboardingCompleted: boolean; skippedAt: string | null } }>('GET', '/onboarding/status'),
+
+  complete: () =>
+    request<{ data: { onboardingCompleted: boolean } }>('POST', '/onboarding/complete', {}),
+
+  skip: () =>
+    request<{ data: { onboardingCompleted: boolean; skipped: boolean } }>('POST', '/onboarding/skip', {}),
 };
 
 // ─── Billing API ─────────────────────────────────────────────────────────────

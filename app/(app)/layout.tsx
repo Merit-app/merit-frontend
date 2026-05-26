@@ -9,6 +9,7 @@ import { CommandPalette } from '@/components/shell/command-palette';
 import { PageTransition } from '@/components/shell/page-transition';
 import { useMeritStore, useHydrationStore } from '@/lib/store';
 import { sessionsApi, orgsApi, usersApi, mapSession, mapOrg, mapUser } from '@/lib/api';
+import { OnboardingModal } from '@/components/onboarding/onboarding-modal';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -80,6 +81,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-screen bg-ink-50 overflow-hidden">
+      <OnboardingModal />
       <Sidebar />
       <CommandPalette />
 
