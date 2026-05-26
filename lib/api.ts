@@ -249,6 +249,10 @@ export const orgsApi = {
   me: () => request<{ data: any[] }>('GET', '/organizations/me'),
 
   get: (id: string) => request<{ data: { org: any } }>('GET', `/organizations/${id}`),
+
+  // Public org profile — no auth
+  getPublic: (slug: string) =>
+    request<{ data: { org: any } }>('GET', `/orgs/${encodeURIComponent(slug)}`, undefined, true),
 };
 
 // ─── Users API ───────────────────────────────────────────────────────────────
