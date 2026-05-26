@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { Toaster } from 'sonner';
 import { StoreHydrator } from '@/components/store-hydrator';
+import { CookieBanner } from '@/components/cookie-banner';
 import './globals.css';
 
 const geistSans = Geist({
@@ -38,6 +39,7 @@ export default function RootLayout({
       <body className="min-h-full bg-ink-50 text-ink-900">
         <StoreHydrator />
         {children}
+        <CookieBanner />
         <Toaster
           position="bottom-right"
           toastOptions={{
