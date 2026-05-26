@@ -33,7 +33,9 @@ const schema = z.object({
   dateOfBirth: z.string().min(1, 'Date of birth is required.'),
   email: z.string().email('Enter a valid email address.'),
   password: z.string().min(8, 'Password must be at least 8 characters.'),
-  parentEmail: z.string().email('Enter a valid parent email.').optional().or(z.literal('')),
+  agreedToTerms: z.boolean().refine((v) => v === true, {
+    message: 'You must agree to the Terms of Service and Privacy Policy.',
+  }),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -75,7 +77,10 @@ export default function SignupPage() {
     control,
     setValue,
     formState: { errors },
-  } = useForm<FormData>({ resolver: zodResolver(schema) });
+  } = useForm<FormData>({
+    resolver: zodResolver(schema),
+    defaultValues: { agreedToTerms: false },
+  });
 
   // Clamp day when month/year changes
   useEffect(() => {
@@ -107,24 +112,19 @@ export default function SignupPage() {
       setServerError('Users must be 13 or older to create an account.');
       return;
     }
-    if (isMinor && !data.parentEmail) {
-      setServerError('A parent or guardian email is required for users under 18.');
-      return;
-    }
 
     setLoading(true);
     setServerError(null);
     setEmailTaken(false);
 
     try {
-      // 1. Create account (no NHS defaults — user sets goal on dashboard)
+      // 1. Create account
       await authApi.signup({
         email: data.email,
         password: data.password,
         name: `${data.firstName} ${data.lastName}`.trim(),
         dateOfBirth: data.dateOfBirth,
         school: data.school,
-        parentEmail: isMinor ? (data.parentEmail || undefined) : undefined,
       });
 
       // 2. Auto-login to get tokens
@@ -136,7 +136,12 @@ export default function SignupPage() {
         expiresAt: session.expiresAt,
       });
 
-      router.replace('/dashboard');
+      // 3. Minors go through one-time consent page first
+      if (isMinor) {
+        router.replace('/onboarding/consent');
+      } else {
+        router.replace('/dashboard');
+      }
     } catch (err) {
       if (err instanceof ApiError) {
         if (err.code === 'email_taken') {
@@ -146,8 +151,6 @@ export default function SignupPage() {
           setServerError('Password is too weak. Try something harder to guess.');
         } else if (err.code === 'age_restricted') {
           setServerError('Users must be 13 or older to create an account.');
-        } else if (err.code === 'parental_email_required') {
-          setServerError('A parent or guardian email is required for users under 18.');
         } else {
           setServerError(err.message || 'Something went wrong. Try again.');
         }
@@ -304,28 +307,6 @@ export default function SignupPage() {
               )}
             </div>
 
-            {/* Parent email for minors */}
-            {isMinor && (
-              <div className="space-y-1.5">
-                <Label htmlFor="parentEmail" className="text-[13px] font-medium text-ink-900">
-                  Parent or guardian email
-                </Label>
-                <Input
-                  id="parentEmail"
-                  type="email"
-                  placeholder="parent@example.com"
-                  {...register('parentEmail')}
-                  className={cn(errors.parentEmail && 'border-danger')}
-                />
-                <p className="text-[12px] text-ink-500">
-                  Required for users under 18. They'll receive a consent link.
-                </p>
-                {errors.parentEmail && (
-                  <p className="text-[12px] text-danger">{errors.parentEmail.message}</p>
-                )}
-              </div>
-            )}
-
             {/* Email */}
             <div className="space-y-1.5">
               <Label htmlFor="email" className="text-[13px] font-medium text-ink-900">
@@ -362,6 +343,38 @@ export default function SignupPage() {
               )}
             </div>
 
+            {/* Terms checkbox */}
+            <div className="space-y-1">
+              <label className="flex items-start gap-2.5 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  {...register('agreedToTerms')}
+                  className="mt-0.5 h-4 w-4 rounded border-ink-300 text-merit-blue-600 focus:ring-merit-blue-500 accent-merit-blue-600 cursor-pointer shrink-0"
+                />
+                <span className="text-[13px] text-ink-600 leading-snug">
+                  I agree to the{' '}
+                  <Link
+                    href="/terms"
+                    target="_blank"
+                    className="text-merit-blue-600 hover:text-merit-blue-700 font-medium underline underline-offset-2"
+                  >
+                    Terms of Service
+                  </Link>
+                  {' '}and{' '}
+                  <Link
+                    href="/privacy"
+                    target="_blank"
+                    className="text-merit-blue-600 hover:text-merit-blue-700 font-medium underline underline-offset-2"
+                  >
+                    Privacy Policy
+                  </Link>
+                </span>
+              </label>
+              {errors.agreedToTerms && (
+                <p className="text-[12px] text-danger">{errors.agreedToTerms.message}</p>
+              )}
+            </div>
+
             {/* Submit */}
             <Button
               type="submit"
@@ -385,13 +398,6 @@ export default function SignupPage() {
           <Link href="/login" className="text-merit-blue-600 hover:text-merit-blue-700 font-medium transition-colors">
             Sign in
           </Link>
-        </p>
-
-        <p className="mt-4 text-center text-[11px] text-ink-400">
-          By creating an account you agree to our{' '}
-          <Link href="/terms" className="hover:text-ink-600 underline transition-colors">Terms</Link>
-          {' '}and{' '}
-          <Link href="/privacy" className="hover:text-ink-600 underline transition-colors">Privacy Policy</Link>.
         </p>
       </div>
     </div>

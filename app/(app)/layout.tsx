@@ -14,6 +14,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const isAuthed = useMeritStore((s) => s.isAuthed);
   const expiresAt = useMeritStore((s) => s.expiresAt);
+  const user = useMeritStore((s) => s.user);
   const setSessions = useMeritStore((s) => s.setSessions);
   const setOrganizations = useMeritStore((s) => s.setOrganizations);
   const updateUser = useMeritStore((s) => s.updateUser);
@@ -32,6 +33,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     if (!isAuthed || !isTokenValid) {
       logout();
       router.replace('/login');
+      return;
+    }
+
+    // Minors who haven't accepted the onboarding consent must complete it first
+    if (user?.isMinor && user?.consentAccepted === false) {
+      router.replace('/onboarding/consent');
       return;
     }
 
@@ -64,11 +71,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     }
 
     loadData();
-  }, [hydrated, isAuthed, isTokenValid]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [hydrated, isAuthed, isTokenValid, user?.isMinor, user?.consentAccepted]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Show nothing until hydration is complete (prevents flash-redirect to /login)
   if (!hydrated) return null;
   if (!isAuthed || !isTokenValid) return null;
+  if (user?.isMinor && user?.consentAccepted === false) return null;
 
   return (
     <div className="flex h-screen bg-ink-50 overflow-hidden">

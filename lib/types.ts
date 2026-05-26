@@ -56,6 +56,8 @@ export interface User {
   nhsGoalHours: number;       // 0 = no goal set yet
   nhsGoalStartDate: string;   // ISO date
   nhsGoalDeadline: string;    // ISO date
+  isMinor?: boolean;
+  consentAccepted?: boolean;
 }
 
 export interface Goal {

@@ -118,6 +118,8 @@ export function mapUser(raw: any): User {
     // Use account creation date as goal start date
     nhsGoalStartDate: raw.created_at ? raw.created_at.split('T')[0] : '',
     nhsGoalDeadline: '',
+    isMinor: raw.is_minor ?? false,
+    consentAccepted: raw.parental_consent_received ?? true,
   };
 }
 
@@ -179,8 +181,7 @@ export const authApi = {
     grade?: number;
     goalProgram?: string;
     goalHours?: number;
-    parentEmail?: string;
-  }) => request<{ data: { user: any; requiresEmailConfirmation: boolean; requiresParentalConsent: boolean } }>('POST', '/auth/signup', body, true),
+  }) => request<{ data: { user: any; requiresEmailConfirmation: boolean; requiresOnboardingConsent: boolean } }>('POST', '/auth/signup', body, true),
 
   login: (email: string, password: string) =>
     request<{ data: { user: any; session: { accessToken: string; refreshToken: string; expiresAt: number } } }>(
@@ -199,6 +200,9 @@ export const authApi = {
 
   changePassword: (currentPassword: string, newPassword: string) =>
     request<{ data: { message: string } }>('POST', '/auth/change-password', { currentPassword, newPassword }),
+
+  acceptConsent: () =>
+    request<{ data: { user: any } }>('PATCH', '/auth/accept-consent', {}),
 };
 
 // ─── Sessions API ────────────────────────────────────────────────────────────
