@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Clock, Plus } from 'lucide-react';
 import { useMeritStore, useHydrationStore } from '@/lib/store';
 import { Skeleton } from '@/components/ui/skeleton';
-import { formatSessionDate } from '@/lib/utils';
+import { formatSessionDate, formatRelativeTime } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 
 const STATUS_STYLES: Record<string, { label: string; className: string }> = {
@@ -91,9 +91,9 @@ export function RecentSessions() {
               onClick={() => router.push(`/hours?session=${session.id}`)}
               className="w-full flex items-center gap-4 py-3 hover:bg-ink-50 -mx-2 px-2 rounded-lg transition-colors duration-100 text-left cursor-pointer"
             >
-              {/* Date */}
-              <span className="text-small text-ink-500 w-16 shrink-0 tabular-nums">
-                {formatSessionDate(session.date)}
+              {/* Date - relative time */}
+              <span className="text-small text-ink-500 w-20 shrink-0 tabular-nums">
+                {formatRelativeTime(session.date + 'T12:00:00')}
               </span>
 
               {/* Org + activity */}

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import { Toaster } from 'sonner';
 import { StoreHydrator } from '@/components/store-hydrator';
 import { CookieBanner } from '@/components/cookie-banner';
+import { NetworkStatus } from '@/components/network-status';
 import './globals.css';
 
 const geistSans = Geist({
@@ -45,6 +46,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-ink-50 text-ink-900">
+        <NetworkStatus />
         <StoreHydrator />
         {children}
         <CookieBanner />

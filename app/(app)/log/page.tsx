@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -21,6 +21,9 @@ import { sessionsApi, mapSession, ApiError } from '@/lib/api';
 import { cn } from '@/lib/utils';
 import type { Organization } from '@/lib/types';
 
+const DRAFT_STORAGE_KEY = 'log-form-draft';
+const DRAFT_RESTORED_SHOWN_KEY = 'draft-restored-shown';
+
 const schema = z.object({
   date: z.string().min(1, 'Select a date'),
   hours: z.number().min(0.5, 'Minimum 0.5 hrs').max(12, 'Maximum 12 hrs'),
@@ -31,6 +34,15 @@ const schema = z.object({
 });
 
 type FormData = z.infer<typeof schema>;
+
+const DEFAULT_VALUES: FormData = {
+  date: format(new Date(), 'yyyy-MM-dd'),
+  hours: 4,
+  activity: '',
+  supervisorName: '',
+  supervisorPhone: '',
+  supervisorEmail: '',
+};
 
 export default function LogPage() {
   const user = useMeritStore((s) => s.user);
@@ -43,6 +55,7 @@ export default function LogPage() {
   const [submittedSupervisor, setSubmittedSupervisor] = useState('');
   const [showEmail, setShowEmail] = useState(false);
   const [calOpen, setCalOpen] = useState(false);
+  const [draftRestored, setDraftRestored] = useState(false);
 
   const {
     register,
@@ -53,18 +66,40 @@ export default function LogPage() {
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: {
-      date: format(new Date(), 'yyyy-MM-dd'),
-      hours: 4,
-      activity: '',
-      supervisorName: '',
-      supervisorPhone: '',
-      supervisorEmail: '',
-    },
+    defaultValues: DEFAULT_VALUES,
   });
 
   const watchedValues = watch();
   const activityLen = (watchedValues.activity ?? '').length;
+
+  // Load draft on mount
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const draft = localStorage.getItem(DRAFT_STORAGE_KEY);
+    const draftShown = localStorage.getItem(DRAFT_RESTORED_SHOWN_KEY);
+    
+    if (draft && !draftShown) {
+      try {
+        const parsed = JSON.parse(draft);
+        reset(parsed);
+        setDraftRestored(true);
+        localStorage.setItem(DRAFT_RESTORED_SHOWN_KEY, 'true');
+        // Hide message after 4 seconds
+        setTimeout(() => setDraftRestored(false), 4000);
+      } catch {
+        // Invalid draft, ignore
+      }
+    }
+  }, [reset]);
+
+  // Save draft on form changes
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const timer = setTimeout(() => {
+      localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(watchedValues));
+    }, 500); // Debounce
+    return () => clearTimeout(timer);
+  }, [watchedValues]);
 
   async function onSubmit(data: FormData) {
     if (!org) { setOrgError(true); return; }
@@ -89,7 +124,13 @@ export default function LogPage() {
       const session = mapSession(res.data.session);
       addSession(session);
       setSubmittedSupervisor(data.supervisorName);
+      
+      // Clear draft on success
+      localStorage.removeItem(DRAFT_STORAGE_KEY);
+      localStorage.removeItem(DRAFT_RESTORED_SHOWN_KEY);
+      
       setSuccess(true);
+      toast.success('Session logged successfully');
     } catch (err) {
       if (err instanceof ApiError) {
         if (err.code === 'invalid_phone') {
@@ -106,7 +147,9 @@ export default function LogPage() {
   }
 
   function handleLogAnother() {
-    reset();
+    reset(DEFAULT_VALUES);
+    localStorage.removeItem(DRAFT_STORAGE_KEY);
+    localStorage.removeItem(DRAFT_RESTORED_SHOWN_KEY);
     setOrg(null);
     setOrgError(false);
     setSuccess(false);
@@ -133,6 +176,13 @@ export default function LogPage() {
       <div className="flex flex-col md:flex-row gap-8 items-start">
         {/* ── LEFT: Form (60%) ────────────────────────────────────────────── */}
         <div className="flex-[3] min-w-0 space-y-5">
+
+          {/* Draft restored message */}
+          {draftRestored && (
+            <div className="rounded-lg bg-success/8 border border-success/20 px-3 py-2.5">
+              <p className="text-[13px] text-success">✓ Draft restored</p>
+            </div>
+          )}
 
           {/* Organization */}
           <div className="space-y-1.5">
