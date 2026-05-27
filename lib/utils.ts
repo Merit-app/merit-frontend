@@ -136,3 +136,44 @@ export function formatPhone(raw: string): string {
   }
   return raw;
 }
+
+// ─── Streak calculation ────────────────────────────────────────────────────────
+
+export function calculateStreak(sessionDates: string[]): number {
+  if (sessionDates.length === 0) return 0;
+
+  const uniqueDates = Array.from(new Set(sessionDates));
+  uniqueDates.sort().reverse();
+
+  let streak = 0;
+  let expected = new Date();
+
+  for (const dateStr of uniqueDates) {
+    const sessionDate = parseISO(dateStr);
+    
+    // Check if date matches expected (same day or within streak)
+    const diff = Math.floor(
+      (expected.getTime() - sessionDate.getTime()) / (1000 * 60 * 60 * 24)
+    );
+
+    if (diff === 0 || (streak === 0 && diff === 0)) {
+      streak++;
+      expected = new Date(sessionDate.getTime() - 24 * 60 * 60 * 1000);
+    } else if (diff === 1) {
+      streak++;
+      expected = new Date(sessionDate.getTime() - 24 * 60 * 60 * 1000);
+    } else {
+      break;
+    }
+  }
+
+  return streak;
+}
+
+// Convert days to "X week(s)" or "X day(s)"
+export function formatStreak(days: number): string {
+  if (days === 0) return '';
+  if (days < 7) return `${days} day${days === 1 ? '' : 's'}`;
+  const weeks = Math.floor(days / 7);
+  return `${weeks} week${weeks === 1 ? '' : 's'}`;
+}
