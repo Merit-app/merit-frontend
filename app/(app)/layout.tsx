@@ -8,8 +8,10 @@ import { MobileNav } from '@/components/shell/mobile-nav';
 import { CommandPalette } from '@/components/shell/command-palette';
 import { PageTransition } from '@/components/shell/page-transition';
 import { useMeritStore, useHydrationStore } from '@/lib/store';
-import { sessionsApi, orgsApi, usersApi, mapSession, mapOrg, mapUser } from '@/lib/api';
+import { sessionsApi, orgsApi, usersApi, onboardingApi, mapSession, mapOrg, mapUser } from '@/lib/api';
 import { OnboardingModal } from '@/components/onboarding/onboarding-modal';
+
+const ONBOARDING_LS_KEY = 'merit_onboarding_done';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -64,7 +66,21 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           );
         }
         if (userRes.status === 'fulfilled') {
-          updateUser(mapUser(userRes.value.data.user));
+          const mappedUser = mapUser(userRes.value.data.user);
+          updateUser(mappedUser);
+
+          // Sync onboarding state to localStorage so the modal never flashes on re-login
+          const sessions = sessionsRes.status === 'fulfilled' ? sessionsRes.value.data : [];
+          if (mappedUser.onboardingCompleted) {
+            // DB says done — persist fast-path
+            try { localStorage.setItem(ONBOARDING_LS_KEY, '1'); } catch { /* ignore */ }
+          } else if (sessions.length > 0) {
+            // Existing user (has logged sessions) but migration 009 defaulted flag to false.
+            // Silently mark as complete so they never see the onboarding modal.
+            try { localStorage.setItem(ONBOARDING_LS_KEY, '1'); } catch { /* ignore */ }
+            updateUser({ onboardingCompleted: true });
+            onboardingApi.complete().catch(() => {});
+          }
         }
       } catch {
         // Non-fatal — store keeps whatever is in localStorage
