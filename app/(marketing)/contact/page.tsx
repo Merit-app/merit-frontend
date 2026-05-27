@@ -12,14 +12,10 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { MarketingFooter } from '@/components/marketing/footer';
 import { cn } from '@/lib/utils';
-import type { Metadata } from 'next';
-
 const schema = z.object({
   name: z.string().min(1, 'Name is required.'),
   email: z.string().email('Enter a valid email address.'),
-  subject: z.enum(['general', 'bug', 'partnership', 'press'], {
-    errorMap: () => ({ message: 'Please select a subject.' }),
-  }),
+  subject: z.enum(['general', 'bug', 'partnership', 'press'] as const),
   message: z.string().min(10, 'Message must be at least 10 characters.').max(2000, 'Message is too long.'),
 });
 
