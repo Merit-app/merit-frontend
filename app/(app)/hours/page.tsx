@@ -150,8 +150,6 @@ export default function HoursPage() {
       : <ChevronDown size={12} className="text-ink-600 ml-0.5" />;
   }
 
-  const COL = 'grid-cols-[32px_120px_1fr_1fr_80px_140px_100px_40px]';
-
   return (
     <div className="px-4 py-4 md:px-8 md:py-6">
       {/* Top bar */}
@@ -235,7 +233,7 @@ export default function HoursPage() {
         <div className="bg-white rounded-xl border border-ink-200 overflow-x-auto">
           <div className="min-w-[820px]">
             {/* Header */}
-            <div className={cn('grid gap-3 px-4 py-2.5 border-b border-ink-200 bg-ink-50 items-center', COL)}>
+            <div className="grid grid-cols-[32px_120px_1fr_1fr_80px_140px_100px_40px] gap-3 px-4 py-2.5 border-b border-ink-200 bg-ink-50 items-center">
               <input
                 type="checkbox"
                 checked={allSelected}
@@ -288,10 +286,10 @@ export default function HoursPage() {
                     }
                   }}
                   className={cn(
-                    'grid gap-3 px-4 py-3.5 border-b border-ink-100 last:border-0 items-center',
+                    'grid grid-cols-[32px_120px_1fr_1fr_80px_140px_100px_40px] gap-3 px-4 py-3.5',
+                    'border-b border-ink-100 last:border-0 items-center',
                     'transition-colors duration-100 cursor-pointer focus-visible:outline-none',
                     'focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-merit-blue-400',
-                    COL,
                     isSelected ? 'bg-merit-blue-50' : 'hover:bg-ink-50'
                   )}
                 >

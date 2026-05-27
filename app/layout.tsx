@@ -22,10 +22,6 @@ export const metadata: Metadata = {
     template: '%s · Merit',
   },
   description: 'Credible service-hour records for high school students.',
-  icons: [
-    { rel: 'icon', type: 'image/svg+xml', url: '/favicon.svg' },
-    { rel: 'icon', type: 'image/x-icon', url: '/favicon.ico' },
-  ],
 };
 
 export default function RootLayout({
@@ -38,6 +34,9 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+      </head>
       <body className="min-h-full bg-ink-50 text-ink-900">
         <a
           href="#main-content"

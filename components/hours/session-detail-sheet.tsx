@@ -310,7 +310,7 @@ export function SessionDetailSheet({ session, open, onClose }: Props) {
                   onClick={() => {
                     const url = `${window.location.origin}/hours?session=${s.id}`;
                     navigator.clipboard.writeText(url).then(() => {
-                      toast.success('Link copied to clipboard.');
+                      toast.success('Link copied.');
                     }).catch(() => {
                       toast.error('Could not copy link.');
                     });
