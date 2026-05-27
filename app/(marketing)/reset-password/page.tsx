@@ -11,6 +11,7 @@ import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { PasswordInput } from '@/components/ui/password-input';
 import { authApi, ApiError } from '@/lib/api';
 import { cn } from '@/lib/utils';
 
@@ -94,14 +95,13 @@ function ResetPasswordForm() {
         <Label htmlFor="newPassword" className="text-[13px] font-medium text-ink-900">
           New password
         </Label>
-        <Input
+        <PasswordInput
           id="newPassword"
-          type="password"
           placeholder="••••••••"
+          error={!!errors.newPassword}
           autoComplete="new-password"
           autoFocus
           {...register('newPassword')}
-          className={cn(errors.newPassword && 'border-danger')}
         />
         {errors.newPassword && (
           <p className="text-[13px] text-danger">{errors.newPassword.message}</p>
@@ -112,10 +112,10 @@ function ResetPasswordForm() {
         <Label htmlFor="confirmPassword" className="text-[13px] font-medium text-ink-900">
           Confirm new password
         </Label>
-        <Input
+        <PasswordInput
           id="confirmPassword"
-          type="password"
           placeholder="••••••••"
+          error={!!errors.confirmPassword}
           autoComplete="new-password"
           {...register('confirmPassword')}
           className={cn(errors.confirmPassword && 'border-danger')}

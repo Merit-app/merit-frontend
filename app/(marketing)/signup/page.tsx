@@ -11,6 +11,7 @@ import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { PasswordInput } from '@/components/ui/password-input';
 import { useMeritStore } from '@/lib/store';
 import { authApi, mapUser, ApiError } from '@/lib/api';
 import { cn } from '@/lib/utils';
@@ -342,10 +343,10 @@ export default function SignupPage() {
               <Label htmlFor="password" className="text-[13px] font-medium text-ink-900">
                 Password
               </Label>
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
                 placeholder="8+ characters"
+                error={!!errors.password}
                 autoComplete="new-password"
                 {...register('password')}
                 className={cn(errors.password && 'border-danger')}

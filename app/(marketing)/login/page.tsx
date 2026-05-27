@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { PasswordInput } from '@/components/ui/password-input';
 import { useMeritStore } from '@/lib/store';
 import { authApi, mapUser, ApiError } from '@/lib/api';
 import { cn } from '@/lib/utils';
@@ -115,6 +116,7 @@ function LoginForm() {
                 type="email"
                 placeholder="you@example.com"
                 autoComplete="email"
+                autoFocus
                 {...register('email')}
                 className={cn(errors.email && 'border-danger')}
               />
@@ -136,13 +138,10 @@ function LoginForm() {
                   Forgot password?
                 </Link>
               </div>
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
-                placeholder="••••••••"
-                autoComplete="current-password"
+                error={!!errors.password}
                 {...register('password')}
-                className={cn(errors.password && 'border-danger')}
               />
               {errors.password && (
                 <p className="text-[13px] text-danger">{errors.password.message}</p>

@@ -23,6 +23,14 @@ export const metadata: Metadata = {
   description: 'Credible service-hour records for high school students.',
   icons: {
     icon: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+    other: [
+      {
+        rel: 'icon',
+        type: 'image/svg+xml',
+        url: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect fill="%231C1917" width="192" height="192" rx="45"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="system-ui, -apple-system" font-size="120" font-weight="700" fill="%23ffffff">M</text></svg>',
+      },
+    ],
   },
 };
 
