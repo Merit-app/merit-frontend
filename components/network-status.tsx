@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { WifiOff, WifiCheck } from 'lucide-react';
+import { WifiOff, Wifi } from 'lucide-react';
 
 export function NetworkStatus() {
   const [isOnline, setIsOnline] = useState(true);
@@ -44,7 +44,7 @@ export function NetworkStatus() {
       <div className="max-w-5xl mx-auto px-4 py-2.5 flex items-center gap-2.5 text-[13px] font-medium">
         {isOnline && wasOffline ? (
           <>
-            <WifiCheck size={16} />
+            <Wifi size={16} />
             Back online
           </>
         ) : (

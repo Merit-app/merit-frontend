@@ -1,6 +1,5 @@
 'use client';
 
-import type { Metadata } from 'next';
 import { useState } from 'react';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
@@ -12,17 +11,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { authApi, ApiError } from '@/lib/api';
 import { cn } from '@/lib/utils';
-
-export const metadata: Metadata = {
-  title: 'Forgot password',
-  description: 'Reset your Merit password to regain access to your account.',
-  openGraph: {
-    title: 'Forgot password',
-    description: 'Reset your Merit password to regain access to your account.',
-    type: 'website',
-    url: 'https://merit-frontend-nine.vercel.app/forgot-password',
-  },
-};
 
 const schema = z.object({
   email: z.string().email('Enter a valid email address.'),
