@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
-import { Trash2, RefreshCw, Pencil, X } from 'lucide-react';
+import { Trash2, RefreshCw, Pencil, X, Link2 } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -252,6 +252,7 @@ export function SessionDetailSheet({ session, open, onClose }: Props) {
             {mode === 'edit' && (
               <button
                 onClick={() => setMode('view')}
+                aria-label="Cancel editing"
                 className="text-ink-400 hover:text-ink-600 transition-colors"
               >
                 <X size={18} />
@@ -290,19 +291,37 @@ export function SessionDetailSheet({ session, open, onClose }: Props) {
 
             {/* Footer actions */}
             <div className="px-6 py-4 border-t border-ink-200 flex items-center justify-between gap-3">
-              {s.status === 'pending' && (
+              <div className="flex items-center gap-2">
+                {s.status === 'pending' && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleResend}
+                    disabled={resending}
+                    className="border-ink-200 text-ink-700 hover:bg-ink-50 font-medium text-[13px]"
+                  >
+                    <RefreshCw size={13} className={`mr-1.5 ${resending ? 'animate-spin' : ''}`} />
+                    {resending ? 'Sending...' : 'Resend verification'}
+                  </Button>
+                )}
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={handleResend}
-                  disabled={resending}
+                  onClick={() => {
+                    const url = `${window.location.origin}/hours?session=${s.id}`;
+                    navigator.clipboard.writeText(url).then(() => {
+                      toast.success('Link copied to clipboard.');
+                    }).catch(() => {
+                      toast.error('Could not copy link.');
+                    });
+                  }}
                   className="border-ink-200 text-ink-700 hover:bg-ink-50 font-medium text-[13px]"
+                  aria-label="Copy session link"
                 >
-                  <RefreshCw size={13} className={`mr-1.5 ${resending ? 'animate-spin' : ''}`} />
-                  {resending ? 'Sending...' : 'Resend verification'}
+                  <Link2 size={13} className="mr-1.5" />
+                  Copy link
                 </Button>
-              )}
-              <div className="flex-1" />
+              </div>
               <Button
                 variant="ghost"
                 size="sm"

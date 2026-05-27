@@ -3,14 +3,16 @@
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { Plus, Search, ChevronUp, ChevronDown, Clock } from 'lucide-react';
+import { Plus, Search, ChevronUp, ChevronDown, Clock, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { StatusBadge } from '@/components/hours/status-badge';
 import { TierBadge } from '@/components/hours/tier-badge';
 import { SessionDetailSheet } from '@/components/hours/session-detail-sheet';
 import { useMeritStore } from '@/lib/store';
+import { sessionsApi, ApiError } from '@/lib/api';
 import { formatSessionDate } from '@/lib/utils';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 import type { Session, SessionStatus } from '@/lib/types';
 
 type FilterTab = 'all' | SessionStatus;
@@ -24,16 +26,40 @@ const FILTER_TABS: { key: FilterTab; label: string }[] = [
   { key: 'disputed', label: 'Disputed' },
 ];
 
+const PREF_KEY = 'hours-list-prefs';
+
+function loadPrefs(): { filter: FilterTab; sortKey: SortKey; sortDir: SortDir } {
+  if (typeof window === 'undefined') return { filter: 'all', sortKey: 'date', sortDir: 'desc' };
+  try {
+    const raw = localStorage.getItem(PREF_KEY);
+    if (!raw) return { filter: 'all', sortKey: 'date', sortDir: 'desc' };
+    return JSON.parse(raw);
+  } catch {
+    return { filter: 'all', sortKey: 'date', sortDir: 'desc' };
+  }
+}
+
 export default function HoursPage() {
   const sessions = useMeritStore((s) => s.sessions);
+  const deleteSession = useMeritStore((s) => s.deleteSession);
   const searchParams = useSearchParams();
 
-  const [filter, setFilter] = useState<FilterTab>('all');
+  const prefs = useMemo(() => loadPrefs(), []);
+
+  const [filter, setFilter] = useState<FilterTab>(prefs.filter);
   const [query, setQuery] = useState('');
-  const [sortKey, setSortKey] = useState<SortKey>('date');
-  const [sortDir, setSortDir] = useState<SortDir>('desc');
+  const [sortKey, setSortKey] = useState<SortKey>(prefs.sortKey);
+  const [sortDir, setSortDir] = useState<SortDir>(prefs.sortDir);
   const [selectedSession, setSelectedSession] = useState<Session | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [bulkDeleting, setBulkDeleting] = useState(false);
+
+  // Persist sort/filter prefs
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem(PREF_KEY, JSON.stringify({ filter, sortKey, sortDir }));
+  }, [filter, sortKey, sortDir]);
 
   // Open sheet from URL param (e.g. from dashboard recent sessions)
   useEffect(() => {
@@ -68,6 +94,55 @@ export default function HoursPage() {
     });
     return rows;
   }, [sessions, filter, query, sortKey, sortDir]);
+
+  const allFilteredIds = useMemo(() => filtered.map((s) => s.id), [filtered]);
+  const allSelected = allFilteredIds.length > 0 && allFilteredIds.every((id) => selected.has(id));
+  const someSelected = selected.size > 0;
+
+  function toggleSelectAll() {
+    if (allSelected) {
+      setSelected(new Set());
+    } else {
+      setSelected(new Set(allFilteredIds));
+    }
+  }
+
+  function toggleSelectRow(id: string, e: React.MouseEvent) {
+    e.stopPropagation();
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  async function handleBulkDelete() {
+    const ids = [...selected];
+    if (!confirm(`Delete ${ids.length} session${ids.length === 1 ? '' : 's'}? This can't be undone.`)) return;
+    setBulkDeleting(true);
+    const failed: string[] = [];
+    await Promise.all(
+      ids.map(async (id) => {
+        try {
+          await sessionsApi.delete(id);
+          deleteSession(id);
+        } catch (err) {
+          failed.push(id);
+          if (err instanceof ApiError) {
+            console.error('Failed to delete session', id, err.message);
+          }
+        }
+      })
+    );
+    setBulkDeleting(false);
+    setSelected(new Set());
+    if (failed.length === 0) {
+      toast.success(`${ids.length} session${ids.length === 1 ? '' : 's'} deleted.`);
+    } else {
+      toast.error(`${failed.length} session${failed.length === 1 ? '' : 's'} could not be deleted.`);
+    }
+  }
 
   function SortIcon({ col }: { col: SortKey }) {
     if (sortKey !== col) return <ChevronDown size={12} className="text-ink-300 ml-0.5" />;
@@ -120,6 +195,30 @@ export default function HoursPage() {
         </div>
       </div>
 
+      {/* Bulk delete bar */}
+      {someSelected && (
+        <div className="mb-4 flex items-center gap-3 rounded-lg bg-ink-900 px-4 py-2.5">
+          <span className="text-[13px] text-white">
+            {selected.size} selected
+          </span>
+          <button
+            onClick={() => setSelected(new Set())}
+            className="text-[13px] text-ink-400 hover:text-white transition-colors"
+          >
+            Deselect all
+          </button>
+          <div className="flex-1" />
+          <button
+            onClick={handleBulkDelete}
+            disabled={bulkDeleting}
+            className="flex items-center gap-1.5 text-[13px] font-medium text-white bg-danger hover:bg-danger/90 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+          >
+            <Trash2 size={13} />
+            {bulkDeleting ? 'Deleting...' : `Delete ${selected.size}`}
+          </button>
+        </div>
+      )}
+
       {/* Table */}
       {filtered.length === 0 ? (
         <div className="flex flex-col items-center py-20 text-center">
@@ -140,10 +239,16 @@ export default function HoursPage() {
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-ink-200 overflow-x-auto">
-          {/* min-w wrapper ensures header and rows share the same width context */}
-          <div className="min-w-[780px]">
+          <div className="min-w-[820px]">
             {/* Header row */}
-            <div className="grid grid-cols-[120px_1fr_1fr_80px_140px_100px_40px] gap-3 px-4 py-2.5 border-b border-ink-200 bg-ink-50">
+            <div className="grid grid-cols-[32px_120px_1fr_1fr_80px_140px_100px_40px] gap-3 px-4 py-2.5 border-b border-ink-200 bg-ink-50 items-center">
+              <input
+                type="checkbox"
+                checked={allSelected}
+                onChange={toggleSelectAll}
+                aria-label="Select all sessions"
+                className="h-4 w-4 rounded border-ink-300 accent-merit-blue-600 cursor-pointer"
+              />
               {([
                 { key: 'date',   label: 'Date' },
                 { key: 'org',    label: 'Organization' },
@@ -173,21 +278,37 @@ export default function HoursPage() {
             {/* Rows */}
             {filtered.map((session) => {
               const hoursStr = session.hours % 1 === 0 ? `${session.hours}` : session.hours.toFixed(1);
+              const isSelected = selected.has(session.id);
               return (
-                <button
+                <div
                   key={session.id}
-                  type="button"
-                  onClick={() => { setSelectedSession(session); setSheetOpen(true); }}
-                  className="w-full grid grid-cols-[120px_1fr_1fr_80px_140px_100px_40px] gap-3 px-4 py-3.5 border-b border-ink-100 last:border-0 hover:bg-ink-50 transition-colors duration-100 text-left items-center cursor-pointer"
+                  className={cn(
+                    'grid grid-cols-[32px_120px_1fr_1fr_80px_140px_100px_40px] gap-3 px-4 py-3.5 border-b border-ink-100 last:border-0 items-center transition-colors duration-100',
+                    isSelected ? 'bg-merit-blue-50' : 'hover:bg-ink-50'
+                  )}
                 >
-                  <span className="text-[13px] text-ink-500 tabular-nums">{formatSessionDate(session.date)}</span>
-                  <span className="text-[13px] font-medium text-ink-900 truncate">{session.org}</span>
-                  <span className="text-[12px] text-ink-500 truncate">{session.activity}</span>
-                  <span className="text-[13px] font-medium text-ink-900 tabular-nums">{hoursStr} hrs</span>
-                  <span><TierBadge tier={session.tier} /></span>
-                  <span><StatusBadge status={session.status} /></span>
-                  <span className="text-ink-300 text-[18px] leading-none select-none">›</span>
-                </button>
+                  <input
+                    type="checkbox"
+                    checked={isSelected}
+                    onChange={() => {}}
+                    onClick={(e) => toggleSelectRow(session.id, e)}
+                    aria-label={`Select session at ${session.org}`}
+                    className="h-4 w-4 rounded border-ink-300 accent-merit-blue-600 cursor-pointer"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => { setSelectedSession(session); setSheetOpen(true); }}
+                    className="contents"
+                  >
+                    <span className="text-[13px] text-ink-500 tabular-nums text-left">{formatSessionDate(session.date)}</span>
+                    <span className="text-[13px] font-medium text-ink-900 truncate text-left">{session.org}</span>
+                    <span className="text-[12px] text-ink-500 truncate text-left">{session.activity}</span>
+                    <span className="text-[13px] font-medium text-ink-900 tabular-nums text-left">{hoursStr} hrs</span>
+                    <span><TierBadge tier={session.tier} /></span>
+                    <span><StatusBadge status={session.status} /></span>
+                    <span className="text-ink-300 text-[18px] leading-none select-none">›</span>
+                  </button>
+                </div>
               );
             })}
           </div>

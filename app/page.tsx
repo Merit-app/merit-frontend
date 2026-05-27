@@ -59,12 +59,18 @@ export default function LandingPage() {
         <span className="text-[18px] font-bold text-ink-900 tracking-tight">
           merit<span className="text-merit-blue-600">.</span>
         </span>
-        <div className="flex items-center gap-5">
+        <div className="flex items-center gap-4 flex-wrap">
+          <Link href="/about" className="text-[13px] font-medium text-ink-600 hover:text-ink-900 transition-colors">
+            About
+          </Link>
           <Link href="/pricing" className="text-[13px] font-medium text-ink-600 hover:text-ink-900 transition-colors">
             Pricing
           </Link>
           <Link href="/faq" className="text-[13px] font-medium text-ink-600 hover:text-ink-900 transition-colors">
             FAQ
+          </Link>
+          <Link href="/contact" className="text-[13px] font-medium text-ink-600 hover:text-ink-900 transition-colors">
+            Contact
           </Link>
           <Link href="/login" className="text-[13px] font-medium text-ink-600 hover:text-ink-900 transition-colors">
             Sign in
@@ -104,6 +110,32 @@ export default function LandingPage() {
           </Link>
         </div>
         <p className="text-[12px] text-ink-400 mt-4">No credit card. No app download. Works in your browser.</p>
+      </section>
+
+      {/* How it works */}
+      <section className="max-w-3xl mx-auto px-8 pb-16">
+        <div className="rounded-3xl bg-white border border-ink-200 p-8 mb-10">
+          <p className="text-[12px] font-semibold text-merit-blue-600 uppercase tracking-widest mb-4 text-center">
+            How it works
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="rounded-2xl border border-ink-200 p-6 text-center">
+              <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-merit-blue-50 flex items-center justify-center text-merit-blue-600 text-xl">1</div>
+              <h3 className="text-[15px] font-semibold text-ink-900 mb-2">Log your hours</h3>
+              <p className="text-[13px] text-ink-500">Fill out a quick form with your session details, organization, and supervisor.</p>
+            </div>
+            <div className="rounded-2xl border border-ink-200 p-6 text-center">
+              <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-merit-blue-50 flex items-center justify-center text-merit-blue-600 text-xl">2</div>
+              <h3 className="text-[15px] font-semibold text-ink-900 mb-2">Supervisor verifies</h3>
+              <p className="text-[13px] text-ink-500">Your supervisor receives a text and confirms your session with one reply.</p>
+            </div>
+            <div className="rounded-2xl border border-ink-200 p-6 text-center">
+              <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-merit-blue-50 flex items-center justify-center text-merit-blue-600 text-xl">3</div>
+              <h3 className="text-[15px] font-semibold text-ink-900 mb-2">Download PDF</h3>
+              <p className="text-[13px] text-ink-500">Export a verified PDF record for NHS, scholarships, and college applications.</p>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* Feature grid */}
@@ -170,6 +202,8 @@ export default function LandingPage() {
               {' '}— Service hour tracking for students
             </span>
             <div className="flex flex-wrap items-center gap-4">
+              <Link href="/about" className="hover:text-ink-700 transition-colors">About</Link>
+              <Link href="/contact" className="hover:text-ink-700 transition-colors">Contact</Link>
               <Link href="/pricing" className="hover:text-ink-700 transition-colors">Pricing</Link>
               <Link href="/faq" className="hover:text-ink-700 transition-colors">FAQ</Link>
               <Link href="/terms" className="hover:text-ink-700 transition-colors">Terms</Link>

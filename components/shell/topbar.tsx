@@ -98,6 +98,7 @@ export function Topbar() {
               'transition-colors duration-100 cursor-pointer',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merit-blue-600'
             )}
+            aria-label="Notifications"
             title="Notifications"
           >
             <Bell size={16} />

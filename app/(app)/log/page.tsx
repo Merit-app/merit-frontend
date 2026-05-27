@@ -27,7 +27,7 @@ const DRAFT_RESTORED_SHOWN_KEY = 'draft-restored-shown';
 const schema = z.object({
   date: z.string().min(1, 'Select a date'),
   hours: z.number().min(0.5, 'Minimum 0.5 hrs').max(12, 'Maximum 12 hrs'),
-  activity: z.string().min(5, 'Describe what you did').max(200, 'Keep it under 200 characters'),
+  activity: z.string().min(5, 'Describe what you did').max(500, 'Keep it under 500 characters'),
   supervisorName: z.string().min(2, 'Enter supervisor name'),
   supervisorPhone: z.string().min(10, 'Enter a valid phone number'),
   supervisorEmail: z.string().email().optional().or(z.literal('')),
@@ -255,15 +255,15 @@ export default function LogPage() {
               <Textarea
                 {...register('activity')}
                 rows={3}
-                maxLength={200}
+                maxLength={500}
                 placeholder="What did you actually do? Sorting food, tutoring a kid, etc."
                 className={cn('resize-none pr-14', errors.activity && 'border-danger')}
               />
               <span className={cn(
                 'absolute bottom-2.5 right-3 text-[11px] tabular-nums pointer-events-none',
-                activityLen > 180 ? 'text-warning' : 'text-ink-400'
+                activityLen > 450 ? 'text-danger' : 'text-ink-400'
               )}>
-                {activityLen}/200
+                {activityLen}/500
               </span>
             </div>
             {errors.activity && <p className="text-[13px] text-danger">{errors.activity.message}</p>}

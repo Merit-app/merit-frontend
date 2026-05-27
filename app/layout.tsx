@@ -46,9 +46,15 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-ink-50 text-ink-900">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-3 focus:py-2 focus:bg-white focus:text-merit-blue-600 focus:shadow-lg"
+        >
+          Skip to main content
+        </a>
         <NetworkStatus />
         <StoreHydrator />
-        {children}
+        <main id="main-content">{children}</main>
         <CookieBanner />
         <Toaster
           position="bottom-right"

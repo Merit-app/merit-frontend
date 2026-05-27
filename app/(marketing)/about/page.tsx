@@ -3,8 +3,14 @@ import Link from 'next/link';
 import { MarketingFooter } from '@/components/marketing/footer';
 
 export const metadata: Metadata = {
-  title: 'About Merit',
+  title: 'About Merit — Built for students',
   description: 'About Merit — Built for students by students to make volunteer hours verifiable and shareable.',
+  openGraph: {
+    title: 'About Merit — Built for students',
+    description: 'About Merit — Built for students by students to make volunteer hours verifiable and shareable.',
+    type: 'website',
+    url: 'https://merit-frontend-nine.vercel.app/about',
+  },
 };
 
 export default function AboutPage() {

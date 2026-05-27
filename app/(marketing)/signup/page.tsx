@@ -206,6 +206,7 @@ export default function SignupPage() {
                 <Input
                   id="firstName"
                   placeholder="First name"
+                  autoFocus
                   {...register('firstName')}
                   className={cn(errors.firstName && 'border-danger')}
                 />

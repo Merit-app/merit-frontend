@@ -3,10 +3,10 @@ import Link from 'next/link';
 import { MarketingFooter } from '@/components/marketing/footer';
 
 export const metadata: Metadata = {
-  title: 'FAQ',
+  title: 'Merit FAQ — Your questions answered',
   description: 'Merit FAQ — Your questions answered about SMS verification, PDF export, school partnerships, and more.',
   openGraph: {
-    title: 'Merit FAQ',
+    title: 'Merit FAQ — Your questions answered',
     description: 'Merit FAQ — Your questions answered about SMS verification, PDF export, school partnerships, and more.',
     type: 'website',
     url: 'https://merit-frontend-nine.vercel.app/faq',

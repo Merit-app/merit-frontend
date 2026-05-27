@@ -1,5 +1,6 @@
 'use client';
 
+import { Bell } from 'lucide-react';
 import { toast } from 'sonner';
 import { Separator } from '@/components/ui/separator';
 import { useMeritStore } from '@/lib/store';
@@ -58,6 +59,18 @@ export default function NotificationsPage() {
       <div className="mb-6">
         <h2 className="text-h1 text-ink-900">Notifications</h2>
         <p className="text-small text-ink-500 mt-1">Choose what Merit contacts you about.</p>
+      </div>
+
+      <div className="rounded-3xl border border-ink-200 bg-ink-50 p-5 mb-6 flex items-center gap-4">
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-merit-blue-600">
+          <Bell size={20} />
+        </div>
+        <div>
+          <p className="text-[14px] font-semibold text-ink-900">You're all caught up</p>
+          <p className="text-[13px] text-ink-500">
+            Notifications will appear here when your hours are verified or disputed.
+          </p>
+        </div>
       </div>
 
       <div className="bg-white rounded-xl border border-ink-200 divide-y divide-ink-200">

@@ -10,6 +10,8 @@ export function MarketingFooter() {
             {' '}— Service hour tracking for students
           </span>
           <div className="flex flex-wrap items-center gap-4">
+            <Link href="/about" className="hover:text-ink-700 transition-colors">About</Link>
+            <Link href="/contact" className="hover:text-ink-700 transition-colors">Contact</Link>
             <Link href="/pricing" className="hover:text-ink-700 transition-colors">Pricing</Link>
             <Link href="/faq" className="hover:text-ink-700 transition-colors">FAQ</Link>
             <Link href="/terms" className="hover:text-ink-700 transition-colors">Terms</Link>

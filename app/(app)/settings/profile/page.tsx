@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { useMeritStore } from '@/lib/store';
@@ -62,6 +63,18 @@ export default function ProfilePage() {
     },
   });
 
+  const profileFields = [
+    !!user.firstName && !!user.lastName,
+    !!user.school,
+    !!user.grade,
+    !!user.graduationYear,
+    !!user.goalProgram,
+    !!user.nhsGoalHours,
+    !!user.phone,
+  ];
+  const completedFields = profileFields.filter(Boolean).length;
+  const profileCompletion = Math.round((completedFields / profileFields.length) * 100);
+
   function handleProgramChange(e: React.ChangeEvent<HTMLSelectElement>) {
     const program = e.target.value;
     setValue('goalProgram', program, { shouldDirty: true });
@@ -106,7 +119,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Avatar */}
-      <div className="flex items-center gap-4 mb-8">
+      <div className="flex items-center gap-4 mb-4">
         <span
           className="flex h-16 w-16 items-center justify-center rounded-full text-[20px] font-semibold shrink-0"
           style={{ background: '#DBEAFE', color: '#1D4ED8' }}
@@ -116,6 +129,19 @@ export default function ProfilePage() {
         <div>
           <p className="text-[13px] font-medium text-ink-900">{user.firstName} {user.lastName}</p>
           <p className="text-small text-ink-500">{user.school} · Grade {user.grade}</p>
+        </div>
+      </div>
+
+      <div className="rounded-2xl bg-ink-50 border border-ink-200 p-4 mb-6">
+        <div className="flex items-center justify-between gap-4 mb-2">
+          <div>
+            <p className="text-[13px] font-semibold text-ink-900">Profile {profileCompletion}% complete</p>
+            <p className="text-[12px] text-ink-500">Complete your profile to get the most accurate graduation planning and goal guidance.</p>
+          </div>
+          <span className="text-[12px] font-medium text-merit-blue-600">{profileCompletion}%</span>
+        </div>
+        <div className="h-2 rounded-full bg-ink-200 overflow-hidden">
+          <div className="h-full bg-merit-blue-600 transition-all" style={{ width: `${profileCompletion}%` }} />
         </div>
       </div>
 
@@ -148,10 +174,20 @@ export default function ProfilePage() {
           <div className="space-y-1.5">
             <Label className="text-[13px] font-medium text-ink-900">Grade</Label>
             <Input type="number" min={9} max={12} {...register('grade', { valueAsNumber: true })} />
+            {errors.grade && <p className="text-[12px] text-danger">{errors.grade.message}</p>}
           </div>
           <div className="space-y-1.5">
             <Label className="text-[13px] font-medium text-ink-900">Graduation year</Label>
-            <Input type="number" min={2025} max={2035} {...register('graduationYear', { valueAsNumber: true })} />
+            <select
+              {...register('graduationYear', { valueAsNumber: true })}
+              className="flex h-10 w-full rounded-lg border border-ink-200 bg-white px-3 text-[14px] text-ink-900 focus:outline-none hover:border-ink-300 transition-colors appearance-none"
+            >
+              <option value="">Select year</option>
+              {[2025, 2026, 2027, 2028, 2029].map((year) => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </select>
+            {errors.graduationYear && <p className="text-[12px] text-danger">{errors.graduationYear.message}</p>}
           </div>
         </div>
 
@@ -422,17 +458,17 @@ function ChangePasswordSection() {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 max-w-sm">
         <div className="space-y-1.5">
           <Label className="text-[13px] font-medium text-ink-900">Current password</Label>
-          <Input type="password" {...register('currentPassword')} className={cn(errors.currentPassword && 'border-danger')} />
+          <PasswordInput type="password" {...register('currentPassword')} className={cn(errors.currentPassword && 'border-danger')} />
           {errors.currentPassword && <p className="text-[12px] text-danger">{errors.currentPassword.message}</p>}
         </div>
         <div className="space-y-1.5">
           <Label className="text-[13px] font-medium text-ink-900">New password</Label>
-          <Input type="password" placeholder="8+ characters" {...register('newPassword')} className={cn(errors.newPassword && 'border-danger')} />
+          <PasswordInput placeholder="8+ characters" {...register('newPassword')} className={cn(errors.newPassword && 'border-danger')} />
           {errors.newPassword && <p className="text-[12px] text-danger">{errors.newPassword.message}</p>}
         </div>
         <div className="space-y-1.5">
           <Label className="text-[13px] font-medium text-ink-900">Confirm new password</Label>
-          <Input type="password" {...register('confirmPassword')} className={cn(errors.confirmPassword && 'border-danger')} />
+          <PasswordInput {...register('confirmPassword')} className={cn(errors.confirmPassword && 'border-danger')} />
           {errors.confirmPassword && <p className="text-[12px] text-danger">{errors.confirmPassword.message}</p>}
         </div>
         <Button

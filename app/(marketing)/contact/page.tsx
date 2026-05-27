@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { MarketingFooter } from '@/components/marketing/footer';
 import { cn } from '@/lib/utils';
+
 const schema = z.object({
   name: z.string().min(1, 'Name is required.'),
   email: z.string().email('Enter a valid email address.'),
