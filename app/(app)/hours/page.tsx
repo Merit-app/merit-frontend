@@ -61,7 +61,7 @@ export default function HoursPage() {
     localStorage.setItem(PREF_KEY, JSON.stringify({ filter, sortKey, sortDir }));
   }, [filter, sortKey, sortDir]);
 
-  // Open sheet from URL param (e.g. from dashboard recent sessions)
+  // Open sheet from URL param
   useEffect(() => {
     const id = searchParams.get('session');
     if (id) {
@@ -71,7 +71,7 @@ export default function HoursPage() {
   }, [searchParams, sessions]);
 
   function toggleSort(key: SortKey) {
-    if (sortKey === key) setSortDir((d) => d === 'asc' ? 'desc' : 'asc');
+    if (sortKey === key) setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
     else { setSortKey(key); setSortDir('desc'); }
   }
 
@@ -81,7 +81,10 @@ export default function HoursPage() {
     if (query) {
       const q = query.toLowerCase();
       rows = rows.filter(
-        (s) => s.org.toLowerCase().includes(q) || s.activity.toLowerCase().includes(q) || s.supervisor.toLowerCase().includes(q)
+        (s) =>
+          s.org.toLowerCase().includes(q) ||
+          s.activity.toLowerCase().includes(q) ||
+          s.supervisor.toLowerCase().includes(q)
       );
     }
     rows = [...rows].sort((a, b) => {
@@ -100,14 +103,10 @@ export default function HoursPage() {
   const someSelected = selected.size > 0;
 
   function toggleSelectAll() {
-    if (allSelected) {
-      setSelected(new Set());
-    } else {
-      setSelected(new Set(allFilteredIds));
-    }
+    setSelected(allSelected ? new Set() : new Set(allFilteredIds));
   }
 
-  function toggleSelectRow(id: string, e: React.MouseEvent) {
+  function toggleSelectRow(id: string, e: React.MouseEvent | React.ChangeEvent) {
     e.stopPropagation();
     setSelected((prev) => {
       const next = new Set(prev);
@@ -140,7 +139,7 @@ export default function HoursPage() {
     if (failed.length === 0) {
       toast.success(`${ids.length} session${ids.length === 1 ? '' : 's'} deleted.`);
     } else {
-      toast.error(`${failed.length} session${failed.length === 1 ? '' : 's'} could not be deleted.`);
+      toast.error(`${failed.length} could not be deleted.`);
     }
   }
 
@@ -151,11 +150,12 @@ export default function HoursPage() {
       : <ChevronDown size={12} className="text-ink-600 ml-0.5" />;
   }
 
+  const COL = 'grid-cols-[32px_120px_1fr_1fr_80px_140px_100px_40px]';
+
   return (
     <div className="px-4 py-4 md:px-8 md:py-6">
       {/* Top bar */}
       <div className="flex items-center justify-between mb-6">
-        {/* Filter chips */}
         <div className="flex items-center gap-1 bg-ink-100 p-1 rounded-lg">
           {FILTER_TABS.map(({ key, label }) => (
             <button
@@ -163,9 +163,7 @@ export default function HoursPage() {
               onClick={() => setFilter(key)}
               className={cn(
                 'px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors',
-                filter === key
-                  ? 'bg-white text-ink-900 shadow-sm'
-                  : 'text-ink-500 hover:text-ink-700'
+                filter === key ? 'bg-white text-ink-900 shadow-sm' : 'text-ink-500 hover:text-ink-700'
               )}
             >
               {label}
@@ -174,7 +172,6 @@ export default function HoursPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Search */}
           <div className="relative">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-400 pointer-events-none" />
             <Input
@@ -184,7 +181,6 @@ export default function HoursPage() {
               className="pl-9 w-56 h-9 text-[13px]"
             />
           </div>
-          {/* Log new */}
           <Link
             href="/log"
             className="flex items-center gap-1.5 bg-merit-blue-600 hover:bg-merit-blue-700 text-white text-[13px] font-medium px-3.5 py-2 rounded-lg transition-colors"
@@ -195,12 +191,10 @@ export default function HoursPage() {
         </div>
       </div>
 
-      {/* Bulk delete bar */}
+      {/* Bulk action bar */}
       {someSelected && (
         <div className="mb-4 flex items-center gap-3 rounded-lg bg-ink-900 px-4 py-2.5">
-          <span className="text-[13px] text-white">
-            {selected.size} selected
-          </span>
+          <span className="text-[13px] text-white">{selected.size} selected</span>
           <button
             onClick={() => setSelected(new Set())}
             className="text-[13px] text-ink-400 hover:text-white transition-colors"
@@ -240,8 +234,8 @@ export default function HoursPage() {
       ) : (
         <div className="bg-white rounded-xl border border-ink-200 overflow-x-auto">
           <div className="min-w-[820px]">
-            {/* Header row */}
-            <div className="grid grid-cols-[32px_120px_1fr_1fr_80px_140px_100px_40px] gap-3 px-4 py-2.5 border-b border-ink-200 bg-ink-50 items-center">
+            {/* Header */}
+            <div className={cn('grid gap-3 px-4 py-2.5 border-b border-ink-200 bg-ink-50 items-center', COL)}>
               <input
                 type="checkbox"
                 checked={allSelected}
@@ -249,15 +243,17 @@ export default function HoursPage() {
                 aria-label="Select all sessions"
                 className="h-4 w-4 rounded border-ink-300 accent-merit-blue-600 cursor-pointer"
               />
-              {([
-                { key: 'date',   label: 'Date' },
-                { key: 'org',    label: 'Organization' },
-                { label: 'Activity', noSort: true },
-                { key: 'hours',  label: 'Hours' },
-                { label: 'Tier', noSort: true },
-                { key: 'status', label: 'Status' },
-                { label: '',     noSort: true },
-              ] as { key?: SortKey; label: string; noSort?: boolean }[]).map(({ key, label, noSort }) => (
+              {(
+                [
+                  { key: 'date',   label: 'Date' },
+                  { key: 'org',    label: 'Organization' },
+                  { label: 'Activity', noSort: true },
+                  { key: 'hours',  label: 'Hours' },
+                  { label: 'Tier', noSort: true },
+                  { key: 'status', label: 'Status' },
+                  { label: '',     noSort: true },
+                ] as { key?: SortKey; label: string; noSort?: boolean }[]
+              ).map(({ key, label, noSort }) => (
                 <button
                   key={label || 'actions'}
                   type="button"
@@ -275,39 +271,45 @@ export default function HoursPage() {
               ))}
             </div>
 
-            {/* Rows */}
+            {/* Rows — plain div with onClick; checkbox stops propagation */}
             {filtered.map((session) => {
               const hoursStr = session.hours % 1 === 0 ? `${session.hours}` : session.hours.toFixed(1);
               const isSelected = selected.has(session.id);
               return (
                 <div
                   key={session.id}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => { setSelectedSession(session); setSheetOpen(true); }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      setSelectedSession(session);
+                      setSheetOpen(true);
+                    }
+                  }}
                   className={cn(
-                    'grid grid-cols-[32px_120px_1fr_1fr_80px_140px_100px_40px] gap-3 px-4 py-3.5 border-b border-ink-100 last:border-0 items-center transition-colors duration-100',
+                    'grid gap-3 px-4 py-3.5 border-b border-ink-100 last:border-0 items-center',
+                    'transition-colors duration-100 cursor-pointer focus-visible:outline-none',
+                    'focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-merit-blue-400',
+                    COL,
                     isSelected ? 'bg-merit-blue-50' : 'hover:bg-ink-50'
                   )}
                 >
                   <input
                     type="checkbox"
                     checked={isSelected}
-                    onChange={() => {}}
-                    onClick={(e) => toggleSelectRow(session.id, e)}
+                    onChange={(e) => toggleSelectRow(session.id, e)}
+                    onClick={(e) => e.stopPropagation()}
                     aria-label={`Select session at ${session.org}`}
                     className="h-4 w-4 rounded border-ink-300 accent-merit-blue-600 cursor-pointer"
                   />
-                  <button
-                    type="button"
-                    onClick={() => { setSelectedSession(session); setSheetOpen(true); }}
-                    className="contents"
-                  >
-                    <span className="text-[13px] text-ink-500 tabular-nums text-left">{formatSessionDate(session.date)}</span>
-                    <span className="text-[13px] font-medium text-ink-900 truncate text-left">{session.org}</span>
-                    <span className="text-[12px] text-ink-500 truncate text-left">{session.activity}</span>
-                    <span className="text-[13px] font-medium text-ink-900 tabular-nums text-left">{hoursStr} hrs</span>
-                    <span><TierBadge tier={session.tier} /></span>
-                    <span><StatusBadge status={session.status} /></span>
-                    <span className="text-ink-300 text-[18px] leading-none select-none">›</span>
-                  </button>
+                  <span className="text-[13px] text-ink-500 tabular-nums">{formatSessionDate(session.date)}</span>
+                  <span className="text-[13px] font-medium text-ink-900 truncate">{session.org}</span>
+                  <span className="text-[12px] text-ink-500 truncate">{session.activity}</span>
+                  <span className="text-[13px] font-medium text-ink-900 tabular-nums">{hoursStr} hrs</span>
+                  <TierBadge tier={session.tier} />
+                  <StatusBadge status={session.status} />
+                  <span className="text-ink-300 text-[18px] leading-none select-none">›</span>
                 </div>
               );
             })}
