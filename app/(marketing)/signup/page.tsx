@@ -1,5 +1,6 @@
 'use client';
 
+import type { Metadata } from 'next';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -13,6 +14,17 @@ import { Label } from '@/components/ui/label';
 import { useMeritStore } from '@/lib/store';
 import { authApi, mapUser, ApiError } from '@/lib/api';
 import { cn } from '@/lib/utils';
+
+export const metadata: Metadata = {
+  title: 'Sign up',
+  description: 'Create your Merit account — Free forever. Track, verify, and export your volunteer hours with SMS verification.',
+  openGraph: {
+    title: 'Create your Merit account',
+    description: 'Create your Merit account — Free forever. Track, verify, and export your volunteer hours with SMS verification.',
+    type: 'website',
+    url: 'https://merit-frontend-nine.vercel.app/signup',
+  },
+};
 
 const MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',

@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /log
+Disallow: /hours
+Disallow: /organizations
+Disallow: /badges
+Disallow: /export
+Disallow: /orgs/
+Disallow: /u/
+Disallow: /onboarding
+
+Sitemap: https://merit-frontend-nine.vercel.app/sitemap.xml

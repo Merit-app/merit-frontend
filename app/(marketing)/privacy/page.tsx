@@ -2,7 +2,16 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { MarketingFooter } from '@/components/marketing/footer';
 
-export const metadata: Metadata = { title: 'Privacy Policy · Merit' };
+export const metadata: Metadata = {
+  title: 'Privacy Policy',
+  description: 'Merit Privacy Policy — How we protect your data and use SMS verification for service hour verification.',
+  openGraph: {
+    title: 'Merit Privacy Policy',
+    description: 'Merit Privacy Policy — How we protect your data and use SMS verification for service hour verification.',
+    type: 'website',
+    url: 'https://merit-frontend-nine.vercel.app/privacy',
+  },
+};
 
 export default function PrivacyPage() {
   return (

@@ -1,5 +1,6 @@
 'use client';
 
+import type { Metadata } from 'next';
 import { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -14,6 +15,17 @@ import { Label } from '@/components/ui/label';
 import { useMeritStore } from '@/lib/store';
 import { authApi, mapUser, ApiError } from '@/lib/api';
 import { cn } from '@/lib/utils';
+
+export const metadata: Metadata = {
+  title: 'Sign in',
+  description: 'Sign in to your Merit account to track and verify your volunteer hours.',
+  openGraph: {
+    title: 'Sign in to Merit',
+    description: 'Sign in to your Merit account to track and verify your volunteer hours.',
+    type: 'website',
+    url: 'https://merit-frontend-nine.vercel.app/login',
+  },
+};
 
 const schema = z.object({
   email: z.string().email('Enter a valid email address.'),

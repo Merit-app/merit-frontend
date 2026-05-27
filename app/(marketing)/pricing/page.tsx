@@ -3,7 +3,16 @@ import Link from 'next/link';
 import { Check } from 'lucide-react';
 import { MarketingFooter } from '@/components/marketing/footer';
 
-export const metadata: Metadata = { title: 'Pricing · Merit' };
+export const metadata: Metadata = {
+  title: 'Pricing',
+  description: 'Merit Pricing — Free, Pro, and Premium plans for every student. Start free, upgrade when you need more verifications.',
+  openGraph: {
+    title: 'Merit Pricing',
+    description: 'Merit Pricing — Free, Pro, and Premium plans for every student. Start free, upgrade when you need more verifications.',
+    type: 'website',
+    url: 'https://merit-frontend-nine.vercel.app/pricing',
+  },
+};
 
 const PLANS = [
   {

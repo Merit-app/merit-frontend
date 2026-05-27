@@ -1,5 +1,6 @@
 'use client';
 
+import type { Metadata } from 'next';
 import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -12,6 +13,17 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { authApi, ApiError } from '@/lib/api';
 import { cn } from '@/lib/utils';
+
+export const metadata: Metadata = {
+  title: 'Reset password',
+  description: 'Reset your Merit password using the link sent to your email.',
+  openGraph: {
+    title: 'Reset password',
+    description: 'Reset your Merit password using the link sent to your email.',
+    type: 'website',
+    url: 'https://merit-frontend-nine.vercel.app/reset-password',
+  },
+};
 
 const schema = z
   .object({

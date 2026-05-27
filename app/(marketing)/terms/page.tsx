@@ -2,7 +2,16 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { MarketingFooter } from '@/components/marketing/footer';
 
-export const metadata: Metadata = { title: 'Terms of Service · Merit' };
+export const metadata: Metadata = {
+  title: 'Terms of Service',
+  description: 'Merit Terms of Service — Our terms and conditions for using the Merit volunteer hours tracking platform.',
+  openGraph: {
+    title: 'Merit Terms of Service',
+    description: 'Merit Terms of Service — Our terms and conditions for using the Merit volunteer hours tracking platform.',
+    type: 'website',
+    url: 'https://merit-frontend-nine.vercel.app/terms',
+  },
+};
 
 export default function TermsPage() {
   return (

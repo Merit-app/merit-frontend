@@ -1,5 +1,26 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { CheckCircle, ShieldCheck, FileText, Clock } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'Merit — Volunteer hours you can prove',
+  description: 'Track, verify, and export your volunteer hours with SMS verification. Built for NHS, IB, college apps, and graduation requirements.',
+  openGraph: {
+    title: 'Merit — Volunteer hours you can prove',
+    description: 'Track, verify, and export your volunteer hours with SMS verification. Built for NHS, IB, college apps, and graduation requirements.',
+    type: 'website',
+    url: 'https://merit-frontend-nine.vercel.app',
+    images: [{
+      url: '/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'Merit — Volunteer hours you can prove',
+    }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+  },
+};
 
 const FEATURES = [
   {
