@@ -49,7 +49,6 @@ export default function AboutPage() {
             Volunteer hours are hard to prove. You log them in spreadsheets, email them to supervisors, and hope they get verified before the deadline. Hours get lost, supervisors forget to confirm, and you're left scrambling to re-create records for:
           </p>
           <ul className="space-y-2 text-[16px] text-ink-700">
-            <li>🏥 NHS (National Honor Society) — requires 75+ verified hours</li>
             <li>📚 IB CAS (Creativity, Activity, Service) — needs documented proof</li>
             <li>🎓 College applications — admissions officers want credible evidence</li>
             <li>👨‍🎓 Graduation requirements — schools mandate verifiable service records</li>

@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 const FAQS = [
   {
     q: 'What is Merit?',
-    a: 'Merit is a service hour tracking app for high school students. It lets you log volunteer sessions, get them verified by your supervisor via SMS or email, and export a clean PDF record for NHS submissions, scholarship applications, or graduation requirements.',
+    a: 'Merit is a service hour tracking app for high school students. It lets you log volunteer sessions, get them verified by your supervisor via SMS or email, and export a clean PDF record for scholarship applications, college apps, or graduation requirements.',
   },
   {
     q: 'How does SMS verification work?',
@@ -27,7 +27,7 @@ const FAQS = [
     a: "The session stays in Pending status. You can resend the verification request from the session detail view (within the limits of your plan). If your supervisor never responds, the session remains unverified — we can't automatically verify hours your supervisor hasn't confirmed.",
   },
   {
-    q: 'Can I use Merit for NHS, IB CAS, and graduation at the same time?',
+    q: 'Can I track multiple program goals at the same time?',
     a: "Currently Merit tracks one goal at a time, but you can switch programs in Settings → Profile at any time. All logged sessions are preserved regardless of which goal is active. Multiple simultaneous goal tracking is on our roadmap.",
   },
   {
@@ -36,7 +36,7 @@ const FAQS = [
   },
   {
     q: 'What PDF formats are available?',
-    a: 'The Free plan includes the Classic PDF template — a clean, professional record of your sessions. Pro and Premium plans unlock the Modern template and NHS-formatted exports. Premium also allows custom PDF branding.',
+    a: 'The Free plan includes the Classic PDF template — a clean, professional record of your sessions. Pro and Premium plans unlock the Modern template and additional PDF formats. Premium also allows custom PDF branding.',
   },
   {
     q: 'How do I cancel my subscription?',
@@ -51,7 +51,7 @@ const FAQS = [
     a: "No problem. When logging a session, type the organization name and select 'Create new organization.' It'll be added to your account and can be reused for future sessions. Over 1 million nonprofits are pre-loaded from IRS and CRA databases.",
   },
   {
-    q: 'Can my school or NHS chapter use Merit?',
+    q: 'Can my school or organization use Merit?',
     a: "Yes — we offer an Institutional plan with an admin dashboard for advisors, supervisor whitelisting, custom branded PDFs, and grant reporting. Reach out at hello@merit.app to learn more.",
   },
 ];

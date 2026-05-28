@@ -1,47 +1,63 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import Link from 'next/link';
 import { PDFViewer, PDFDownloadLink } from '@react-pdf/renderer';
-import { Lock, Download, FileText } from 'lucide-react';
+import { Lock, Download, FileText, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { MeritPdfDocument } from '@/lib/pdf-template';
 import { useMeritStore } from '@/lib/store';
+import { usePlan } from '@/lib/hooks/use-plan';
 import { cn } from '@/lib/utils';
 
 type Template = 'classic' | 'modern' | 'nhs-formal';
 type DateRange = 'all' | 'school-year' | 'custom';
 
+const FREE_LOOKBACK_DAYS = 30;
+
 const TEMPLATES: { key: Template; label: string; premium: boolean }[] = [
   { key: 'classic',    label: 'Classic',    premium: false },
   { key: 'modern',     label: 'Modern',     premium: true },
-  { key: 'nhs-formal', label: 'NHS-formal', premium: true },
+  { key: 'nhs-formal', label: 'Advanced', premium: true },
 ];
 
 export default function PdfExportInner() {
   const user = useMeritStore((s) => s.user);
   const sessions = useMeritStore((s) => s.sessions);
+  const { isFree, isPremium } = usePlan();
 
-  const [includeCover,      setIncludeCover]      = useState(true);
-  const [includeStats,      setIncludeStats]      = useState(true);
-  const [includeLog,        setIncludeLog]        = useState(true);
-  const [includeVerify,     setIncludeVerify]     = useState(true);
-  const [template,          setTemplate]          = useState<Template>('classic');
-  const [dateRange,         setDateRange]         = useState<DateRange>('all');
-  const [format,            setFormat]            = useState<'pdf' | 'csv'>('pdf');
+  const [includeStats,  setIncludeStats]  = useState(true);
+  const [includeLog,    setIncludeLog]    = useState(true);
+  const [includeVerify, setIncludeVerify] = useState(true);
+  const [template,      setTemplate]      = useState<Template>('classic');
+  const [dateRange,     setDateRange]     = useState<DateRange>('all');
+  const [format,        setFormat]        = useState<'pdf' | 'csv'>('pdf');
 
-  const isPremium = user.plan === 'premium';
+  // Free plan: enforce 30-day lookback on "All time" selection
+  const freeCutoff = useMemo(() => {
+    if (!isFree) return null;
+    const d = new Date();
+    d.setDate(d.getDate() - FREE_LOOKBACK_DAYS);
+    return d;
+  }, [isFree]);
 
   const filteredSessions = useMemo(() => {
-    if (dateRange === 'school-year') {
+    let base = sessions;
+
+    // Free tier: restrict to last 30 days regardless of user selection
+    if (isFree && freeCutoff) {
+      base = base.filter((s) => new Date(s.date) >= freeCutoff);
+    } else if (dateRange === 'school-year') {
       const now = new Date();
       const cutoff = now.getMonth() >= 8
         ? new Date(now.getFullYear(), 8, 1)
         : new Date(now.getFullYear() - 1, 8, 1);
-      return sessions.filter((s) => new Date(s.date) >= cutoff);
+      base = base.filter((s) => new Date(s.date) >= cutoff);
     }
-    return sessions;
-  }, [sessions, dateRange]);
+
+    return base;
+  }, [sessions, dateRange, isFree, freeCutoff]);
 
   const hasVerified = filteredSessions.some((s) => s.status === 'verified');
 
@@ -105,6 +121,21 @@ export default function PdfExportInner() {
               <span className="text-[13px] text-ink-700">{label}</span>
             </label>
           ))}
+          {/* Free-tier notice */}
+          {isFree && (
+            <div className="mt-2 rounded-lg border border-merit-blue-200 bg-merit-blue-50 px-3 py-2.5 flex items-start gap-2">
+              <Zap size={13} className="text-merit-blue-600 shrink-0 mt-0.5" />
+              <div>
+                <p className="text-[12px] font-medium text-merit-blue-700">Last 30 days only</p>
+                <p className="text-[11px] text-merit-blue-600 mt-0.5">
+                  <Link href="/settings/billing" className="underline underline-offset-2 hover:text-merit-blue-800">
+                    Upgrade to Pro
+                  </Link>{' '}
+                  for full history exports.
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Template picker */}
@@ -136,7 +167,7 @@ export default function PdfExportInner() {
             })}
           </div>
           {!isPremium && (
-            <p className="text-[11px] text-ink-500 mt-1">Modern & NHS-formal require Premium.</p>
+            <p className="text-[11px] text-ink-500 mt-1">Modern & Advanced templates require Premium.</p>
           )}
         </div>
 

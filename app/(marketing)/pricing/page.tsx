@@ -78,7 +78,7 @@ const PLANS = [
 
 const INSTITUTIONAL = {
   name: 'Institutional',
-  description: 'For schools, NHS chapters, and clubs managing multiple students.',
+  description: 'For schools and clubs managing multiple students.',
   features: [
     'Everything in Premium',
     'Admin dashboard for advisors',

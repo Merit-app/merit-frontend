@@ -40,7 +40,7 @@ export default function TermsPage() {
         <div className="space-y-8 text-[14px] text-ink-700 leading-relaxed">
           <section>
             <h2 className="text-[16px] font-semibold text-ink-900 mb-3">1. About Merit</h2>
-            <p>Merit is a volunteer hour tracking tool designed for high school students. It helps you log service sessions, have them verified by your supervisor, and generate PDF records for NHS, scholarship, and graduation requirements.</p>
+            <p>Merit is a volunteer hour tracking tool designed for high school students. It helps you log service sessions, have them verified by your supervisor, and generate PDF records for scholarship and graduation requirements.</p>
           </section>
 
           <section>
@@ -55,7 +55,7 @@ export default function TermsPage() {
 
           <section>
             <h2 className="text-[16px] font-semibold text-ink-900 mb-3">4. Verification Disputes</h2>
-            <p>Merit facilitates supervisor verification via SMS and email. Merit is not responsible for supervisors who do not respond, disputes between you and your supervisor, or decisions made by your school, NHS chapter, or scholarship committee based on your records.</p>
+            <p>Merit facilitates supervisor verification via SMS and email. Merit is not responsible for supervisors who do not respond, disputes between you and your supervisor, or decisions made by your school or scholarship committee based on your records.</p>
           </section>
 
           <section>

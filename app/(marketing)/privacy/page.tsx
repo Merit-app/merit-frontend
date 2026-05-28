@@ -56,7 +56,7 @@ export default function PrivacyPage() {
             <p>We collect this information to:</p>
             <ul className="list-disc list-inside space-y-1.5 text-ink-600 mt-2">
               <li>Verify your volunteer hours with your supervisors</li>
-              <li>Generate PDF records for NHS, scholarship, and school requirements</li>
+              <li>Generate PDF records for scholarship and school requirements</li>
               <li>Track your progress toward your service goal</li>
               <li>Send you account and verification notifications</li>
               <li>Process subscription payments (Pro and Premium plans)</li>

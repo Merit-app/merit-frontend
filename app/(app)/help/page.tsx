@@ -4,7 +4,7 @@ import { MessageCircle, FileText, Mail } from 'lucide-react';
 const FAQS = [
   {
     q: 'How does supervisor verification work?',
-    a: "After you log a session, Merit sends your supervisor an SMS with a summary. They reply YES to confirm or NO to dispute. Verified sessions count toward your NHS goal; disputed ones appear flagged in your record.",
+    a: "After you log a session, Merit sends your supervisor an SMS with a summary. They reply YES to confirm or NO to dispute. Verified sessions count toward your goal; disputed ones appear flagged in your record.",
   },
   {
     q: 'What counts as a verified hour?',
@@ -20,7 +20,7 @@ const FAQS = [
   },
   {
     q: 'How do I export my hours for college applications?',
-    a: 'Go to Export in the sidebar. You can choose a date range, include or exclude supervisor names, and download a signed PDF suitable for NHS, scholarship, and college application submissions.',
+    a: 'Go to Export in the sidebar. You can choose a date range, include or exclude supervisor names, and download a signed PDF suitable for scholarship, college application, and graduation requirement submissions.',
   },
   {
     q: 'Is my data stored securely?',

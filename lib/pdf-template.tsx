@@ -158,7 +158,7 @@ export function MeritPdfDocument({ user, sessions, includeStats = true, includeS
             <View style={s.summaryCard}>
               <Text style={s.summaryLabel}>Total verified hours</Text>
               <Text style={s.summaryValue}>{hoursStr}</Text>
-              <Text style={s.summarySub}>of {user.nhsGoalHours} hr NHS goal</Text>
+              <Text style={s.summarySub}>of {user.nhsGoalHours} hr goal</Text>
             </View>
             <View style={s.summaryCard}>
               <Text style={s.summaryLabel}>Verified rate</Text>

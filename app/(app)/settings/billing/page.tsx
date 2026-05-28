@@ -29,7 +29,7 @@ const FREE_FEATURES = [
 
 const PRO_FEATURES = [
   'Everything in Free',
-  'Modern & NHS-formal PDF templates',
+  'Modern PDF templates',
   'Unlimited organizations',
   'CSV export',
   'Priority support',

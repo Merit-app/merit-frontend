@@ -83,7 +83,7 @@ export function QuickActions() {
           <p className="text-micro text-ink-500 mb-2">Stay on track</p>
           <p className="text-h3 text-ink-900 mb-1">Export your record</p>
           <p className="text-small text-ink-500 mb-4">
-            Download a verified PDF of your hours for NHS, scholarship, or college applications.
+            Download a verified PDF of your hours for scholarships, college applications, and graduation.
           </p>
           <Link
             href="/export"

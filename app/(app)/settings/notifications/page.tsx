@@ -21,7 +21,7 @@ const NOTIFICATION_OPTIONS: { key: NotificationKey; label: string; description: 
   {
     key: 'goalMilestones',
     label: 'Goal milestones',
-    description: 'Notifications at 25%, 50%, 75%, and 100% of your NHS or scholarship hour goals.',
+    description: 'Notifications at 25%, 50%, 75%, and 100% of your service hour goals.',
   },
   {
     key: 'productUpdates',

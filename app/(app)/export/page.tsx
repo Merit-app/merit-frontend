@@ -9,7 +9,7 @@ export default function ExportPage() {
       <div className="mb-6">
         <h1 className="text-h1 text-ink-900">Export</h1>
         <p className="text-small text-ink-500 mt-1">
-          Download a verified PDF of your hours for NHS, scholarships, or college applications.
+          Download a verified PDF of your hours for scholarships, college applications, and graduation requirements.
         </p>
       </div>
       <PdfExportClient />

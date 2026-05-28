@@ -94,7 +94,7 @@ export default function AppOrgProfilePage({ params }: { params: Promise<{ slug: 
   // Skeleton
   if (loading) {
     return (
-      <div className="px-4 py-6 md:px-8 max-w-3xl mx-auto space-y-4 animate-pulse">
+      <div className="px-4 py-6 md:px-8 max-w-4xl mx-auto space-y-4 animate-pulse">
         <div className="bg-white rounded-xl border border-ink-200 overflow-hidden">
           <div className="h-40 bg-ink-100" />
           <div className="p-5 space-y-3">
@@ -113,7 +113,7 @@ export default function AppOrgProfilePage({ params }: { params: Promise<{ slug: 
   const orgSlugForLog = org.slug ?? org.id;
 
   return (
-    <div className="px-4 py-6 md:px-8 max-w-3xl mx-auto space-y-4">
+    <div className="px-4 py-6 md:px-8 max-w-4xl mx-auto space-y-4">
       {/* Breadcrumb */}
       <p className="text-[12px] text-ink-400">
         <Link href="/organizations" className="hover:text-ink-700 transition-colors">Organizations</Link>
