@@ -46,6 +46,7 @@ export const useMeritStore = create<MeritStore>()(
       // ── Data ────────────────────────────────────────────────────────────
       sessions: [],
       organizations: [],
+      followedOrgIds: [],
 
       // ── Settings ────────────────────────────────────────────────────────
       notifications: defaultNotifications,
@@ -69,6 +70,7 @@ export const useMeritStore = create<MeritStore>()(
           expiresAt: null,
           sessions: [],
           organizations: [],
+          followedOrgIds: [],
         }),
 
       setTokens: (accessToken: string, refreshToken: string, expiresAt: number) =>
@@ -77,6 +79,15 @@ export const useMeritStore = create<MeritStore>()(
       setSessions: (sessions: Session[]) => set({ sessions }),
 
       setOrganizations: (organizations: Organization[]) => set({ organizations }),
+
+      setFollowedOrgIds: (ids: string[]) => set({ followedOrgIds: ids }),
+
+      toggleFollowOptimistic: (orgId: string) =>
+        set((state) => ({
+          followedOrgIds: state.followedOrgIds.includes(orgId)
+            ? state.followedOrgIds.filter((id) => id !== orgId)
+            : [...state.followedOrgIds, orgId],
+        })),
 
       addSession: (session: Session) =>
         set((state) => ({ sessions: [session, ...state.sessions] })),

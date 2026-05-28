@@ -14,6 +14,7 @@ import {
   X,
   ChevronUp,
   Award,
+  Bookmark,
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -24,6 +25,7 @@ const primaryNav = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/hours', label: 'All sessions', icon: Clock },
   { href: '/organizations', label: 'Organizations', icon: Building2 },
+  { href: '/saved', label: 'Saved', icon: Bookmark },
   { href: '/badges', label: 'Badges', icon: Award },
   { href: '/export', label: 'Export', icon: FileDown },
 ] as const;

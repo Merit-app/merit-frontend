@@ -41,6 +41,49 @@ export interface Organization {
   description?: string;
 }
 
+/** Org returned by the discover / following endpoints */
+export interface DiscoverOrg {
+  id: string;
+  slug: string;
+  name: string;
+  category: string | null;
+  city: string | null;
+  state: string | null;
+  website: string | null;
+  description: string | null;
+  logoUrl: string | null;
+  coverUrl: string | null;
+  isRegisteredNonprofit: boolean;
+  isInstitutionalPartner: boolean;
+  claimed: boolean;
+  isRecruiting: boolean;
+  studentCount: number;
+  isFollowing: boolean;
+}
+
+/** Small card for "similar orgs" sections */
+export interface SimilarOrg {
+  id: string;
+  slug: string;
+  name: string;
+  category: string | null;
+  city: string | null;
+  state: string | null;
+  logoUrl: string | null;
+  isRegisteredNonprofit: boolean;
+  studentCount: number;
+}
+
+/** Stats returned by GET /organizations/:id/stats */
+export interface OrgStats {
+  totalStudents: number;
+  totalHours: number;
+  avgSessionHours: number;
+  totalSessions: number;
+  mostActiveMonths: string[];
+  recentVolunteerCount: number;
+}
+
 export interface User {
   id: string;
   firstName: string;
@@ -96,6 +139,7 @@ export interface MeritStore {
   // Data
   sessions: Session[];
   organizations: Organization[];
+  followedOrgIds: string[];
 
   // Settings
   notifications: NotificationPreferences;
@@ -106,6 +150,8 @@ export interface MeritStore {
   setTokens: (accessToken: string, refreshToken: string, expiresAt: number) => void;
   setSessions: (sessions: Session[]) => void;
   setOrganizations: (organizations: Organization[]) => void;
+  setFollowedOrgIds: (ids: string[]) => void;
+  toggleFollowOptimistic: (orgId: string) => void;
   addSession: (session: Session) => void;
   updateSession: (id: string, patch: Partial<Session>) => void;
   deleteSession: (id: string) => void;

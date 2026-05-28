@@ -1,57 +1,272 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import Link from 'next/link';
-import { Search, Building2 } from 'lucide-react';
+import { Search, Building2, ChevronRight } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { OrgCard } from '@/components/orgs/org-card';
-import { useMeritStore, useHydrationStore } from '@/lib/store';
 import { Skeleton } from '@/components/ui/skeleton';
+import { DiscoverOrgCard } from '@/components/orgs/discover-org-card';
+import { useMeritStore, useHydrationStore } from '@/lib/store';
+import { orgsApi, ApiError } from '@/lib/api';
 import { cn } from '@/lib/utils';
-import type { OrgCategory } from '@/lib/types';
+import type { DiscoverOrg, Session } from '@/lib/types';
+import { formatDistanceToNow, parseISO } from 'date-fns';
 
-const CATEGORIES: (OrgCategory | 'All')[] = [
-  'All', 'Community', 'Education', 'Health', 'Animal welfare',
-  'Environment', 'Social services', 'Other',
-];
+// ── Category pills ────────────────────────────────────────────────────────────
+
+const STATIC_CATEGORIES = [
+  'All',
+  'Food & Hunger',
+  'Education & Tutoring',
+  'Environment & Nature',
+  'Animal Welfare',
+  'Health & Wellness',
+  'Community & Social',
+  'Youth & Children',
+  'Arts & Culture',
+  'Emergency & Crisis',
+] as const;
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function getInitials(name: string) {
+  return name.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2);
+}
+
+function orgHours(orgId: string, sessions: Session[]) {
+  return sessions
+    .filter((s) => s.orgSlug === orgId && s.status === 'verified')
+    .reduce((sum, s) => sum + s.hours, 0);
+}
+
+function orgLastDate(orgId: string, sessions: Session[]): string | null {
+  const dates = sessions
+    .filter((s) => s.orgSlug === orgId)
+    .map((s) => s.date)
+    .sort((a, b) => b.localeCompare(a));
+  return dates[0] ?? null;
+}
+
+// ── My Org Card (horizontal scroll) ──────────────────────────────────────────
+
+function MyOrgCard({ org, sessions }: { org: ReturnType<typeof useMeritStore.getState>['organizations'][0]; sessions: Session[] }) {
+  const hours = orgHours(org.id, sessions);
+  const lastDate = orgLastDate(org.id, sessions);
+  const hoursStr = hours % 1 === 0 ? String(hours) : hours.toFixed(1);
+  const lastRelative = lastDate
+    ? formatDistanceToNow(parseISO(lastDate + 'T00:00:00'), { addSuffix: true })
+    : null;
+
+  return (
+    <Link
+      href={`/organizations/${org.slug}`}
+      className="flex-shrink-0 w-48 bg-white rounded-xl border border-ink-200 p-4 hover:border-merit-blue-300 hover:shadow-sm transition-all duration-150 flex flex-col gap-2"
+    >
+      {/* Logo */}
+      <div className="w-10 h-10 rounded-xl bg-merit-blue-100 flex items-center justify-center text-[13px] font-bold text-merit-blue-700 shrink-0">
+        {getInitials(org.name)}
+      </div>
+
+      {/* Name */}
+      <p className="text-[13px] font-semibold text-ink-900 leading-snug line-clamp-2">{org.name}</p>
+
+      {/* Stats */}
+      <div className="mt-auto space-y-0.5">
+        <p className="text-[12px] text-ink-500">
+          <span className="font-semibold text-ink-700">{hoursStr} hrs</span> logged
+        </p>
+        {lastRelative && (
+          <p className="text-[11px] text-ink-400">Last visited {lastRelative}</p>
+        )}
+      </div>
+
+      {/* Trust badge */}
+      {org.registrationStatus === 'registered' && (
+        <span className="inline-flex items-center text-[10px] font-medium text-green-700 bg-green-50 px-1.5 py-0.5 rounded-full w-fit">
+          Verified
+        </span>
+      )}
+      {org.registrationStatus === 'institutional' && (
+        <span className="inline-flex items-center text-[10px] font-medium text-merit-blue-700 bg-merit-blue-50 px-1.5 py-0.5 rounded-full w-fit">
+          Partner
+        </span>
+      )}
+    </Link>
+  );
+}
+
+// ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function OrganizationsPage() {
   const hydrated = useHydrationStore((s) => s.hydrated);
   const organizations = useMeritStore((s) => s.organizations);
   const sessions = useMeritStore((s) => s.sessions);
-  const [query, setQuery] = useState('');
-  const [category, setCategory] = useState<OrgCategory | 'All'>('All');
+  const followedOrgIds = useMeritStore((s) => s.followedOrgIds);
+  const toggleFollowOptimistic = useMeritStore((s) => s.toggleFollowOptimistic);
 
-  const filtered = useMemo(() => {
-    let orgs = organizations;
-    if (category !== 'All') orgs = orgs.filter((o) => o.category === category);
-    if (query) {
-      const q = query.toLowerCase();
-      orgs = orgs.filter((o) => o.name.toLowerCase().includes(q));
+  const [query, setQuery] = useState('');
+  const [category, setCategory] = useState<string>('All');
+  const [discoverOrgs, setDiscoverOrgs] = useState<DiscoverOrg[]>([]);
+  const [followingOrgs, setFollowingOrgs] = useState<DiscoverOrg[]>([]);
+  const [discoverLoading, setDiscoverLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const offsetRef = useRef(0);
+
+  const hasFollows = followedOrgIds.length > 0;
+  const categories = hasFollows ? [...STATIC_CATEGORIES, 'Following'] : STATIC_CATEGORIES;
+
+  // ── Fetch discover ────────────────────────────────────────────────────────
+
+  const fetchDiscover = useCallback(async (q: string, cat: string, reset: boolean) => {
+    if (reset) {
+      setDiscoverLoading(true);
+      offsetRef.current = 0;
     }
-    return orgs;
-  }, [organizations, category, query]);
+
+    try {
+      if (cat === 'Following') {
+        const res = await orgsApi.following();
+        const orgs: DiscoverOrg[] = (res.data ?? []).map((o: any) => ({ ...o, isFollowing: true }));
+        setFollowingOrgs(orgs);
+        setDiscoverOrgs(orgs);
+        setHasMore(false);
+        return;
+      }
+
+      const res = await orgsApi.discover({
+        q: q || undefined,
+        category: cat !== 'All' ? cat : undefined,
+        limit: 30,
+        offset: reset ? 0 : offsetRef.current,
+      });
+      const incoming: DiscoverOrg[] = res.data ?? [];
+
+      if (reset) {
+        setDiscoverOrgs(incoming);
+      } else {
+        setDiscoverOrgs((prev) => {
+          const existingIds = new Set(prev.map((o) => o.id));
+          return [...prev, ...incoming.filter((o) => !existingIds.has(o.id))];
+        });
+      }
+
+      offsetRef.current = (reset ? 0 : offsetRef.current) + incoming.length;
+      setHasMore(incoming.length === 30);
+    } catch {
+      // non-fatal
+    } finally {
+      setDiscoverLoading(false);
+      setLoadingMore(false);
+    }
+  }, []);
+
+  // Initial + category change
+  useEffect(() => {
+    if (!hydrated) return;
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    fetchDiscover(query, category, true);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hydrated, category]);
+
+  // Debounced search
+  useEffect(() => {
+    if (!hydrated) return;
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      fetchDiscover(query, category, true);
+    }, 300);
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query]);
+
+  const handleLoadMore = () => {
+    setLoadingMore(true);
+    fetchDiscover(query, category, false);
+  };
+
+  // ── Follow toggle ─────────────────────────────────────────────────────────
+
+  const handleToggleFollow = useCallback(async (orgId: string) => {
+    toggleFollowOptimistic(orgId);
+    // Update discover list optimistically
+    setDiscoverOrgs((prev) =>
+      prev.map((o) => o.id === orgId ? { ...o, isFollowing: !o.isFollowing } : o)
+    );
+    try {
+      await orgsApi.follow(orgId);
+    } catch {
+      // Revert on failure
+      toggleFollowOptimistic(orgId);
+      setDiscoverOrgs((prev) =>
+        prev.map((o) => o.id === orgId ? { ...o, isFollowing: !o.isFollowing } : o)
+      );
+    }
+  }, [toggleFollowOptimistic]);
+
+  // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="px-4 py-4 md:px-8 md:py-6">
-      {/* Search + filter */}
-      <div className="flex items-center gap-3 mb-6 flex-wrap">
-        <div className="relative flex-1 min-w-56 max-w-sm">
+    <div className="px-4 py-6 md:px-8 space-y-8">
+
+      {/* SECTION 1 — Your Organizations */}
+      <section>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-[16px] font-semibold text-ink-900">Your Organizations</h2>
+          {organizations.length > 0 && (
+            <span className="text-[12px] text-ink-400">{organizations.length} {organizations.length === 1 ? 'org' : 'orgs'}</span>
+          )}
+        </div>
+
+        {!hydrated ? (
+          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="flex-shrink-0 w-48 h-36 bg-white rounded-xl border border-ink-200 animate-pulse" />
+            ))}
+          </div>
+        ) : organizations.length === 0 ? (
+          <div className="bg-white rounded-xl border border-ink-100 px-5 py-6 text-center">
+            <Building2 size={24} className="text-ink-300 mx-auto mb-2" />
+            <p className="text-[13px] text-ink-500">
+              Your organizations will appear here once you log your first session.
+            </p>
+            <Link href="/log" className="mt-3 inline-block text-[13px] font-medium text-merit-blue-600 hover:text-merit-blue-700 transition-colors">
+              Log a session →
+            </Link>
+          </div>
+        ) : (
+          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none">
+            {organizations.map((org) => (
+              <MyOrgCard key={org.id} org={org} sessions={sessions} />
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* SECTION 2 — Discover */}
+      <section>
+        <h2 className="text-[16px] font-semibold text-ink-900 mb-4">Discover</h2>
+
+        {/* Search */}
+        <div className="relative mb-4">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-400 pointer-events-none" />
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search organizations..."
-            className="pl-9 h-9 text-[13px]"
+            className="pl-9 h-10 text-[13px]"
           />
         </div>
-        <div className="flex items-center gap-1 flex-wrap">
-          {CATEGORIES.map((cat) => (
+
+        {/* Category pills */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-2 mb-5 scrollbar-none">
+          {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setCategory(cat)}
               className={cn(
-                'px-3 py-1.5 rounded-lg text-[12px] font-medium transition-colors',
+                'flex-shrink-0 px-3 py-1.5 rounded-full text-[12px] font-medium transition-colors',
                 category === cat
                   ? 'bg-ink-900 text-white'
                   : 'bg-ink-100 text-ink-600 hover:bg-ink-200'
@@ -61,37 +276,56 @@ export default function OrganizationsPage() {
             </button>
           ))}
         </div>
-      </div>
 
-      {/* Grid */}
-      {!hydrated ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[0, 1, 2].map((i) => (
-            <div key={i} className="bg-white rounded-xl border border-ink-200 p-5 space-y-3">
-              <Skeleton className="h-4 w-40" />
-              <Skeleton className="h-3 w-24" />
-              <Skeleton className="h-3 w-full" />
-              <Skeleton className="h-3 w-3/4" />
+        {/* Grid */}
+        {discoverLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="bg-white rounded-xl border border-ink-200 overflow-hidden animate-pulse">
+                <div className="h-20 bg-ink-100" />
+                <div className="p-4 space-y-2">
+                  <div className="h-3 bg-ink-100 rounded w-3/4" />
+                  <div className="h-2.5 bg-ink-100 rounded w-1/2" />
+                  <div className="h-2.5 bg-ink-100 rounded w-2/3" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : discoverOrgs.length === 0 ? (
+          <div className="flex flex-col items-center py-16 text-center">
+            <Building2 size={32} className="text-ink-300 mb-3" />
+            <p className="text-[15px] font-semibold text-ink-900 mb-1">No organizations found</p>
+            <p className="text-small text-ink-500">
+              {query ? 'Try a different search term.' : 'Check back later as more organizations join Merit.'}
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {discoverOrgs.map((org) => (
+                <DiscoverOrgCard
+                  key={org.id}
+                  org={org}
+                  isFollowing={followedOrgIds.includes(org.id)}
+                  onToggleFollow={handleToggleFollow}
+                />
+              ))}
             </div>
-          ))}
-        </div>
-      ) : filtered.length === 0 ? (
-        <div className="flex flex-col items-center py-20 text-center">
-          <Building2 size={32} className="text-ink-300 mb-3" />
-          <p className="text-[15px] font-semibold text-ink-900 mb-1">No organizations found.</p>
-          <p className="text-small text-ink-500">
-            {query || category !== 'All'
-              ? 'Try a different search or category.'
-              : 'Organizations you log hours at will appear here.'}
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.map((org) => (
-            <OrgCard key={org.id} org={org} sessions={sessions} />
-          ))}
-        </div>
-      )}
+
+            {hasMore && (
+              <div className="flex justify-center mt-6">
+                <button
+                  onClick={handleLoadMore}
+                  disabled={loadingMore}
+                  className="px-6 py-2.5 rounded-lg border border-ink-200 text-[13px] font-medium text-ink-700 hover:bg-ink-50 transition-colors disabled:opacity-50"
+                >
+                  {loadingMore ? 'Loading...' : 'Load more'}
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </section>
     </div>
   );
 }

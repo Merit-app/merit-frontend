@@ -9,6 +9,7 @@ import { CommandPalette } from '@/components/shell/command-palette';
 import { PageTransition } from '@/components/shell/page-transition';
 import { useMeritStore, useHydrationStore } from '@/lib/store';
 import { sessionsApi, orgsApi, usersApi, onboardingApi, mapSession, mapOrg, mapUser } from '@/lib/api';
+// Note: setFollowedOrgIds pulled via store selector below
 import { OnboardingModal } from '@/components/onboarding/onboarding-modal';
 
 const ONBOARDING_LS_KEY = 'merit_onboarding_done';
@@ -20,6 +21,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const user = useMeritStore((s) => s.user);
   const setSessions = useMeritStore((s) => s.setSessions);
   const setOrganizations = useMeritStore((s) => s.setOrganizations);
+  const setFollowedOrgIds = useMeritStore((s) => s.setFollowedOrgIds);
   const updateUser = useMeritStore((s) => s.updateUser);
   const logout = useMeritStore((s) => s.logout);
   const hydrated = useHydrationStore((s) => s.hydrated);
@@ -51,10 +53,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
     async function loadData() {
       try {
-        const [sessionsRes, orgsRes, userRes] = await Promise.allSettled([
+        const [sessionsRes, orgsRes, userRes, followingRes] = await Promise.allSettled([
           sessionsApi.list({ perPage: 200 }),
           orgsApi.me(),
           usersApi.me(),
+          orgsApi.following(),
         ]);
 
         if (sessionsRes.status === 'fulfilled') {
@@ -64,6 +67,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           setOrganizations(
             (orgsRes.value.data ?? []).map((o: any) => mapOrg({ ...o, is_registered_nonprofit: o.is_registered_nonprofit ?? false })),
           );
+        }
+        if (followingRes.status === 'fulfilled') {
+          setFollowedOrgIds((followingRes.value.data ?? []).map((o: any) => o.id as string));
         }
         if (userRes.status === 'fulfilled') {
           const mappedUser = mapUser(userRes.value.data.user);
