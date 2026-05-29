@@ -103,6 +103,7 @@ export interface User {
   consentAccepted?: boolean;
   onboardingCompleted?: boolean;
   username?: string;
+  avatarUrl?: string;
 }
 
 export interface Goal {
