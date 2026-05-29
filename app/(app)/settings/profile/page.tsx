@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
+import { Camera, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PasswordInput } from '@/components/ui/password-input';
@@ -109,8 +110,6 @@ export default function ProfilePage() {
     }
   }
 
-  const initials = `${user.firstName?.[0] ?? ''}${user.lastName?.[0] ?? ''}`.toUpperCase() || '??';
-
   return (
     <div className="max-w-2xl">
       <div className="mb-6">
@@ -118,19 +117,9 @@ export default function ProfilePage() {
         <p className="text-small text-ink-500 mt-1">Your personal details and school information.</p>
       </div>
 
-      {/* Avatar */}
-      <div className="flex items-center gap-4 mb-4">
-        <span
-          className="flex h-16 w-16 items-center justify-center rounded-full text-[20px] font-semibold shrink-0"
-          style={{ background: '#DBEAFE', color: '#1D4ED8' }}
-        >
-          {initials}
-        </span>
-        <div>
-          <p className="text-[13px] font-medium text-ink-900">{user.firstName} {user.lastName}</p>
-          <p className="text-small text-ink-500">{user.school} · Grade {user.grade}</p>
-        </div>
-      </div>
+      {/* Avatar upload */}
+      <AvatarUpload />
+
 
       <div className="rounded-2xl bg-ink-50 border border-ink-200 p-4 mb-6">
         <div className="flex items-center justify-between gap-4 mb-2">
@@ -284,6 +273,133 @@ export default function ProfilePage() {
       <Separator className="my-8 bg-ink-200" />
 
       <ChangePasswordSection />
+    </div>
+  );
+}
+
+// ── Avatar upload section ──────────────────────────────────────────────────
+
+const AVATAR_COLORS = [
+  { bg: '#EDE9FE', text: '#5B21B6' },
+  { bg: '#DBEAFE', text: '#1D4ED8' },
+  { bg: '#D1FAE5', text: '#065F46' },
+  { bg: '#FEF3C7', text: '#92400E' },
+  { bg: '#FFE4E6', text: '#9F1239' },
+  { bg: '#E0F2FE', text: '#0369A1' },
+  { bg: '#E0E7FF', text: '#3730A3' },
+];
+function getAvatarColor(name: string) {
+  let h = 0;
+  for (const c of name) h = (h * 31 + c.charCodeAt(0)) & 0x7fffffff;
+  return AVATAR_COLORS[h % AVATAR_COLORS.length];
+}
+
+function AvatarUpload() {
+  const user = useMeritStore((s) => s.user);
+  const updateUser = useMeritStore((s) => s.updateUser);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [preview, setPreview] = useState<string | null>(user.avatarUrl ?? null);
+
+  const initials = `${user.firstName?.[0] ?? ''}${user.lastName?.[0] ?? ''}`.toUpperCase() || '?';
+  const fullName = `${user.firstName} ${user.lastName}`.trim();
+  const color = getAvatarColor(fullName);
+
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file.');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image must be under 5 MB.');
+      return;
+    }
+
+    // Show preview immediately
+    const objectUrl = URL.createObjectURL(file);
+    setPreview(objectUrl);
+
+    setUploading(true);
+    try {
+      // Avatar upload requires the Supabase storage bucket "avatars" to be created.
+      // Show a friendly message until the bucket is configured.
+      toast.info('Avatar upload coming soon — the storage bucket needs to be enabled in the Supabase dashboard first.');
+      setPreview(null);
+    } catch {
+      toast.error('Upload failed. Try again.');
+      setPreview(user.avatarUrl ?? null);
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = '';
+    }
+  }
+
+  async function handleRemove() {
+    try {
+      const res = await usersApi.update({ avatarUrl: null } as any);
+      updateUser(mapUser(res.data.user));
+      setPreview(null);
+      toast.success('Photo removed.');
+    } catch {
+      toast.error('Failed to remove photo.');
+    }
+  }
+
+  return (
+    <div className="flex items-center gap-5 mb-6">
+      {/* Circle */}
+      <div className="relative shrink-0">
+        <div
+          className="w-20 h-20 rounded-full flex items-center justify-center text-[26px] font-semibold overflow-hidden"
+          style={preview ? {} : { background: color.bg, color: color.text }}
+        >
+          {preview ? (
+            <img src={preview} alt={fullName} className="w-full h-full object-cover" />
+          ) : (
+            initials
+          )}
+        </div>
+        {uploading && (
+          <div className="absolute inset-0 rounded-full bg-black/30 flex items-center justify-center">
+            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          </div>
+        )}
+      </div>
+
+      {/* Controls */}
+      <div className="flex flex-col gap-1.5">
+        <button
+          type="button"
+          onClick={() => fileRef.current?.click()}
+          disabled={uploading}
+          className="flex items-center gap-1.5 text-[13px] font-medium text-merit-blue-600 hover:text-merit-blue-700 transition-colors disabled:opacity-50"
+        >
+          <Camera size={14} />
+          Change photo
+        </button>
+        {preview && (
+          <button
+            type="button"
+            onClick={handleRemove}
+            className="flex items-center gap-1.5 text-[12px] text-ink-400 hover:text-danger transition-colors"
+          >
+            <X size={12} />
+            Remove photo
+          </button>
+        )}
+        <p className="text-[11px] text-ink-400">JPG, PNG or WebP · max 5 MB</p>
+      </div>
+
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleFile}
+      />
     </div>
   );
 }

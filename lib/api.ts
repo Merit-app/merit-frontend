@@ -252,6 +252,19 @@ export const onboardingApi = {
   skip: () => request<{ data: { onboardingCompleted: boolean; skipped: boolean } }>('POST', '/onboarding/skip', {}),
 };
 
+// ─── Org Claims API ──────────────────────────────────────────────────────────
+
+export const orgClaimsApi = {
+  submit: (body: { orgId: string; role: string; workEmail: string }) =>
+    request<{ data: { claimId: string; autoApproved: boolean } }>('POST', '/org-claims', body),
+  status: (orgId: string) =>
+    request<{ data: { status: string } }>('GET', `/org-claims/status/${orgId}`),
+  approve: (claimId: string) =>
+    request<{ data: { approved: boolean } }>('POST', `/org-claims/${claimId}/approve`, {}),
+  reject: (claimId: string, reason?: string) =>
+    request<{ data: { rejected: boolean } }>('POST', `/org-claims/${claimId}/reject`, { reason }),
+};
+
 // ─── Billing API ─────────────────────────────────────────────────────────────
 
 export const billingApi = {

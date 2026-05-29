@@ -47,6 +47,25 @@ function orgLastDate(orgId: string, sessions: Session[]): string | null {
   return dates[0] ?? null;
 }
 
+// ── Deterministic avatar color ────────────────────────────────────────────────
+
+const AVATAR_COLORS = [
+  { bg: 'bg-violet-100', text: 'text-violet-700' },
+  { bg: 'bg-blue-100',   text: 'text-blue-700' },
+  { bg: 'bg-emerald-100',text: 'text-emerald-700' },
+  { bg: 'bg-amber-100',  text: 'text-amber-700' },
+  { bg: 'bg-rose-100',   text: 'text-rose-700' },
+  { bg: 'bg-sky-100',    text: 'text-sky-700' },
+  { bg: 'bg-indigo-100', text: 'text-indigo-700' },
+  { bg: 'bg-teal-100',   text: 'text-teal-700' },
+];
+
+function getAvatarColor(name: string) {
+  let h = 0;
+  for (const c of name) h = (h * 31 + c.charCodeAt(0)) & 0x7fffffff;
+  return AVATAR_COLORS[h % AVATAR_COLORS.length];
+}
+
 // ── My Org Card (horizontal scroll) ──────────────────────────────────────────
 
 function MyOrgCard({ org, sessions }: { org: ReturnType<typeof useMeritStore.getState>['organizations'][0]; sessions: Session[] }) {
@@ -56,14 +75,15 @@ function MyOrgCard({ org, sessions }: { org: ReturnType<typeof useMeritStore.get
   const lastRelative = lastDate
     ? formatDistanceToNow(parseISO(lastDate + 'T00:00:00'), { addSuffix: true })
     : null;
+  const color = getAvatarColor(org.name);
 
   return (
     <Link
       href={`/organizations/${org.slug}`}
-      className="flex-shrink-0 w-48 bg-white rounded-xl border border-ink-200 p-4 hover:border-merit-blue-300 hover:shadow-sm transition-all duration-150 flex flex-col gap-2"
+      className="min-w-[200px] rounded-xl border border-border bg-white p-4 flex flex-col gap-2 flex-shrink-0 hover:shadow-md transition-shadow duration-150"
     >
-      {/* Logo */}
-      <div className="w-10 h-10 rounded-xl bg-merit-blue-100 flex items-center justify-center text-[13px] font-bold text-merit-blue-700 shrink-0">
+      {/* Avatar circle — deterministic color */}
+      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-[13px] font-bold shrink-0 ${color.bg} ${color.text}`}>
         {getInitials(org.name)}
       </div>
 

@@ -19,6 +19,7 @@ import {
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { UserMenu } from './user-menu';
+import { SidebarAvatar } from '@/components/profile/sidebar-avatar';
 import { useMeritStore } from '@/lib/store';
 
 const primaryNav = [
@@ -152,6 +153,13 @@ export function Sidebar() {
       </div>
 
       <nav className="flex flex-1 flex-col gap-1 px-3 py-4 overflow-y-auto">
+        {/* Profile row — top of nav */}
+        <div className="mb-2">
+          <SidebarAvatar />
+        </div>
+
+        <div className="mx-1 mb-2 h-px bg-ink-200" />
+
         {/* Log hours CTA — primary */}
         <Link
           href="/log"
@@ -183,9 +191,9 @@ export function Sidebar() {
       {/* Upgrade prompt (free users only) */}
       <UpgradePrompt />
 
-      {/* User card */}
-      <div className="border-t border-ink-200 px-3 py-3">
-        <UserMenu />
+      {/* User menu (settings, logout) — compact at bottom */}
+      <div className="border-t border-ink-200 px-3 py-2">
+        <UserMenu compact />
       </div>
     </aside>
   );

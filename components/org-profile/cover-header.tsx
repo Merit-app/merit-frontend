@@ -1,7 +1,6 @@
 'use client';
 
-import Link from 'next/link';
-import { Globe, CheckCircle, ShieldCheck, Bookmark } from 'lucide-react';
+import { Globe, CheckCircle, ShieldCheck, Clock } from 'lucide-react';
 
 interface Props {
   id: string;
@@ -19,6 +18,8 @@ interface Props {
   // Optional auth-only slots
   actions?: React.ReactNode;
   showClaimLink?: boolean;
+  onClaimClick?: () => void;
+  claimStatus?: string | null;
 }
 
 function getInitials(name: string) {
@@ -57,6 +58,8 @@ export function OrgCoverHeader({
   isRecruiting,
   actions,
   showClaimLink = false,
+  onClaimClick,
+  claimStatus,
 }: Props) {
   const location = [city, state].filter(Boolean).join(', ');
   const websiteHost = website
@@ -144,13 +147,26 @@ export function OrgCoverHeader({
           </a>
         )}
 
-        {/* Claim link */}
+        {/* Claim link / status */}
         {showClaimLink && !claimed && (
           <p className="mt-3 text-[12px] text-ink-400">
             Is this your organization?{' '}
-            <Link href="/contact" className="text-merit-blue-600 hover:underline">
-              Claim this page →
-            </Link>
+            {claimStatus === 'pending' ? (
+              <span className="inline-flex items-center gap-1 text-amber-600">
+                <Clock size={11} /> Claim under review
+              </span>
+            ) : claimStatus === 'approved' ? (
+              <a href="/organizations" className="inline-flex items-center gap-1 text-green-600">
+                <CheckCircle size={11} /> You manage this page
+              </a>
+            ) : (
+              <button
+                onClick={onClaimClick}
+                className="text-merit-blue-600 hover:underline bg-transparent border-none p-0 cursor-pointer"
+              >
+                Claim this page →
+              </button>
+            )}
           </p>
         )}
       </div>

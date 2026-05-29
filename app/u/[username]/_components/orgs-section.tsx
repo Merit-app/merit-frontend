@@ -1,8 +1,12 @@
 interface OrgEntry {
-  orgId: string;
-  orgName: string;
+  id: string;
+  name: string;
   totalHours: number;
   sessionCount: number;
+  city?: string | null;
+  state?: string | null;
+  slug?: string | null;
+  category?: string | null;
 }
 
 interface Props {
@@ -38,9 +42,9 @@ export function OrgsSection({ orgs }: Props) {
               : org.totalHours.toFixed(1);
 
           return (
-            <div key={org.orgId} className="bg-white rounded-xl border border-ink-200 px-4 py-3">
+            <div key={org.id} className="bg-white rounded-xl border border-ink-200 px-4 py-3">
               <div className="flex items-center justify-between mb-1.5">
-                <p className="text-[13px] font-semibold text-ink-900 truncate">{org.orgName}</p>
+                <p className="text-[13px] font-semibold text-ink-900 truncate">{org.name}</p>
                 <span className="text-[12px] font-medium text-ink-500 shrink-0 ml-3">
                   {hoursDisplay} hr{org.totalHours !== 1 ? 's' : ''}
                 </span>

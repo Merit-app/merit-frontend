@@ -50,7 +50,14 @@ export default async function PublicProfilePage({
 }) {
   const { username } = await params;
 
-  const profile = await fetchProfile(username);
+  // Wrap fetch so any non-404 backend error (500, network, etc.) shows
+  // the not-found UI instead of crashing with "Something went wrong"
+  let profile: Awaited<ReturnType<typeof fetchProfile>>;
+  try {
+    profile = await fetchProfile(username);
+  } catch {
+    notFound();
+  }
 
   if (!profile) {
     notFound();
@@ -65,23 +72,26 @@ export default async function PublicProfilePage({
     fetchProfileOrgs(username),
   ]);
 
+  // Stats are nested under profile.stats on the backend response
+  const stats = (profile as any).stats ?? {};
+
   return (
     <div className="min-h-screen bg-ink-50">
       <div className="max-w-2xl mx-auto px-4 py-10 space-y-8">
         <ProfileHero
-          name={profile.name}
+          name={profile.name ?? username}
           username={username}
           school={profile.school ?? null}
           grade={profile.grade ?? null}
           graduationYear={profile.graduationYear ?? null}
-          memberSince={profile.memberSince}
+          memberSince={profile.memberSince ?? new Date().toISOString()}
           bio={profile.bio ?? null}
         />
 
         <StatsRow
-          verifiedHours={profile.verifiedHours ?? 0}
-          totalOrgs={profile.totalOrgs ?? 0}
-          lastActive={profile.lastActive ?? null}
+          verifiedHours={stats.verifiedHours ?? 0}
+          totalOrgs={stats.orgCount ?? 0}
+          lastActive={stats.lastActive ?? null}
         />
 
         {badges.length > 0 && <BadgesSection badges={badges} />}

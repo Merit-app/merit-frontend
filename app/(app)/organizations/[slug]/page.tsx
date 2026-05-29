@@ -9,8 +9,9 @@ import { OrgAboutCard } from '@/components/org-profile/about-card';
 import { OrgCommunityCard } from '@/components/org-profile/community-card';
 import { OrgVolunteersCard } from '@/components/org-profile/volunteers-card';
 import { OrgSimilarCard } from '@/components/org-profile/similar-orgs-card';
+import { ClaimOrgModal } from '@/components/orgs/claim-org-modal';
 import { useMeritStore } from '@/lib/store';
-import { orgsApi, ApiError } from '@/lib/api';
+import { orgsApi, orgClaimsApi, ApiError } from '@/lib/api';
 import { cn } from '@/lib/utils';
 import type { OrgStats, SimilarOrg } from '@/lib/types';
 
@@ -48,6 +49,8 @@ export default function AppOrgProfilePage({ params }: { params: Promise<{ slug: 
   const [similar, setSimilar] = useState<SimilarOrg[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFoundFlag, setNotFoundFlag] = useState(false);
+  const [claimModalOpen, setClaimModalOpen] = useState(false);
+  const [claimStatus, setClaimStatus] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -58,14 +61,18 @@ export default function AppOrgProfilePage({ params }: { params: Promise<{ slug: 
         if (cancelled) return;
         setOrg(data);
 
-        // Fetch stats + similar in parallel (public endpoints)
-        const [statsRes, similarRes] = await Promise.allSettled([
+        // Fetch stats, similar, and claim status in parallel
+        const [statsRes, similarRes, claimRes] = await Promise.allSettled([
           orgsApi.stats(data.id),
           orgsApi.similar(data.id),
+          data.claimed ? Promise.resolve(null) : orgClaimsApi.status(data.id),
         ]);
         if (cancelled) return;
         if (statsRes.status === 'fulfilled') setStats(statsRes.value.data);
         if (similarRes.status === 'fulfilled') setSimilar(similarRes.value.data ?? []);
+        if (claimRes.status === 'fulfilled' && claimRes.value) {
+          setClaimStatus(claimRes.value.data.status);
+        }
       } catch (err) {
         if (cancelled) return;
         if (err instanceof ApiError && err.status === 404) setNotFoundFlag(true);
@@ -136,6 +143,8 @@ export default function AppOrgProfilePage({ params }: { params: Promise<{ slug: 
         claimed={org.claimed}
         isRecruiting={org.isRecruiting}
         showClaimLink={true}
+        onClaimClick={() => setClaimModalOpen(true)}
+        claimStatus={claimStatus}
         actions={
           <>
             {/* Bookmark */}
@@ -192,6 +201,14 @@ export default function AppOrgProfilePage({ params }: { params: Promise<{ slug: 
         orgs={similar}
         loading={false}
         basePath="/organizations"
+      />
+
+      {/* Claim modal */}
+      <ClaimOrgModal
+        open={claimModalOpen}
+        onClose={() => setClaimModalOpen(false)}
+        orgId={org.id}
+        orgName={org.name}
       />
     </div>
   );

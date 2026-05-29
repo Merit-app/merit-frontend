@@ -15,69 +15,85 @@ function getInitials(name: string) {
   return name.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2);
 }
 
-const GRADIENTS = [
-  'from-blue-200 to-indigo-300',
-  'from-violet-200 to-purple-300',
-  'from-emerald-200 to-teal-300',
-  'from-amber-200 to-orange-300',
-  'from-rose-200 to-pink-300',
-  'from-sky-200 to-cyan-300',
-  'from-lime-200 to-green-300',
-  'from-fuchsia-200 to-violet-300',
+// Deterministic flat header color from org name
+const HEADER_COLORS = [
+  'bg-violet-200', 'bg-blue-200', 'bg-emerald-200',
+  'bg-amber-200', 'bg-rose-200', 'bg-sky-200', 'bg-indigo-200',
 ];
-function coverGradient(name: string) {
+function headerColor(name: string): string {
   let h = 0;
   for (const c of name) h = (h * 31 + c.charCodeAt(0)) & 0x7fffffff;
-  return GRADIENTS[h % GRADIENTS.length];
+  return HEADER_COLORS[h % HEADER_COLORS.length];
+}
+
+// Deterministic avatar bg/text color
+const AVATAR_COLORS = [
+  { bg: 'bg-violet-600', text: 'text-white' },
+  { bg: 'bg-blue-600',   text: 'text-white' },
+  { bg: 'bg-emerald-600',text: 'text-white' },
+  { bg: 'bg-amber-500',  text: 'text-white' },
+  { bg: 'bg-rose-600',   text: 'text-white' },
+  { bg: 'bg-sky-600',    text: 'text-white' },
+  { bg: 'bg-indigo-600', text: 'text-white' },
+];
+function avatarColor(name: string) {
+  let h = 0;
+  for (const c of name) h = (h * 31 + c.charCodeAt(0)) & 0x7fffffff;
+  return AVATAR_COLORS[h % AVATAR_COLORS.length];
 }
 
 export function DiscoverOrgCard({ org, isFollowing, onToggleFollow }: Props) {
   const location = [org.city, org.state].filter(Boolean).join(', ');
+  const color = avatarColor(org.name);
 
   return (
-    <div className="group relative bg-white rounded-xl border border-ink-200 overflow-hidden hover:border-ink-300 hover:shadow-sm transition-all duration-150">
-      {/* Cover */}
-      <Link href={`/organizations/${org.slug}`} className="block">
-        <div className="relative h-20">
+    <div className="rounded-xl border border-border overflow-hidden bg-white flex flex-col hover:shadow-md transition-shadow duration-150">
+      {/* ── Header area ────────────────────────────────────────────────── */}
+      <div className="h-24 w-full relative flex-shrink-0">
+        {/* Cover image or flat color */}
+        <Link href={`/organizations/${org.slug}`} className="block absolute inset-0">
           {org.coverUrl ? (
             <img src={org.coverUrl} alt="" className="w-full h-full object-cover" />
           ) : (
-            <div className={`w-full h-full bg-gradient-to-br ${coverGradient(org.name)}`} />
+            <div className={`w-full h-full ${headerColor(org.name)}`} />
           )}
-        </div>
-      </Link>
-
-      {/* Bookmark button — top right of cover, stop propagation */}
-      <button
-        onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleFollow(org.id); }}
-        aria-label={isFollowing ? 'Unfollow' : 'Bookmark'}
-        className="absolute top-2 right-2 z-10 w-7 h-7 rounded-lg bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-colors shadow-sm"
-      >
-        <Bookmark
-          size={14}
-          className={cn(
-            'transition-colors',
-            isFollowing ? 'fill-merit-blue-600 text-merit-blue-600' : 'text-ink-500',
-          )}
-        />
-      </button>
-
-      {/* Logo overlapping cover */}
-      <div className="px-4">
-        <Link href={`/organizations/${org.slug}`} className="block">
-          <div className="-mt-5 w-10 h-10 rounded-xl bg-white border-2 border-white shadow-sm flex items-center justify-center text-[12px] font-bold text-merit-blue-700 bg-merit-blue-100 shrink-0 mb-2 overflow-hidden">
-            {org.logoUrl ? (
-              <img src={org.logoUrl} alt={org.name} className="w-full h-full object-cover rounded-xl" />
-            ) : (
-              getInitials(org.name)
-            )}
-          </div>
         </Link>
+
+        {/* Bookmark button — top-right of header */}
+        <button
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleFollow(org.id); }}
+          aria-label={isFollowing ? 'Unfollow' : 'Bookmark'}
+          className="absolute top-2 right-2 z-10 w-8 h-8 rounded-full bg-black/20 hover:bg-black/30 backdrop-blur-sm flex items-center justify-center transition-colors"
+        >
+          <Bookmark
+            size={14}
+            className={cn(
+              'transition-colors',
+              isFollowing ? 'fill-white text-white' : 'text-white/90',
+            )}
+          />
+        </button>
+
+        {/* Initials/logo circle — bottom-left, overlapping into body */}
+        <div className="absolute bottom-0 left-4 translate-y-1/2">
+          <Link href={`/organizations/${org.slug}`} tabIndex={-1}>
+            <div className={cn(
+              'w-12 h-12 rounded-full border-2 border-white flex items-center justify-center text-sm font-semibold overflow-hidden',
+              !org.logoUrl && `${color.bg} ${color.text}`,
+            )}>
+              {org.logoUrl ? (
+                <img src={org.logoUrl} alt={org.name} className="w-full h-full object-cover" />
+              ) : (
+                getInitials(org.name)
+              )}
+            </div>
+          </Link>
+        </div>
       </div>
 
-      {/* Content */}
-      <Link href={`/organizations/${org.slug}`} className="block px-4 pb-4">
-        <h3 className="text-[14px] font-bold text-ink-900 group-hover:text-merit-blue-600 transition-colors leading-snug mb-1 truncate">
+      {/* ── Body ───────────────────────────────────────────────────────── */}
+      <Link href={`/organizations/${org.slug}`} className="flex flex-col flex-1 px-4 pb-4 pt-8">
+        <h3 className="text-[14px] font-bold text-ink-900 leading-snug mb-1 truncate">
           {org.name}
         </h3>
 
