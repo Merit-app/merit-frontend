@@ -24,7 +24,17 @@ async function fetchProfileBadges(username: string) {
     });
     if (!res.ok) return [];
     const json = await res.json();
-    return json?.data?.badges ?? [];
+    // Backend returns { badge: { id, name, tier, icon_name, ... }, earnedAt }
+    // Flatten to the flat shape BadgesSection expects
+    const raw: any[] = json?.data?.badges ?? [];
+    return raw.map((item: any) => ({
+      id: item.badge?.id ?? item.id ?? '',
+      name: item.badge?.name ?? item.name ?? '',
+      description: item.badge?.description ?? item.description ?? '',
+      tier: item.badge?.tier ?? item.tier ?? 'bronze',
+      iconName: item.badge?.icon_name ?? item.iconName ?? '',
+      earnedAt: item.earnedAt ?? item.earned_at ?? '',
+    }));
   } catch {
     return [];
   }
@@ -55,7 +65,8 @@ export default async function PublicProfilePage({
   let profile: Awaited<ReturnType<typeof fetchProfile>>;
   try {
     profile = await fetchProfile(username);
-  } catch {
+  } catch (err) {
+    console.error(`[profile] fetchProfile failed for "${username}":`, err);
     notFound();
   }
 

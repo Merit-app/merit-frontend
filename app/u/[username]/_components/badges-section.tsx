@@ -39,7 +39,7 @@ const TIER_STYLES: Record<Badge['tier'], { ring: string; bg: string; label: stri
 };
 
 function BadgeChip({ badge }: { badge: Badge }) {
-  const styles = TIER_STYLES[badge.tier];
+  const styles = TIER_STYLES[badge.tier] ?? TIER_STYLES.bronze;
   return (
     <div
       className={`flex items-center gap-2 px-3 py-2 rounded-xl border ring-1 ${styles.ring} ${styles.bg}`}
