@@ -120,6 +120,20 @@ export const useMeritStore = create<MeritStore>()(
       storage: createJSONStorage(() => localStorage),
       // skipHydration prevents SSR/client mismatch — rehydrate in a useEffect
       skipHydration: true,
+      // accessToken is short-lived and high-value — keep it in memory only.
+      // On page refresh it will be null; the api.ts 401-retry flow re-acquires
+      // it from the persisted refreshToken automatically.
+      partialize: (state) => ({
+        isAuthed: state.isAuthed,
+        user: state.user,
+        refreshToken: state.refreshToken,
+        expiresAt: state.expiresAt,
+        sessions: state.sessions,
+        organizations: state.organizations,
+        followedOrgIds: state.followedOrgIds,
+        notifications: state.notifications,
+        // accessToken intentionally NOT persisted to localStorage
+      }),
     },
   ),
 );
