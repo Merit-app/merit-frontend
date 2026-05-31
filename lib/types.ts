@@ -104,6 +104,8 @@ export interface User {
   onboardingCompleted?: boolean;
   username?: string;
   avatarUrl?: string;
+  profilePublic?: boolean;
+  bio?: string;
 }
 
 export interface Goal {
@@ -141,6 +143,7 @@ export interface MeritStore {
   sessions: Session[];
   organizations: Organization[];
   followedOrgIds: string[];
+  isOrgAdmin: boolean;
 
   // Settings
   notifications: NotificationPreferences;
@@ -152,6 +155,7 @@ export interface MeritStore {
   setSessions: (sessions: Session[]) => void;
   setOrganizations: (organizations: Organization[]) => void;
   setFollowedOrgIds: (ids: string[]) => void;
+  setIsOrgAdmin: (v: boolean) => void;
   toggleFollowOptimistic: (orgId: string) => void;
   addSession: (session: Session) => void;
   updateSession: (id: string, patch: Partial<Session>) => void;

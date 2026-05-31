@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { badgesApi, ApiError } from '@/lib/api';
 import { useMeritStore } from '@/lib/store';
-import { toast } from 'sonner';
+import { useMyBadges, useRefreshBadges } from '@/lib/hooks/use-queries';
+import { BadgesPageSkeleton } from '@/components/skeletons';
+import { ErrorState } from '@/components/ui/error-state';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { RefreshCw } from 'lucide-react';
 import { EarnedBadgeCard, LockedBadgeCard } from '@/components/badges/badge-card';
-import type { BadgeCardProps } from '@/components/badges/badge-card';
 import { cn } from '@/lib/utils';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -21,14 +21,6 @@ interface RawBadge {
   condition_value?: Record<string, number>;
 }
 
-interface BadgeEntry {
-  badge: RawBadge;
-  earned: boolean;
-  earnedAt?: string;
-}
-
-const TIER_ORDER: Record<string, number> = { platinum: 0, gold: 1, silver: 2, bronze: 3 };
-
 // ── Tier legend ───────────────────────────────────────────────────────────────
 
 const TIER_LEGEND = [
@@ -41,13 +33,17 @@ const TIER_LEGEND = [
 // ── Progress derivation ───────────────────────────────────────────────────────
 
 function deriveProgress(badge: RawBadge, verifiedHours: number, sessionCount: number) {
-  if (!badge.condition_type || !badge.condition_value) return {};
   const cv = badge.condition_value;
-  if (badge.condition_type === 'verified_hours' && cv.hours) {
-    return { progressCurrent: verifiedHours, progressTarget: cv.hours, progressLabel: 'verified hours' };
+  if (!badge.condition_type || !cv) return {};
+  // Backend uses { min: N }; fall back to legacy { hours, sessions } keys
+  const target = cv.min ?? cv.hours ?? cv.sessions;
+  if (!target) return {};
+
+  if (badge.condition_type === 'verified_hours') {
+    return { progressCurrent: verifiedHours, progressTarget: target, progressLabel: 'verified hours' };
   }
-  if (badge.condition_type === 'session_count' && cv.sessions) {
-    return { progressCurrent: sessionCount, progressTarget: cv.sessions, progressLabel: 'sessions logged' };
+  if (badge.condition_type === 'session_count') {
+    return { progressCurrent: sessionCount, progressTarget: target, progressLabel: 'sessions logged' };
   }
   return {};
 }
@@ -56,61 +52,32 @@ function deriveProgress(badge: RawBadge, verifiedHours: number, sessionCount: nu
 
 export default function BadgesPage() {
   const sessions = useMeritStore((s) => s.sessions);
-  const [entries, setEntries] = useState<BadgeEntry[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
+  const { data: entries = [], isLoading, isError, refetch } = useMyBadges();
+  const { mutate: handleRefresh, isPending: refreshing } = useRefreshBadges();
 
   const verifiedHours = sessions
     .filter((s) => s.status === 'verified')
     .reduce((sum, s) => sum + s.hours, 0);
   const sessionCount = sessions.length;
 
-  async function load() {
-    setLoading(true);
-    try {
-      const res = await badgesApi.me();
-      const sorted = [...(res.data.badges ?? [])].sort((a: BadgeEntry, b: BadgeEntry) => {
-        if (a.earned !== b.earned) return a.earned ? -1 : 1;
-        return (TIER_ORDER[a.badge.tier] ?? 9) - (TIER_ORDER[b.badge.tier] ?? 9);
-      });
-      setEntries(sorted);
-    } catch (err) {
-      if (err instanceof ApiError) toast.error(err.message || 'Failed to load badges.');
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleRefresh() {
-    setRefreshing(true);
-    try {
-      await badgesApi.refresh();
-      await load();
-      toast.success('Badges refreshed.');
-    } catch (err) {
-      if (err instanceof ApiError) toast.error(err.message || 'Failed to refresh badges.');
-      else toast.error('Could not reach the server.');
-    } finally {
-      setRefreshing(false);
-    }
-  }
-
-  useEffect(() => { load(); }, []);
-
-  const earned = entries.filter((e) => e.earned);
-  const locked = entries.filter((e) => !e.earned);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="w-full px-4 py-8 md:px-8 max-w-4xl mx-auto">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-          {[...Array(8)].map((_, i) => (
-            <div key={i} className="h-52 rounded-2xl bg-ink-100 animate-pulse" />
-          ))}
-        </div>
+        <BadgesPageSkeleton />
       </div>
     );
   }
+
+  if (isError) {
+    return (
+      <div className="w-full px-4 py-8 md:px-8 max-w-4xl mx-auto">
+        <ErrorState message="Failed to load badges." onRetry={() => refetch()} />
+      </div>
+    );
+  }
+
+  const earned = entries.filter((e) => e.earned);
+  const locked = entries.filter((e) => !e.earned);
 
   return (
     <div className="w-full px-4 py-4 md:px-8 md:py-6 max-w-4xl mx-auto">
@@ -122,15 +89,20 @@ export default function BadgesPage() {
             {earned.length} earned · {locked.length} locked
           </p>
         </div>
-        <button
-          type="button"
-          onClick={handleRefresh}
-          disabled={refreshing}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-ink-200 bg-white hover:bg-ink-50 text-[13px] font-medium text-ink-700 transition-colors disabled:opacity-50"
-        >
-          <RefreshCw size={13} className={refreshing ? 'animate-spin' : ''} />
-          {refreshing ? 'Refreshing…' : 'Refresh'}
-        </button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button"
+              onClick={() => handleRefresh()}
+              disabled={refreshing}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-ink-200 bg-white hover:bg-ink-50 text-[13px] font-medium text-ink-700 transition-colors disabled:opacity-50"
+            >
+              <RefreshCw size={13} className={refreshing ? 'animate-spin' : ''} />
+              {refreshing ? 'Refreshing…' : 'Refresh'}
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>Recompute badges from your latest sessions</TooltipContent>
+        </Tooltip>
       </div>
 
       {/* ── Tier legend ────────────────────────────────────────────────── */}
@@ -150,18 +122,21 @@ export default function BadgesPage() {
             Earned ({earned.length})
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-            {earned.map(({ badge, earnedAt }) => (
-              <EarnedBadgeCard
-                key={badge.id}
-                id={badge.id}
-                name={badge.name}
-                description={badge.description}
-                tier={badge.tier}
-                iconName={badge.icon_name}
-                earned
-                earnedAt={earnedAt}
-              />
-            ))}
+            {earned.map(({ badge, earnedAt }) => {
+              const b = badge as RawBadge;
+              return (
+                <EarnedBadgeCard
+                  key={b.id}
+                  id={b.id}
+                  name={b.name}
+                  description={b.description}
+                  tier={b.tier}
+                  iconName={b.icon_name}
+                  earned
+                  earnedAt={earnedAt}
+                />
+              );
+            })}
           </div>
         </section>
       )}
@@ -174,15 +149,16 @@ export default function BadgesPage() {
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
             {locked.map(({ badge }) => {
-              const progress = deriveProgress(badge, verifiedHours, sessionCount);
+              const b = badge as RawBadge;
+              const progress = deriveProgress(b, verifiedHours, sessionCount);
               return (
                 <LockedBadgeCard
-                  key={badge.id}
-                  id={badge.id}
-                  name={badge.name}
-                  description={badge.description}
-                  tier={badge.tier}
-                  iconName={badge.icon_name}
+                  key={b.id}
+                  id={b.id}
+                  name={b.name}
+                  description={b.description}
+                  tier={b.tier}
+                  iconName={b.icon_name}
                   earned={false}
                   {...progress}
                 />
@@ -192,9 +168,13 @@ export default function BadgesPage() {
         </section>
       )}
 
+      {/* ── Empty ──────────────────────────────────────────────────────── */}
       {entries.length === 0 && (
         <div className="text-center py-16">
-          <p className="text-ink-400 text-sm">No badges found. Log and verify volunteer hours to start earning.</p>
+          <p className="text-[15px] font-semibold text-ink-900 mb-2">No badges yet</p>
+          <p className="text-sm text-ink-400">
+            Log and verify volunteer hours to start earning badges.
+          </p>
         </div>
       )}
     </div>

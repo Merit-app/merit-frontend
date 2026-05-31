@@ -1,26 +1,16 @@
 import type { Metadata } from 'next';
+import { buildMetadata } from '@/lib/seo';
 import Link from 'next/link';
 import { CheckCircle, ShieldCheck, FileText, Clock, Target } from 'lucide-react';
+import { MarketingNav } from '@/components/marketing/nav';
 
-export const metadata: Metadata = {
-  title: 'Merit — Volunteer hours you can prove',
-  description: 'Track, verify, and export your volunteer hours with SMS verification. Built for scholarship applications, college apps, and graduation requirements.',
-  openGraph: {
-    title: 'Merit — Volunteer hours you can prove',
-    description: 'Track, verify, and export your volunteer hours with SMS verification. Built for scholarship applications, college apps, and graduation requirements.',
-    type: 'website',
-    url: 'https://merit-frontend-nine.vercel.app',
-    images: [{
-      url: '/og-image.png',
-      width: 1200,
-      height: 630,
-      alt: 'Merit — Volunteer hours you can prove',
-    }],
-  },
-  twitter: {
-    card: 'summary_large_image',
-  },
-};
+export const metadata: Metadata = buildMetadata({
+  title: 'Student Volunteer Hour Tracker',
+  description:
+    'The easiest way to track volunteer hours, get verified by SMS, ' +
+    'and export a signed PDF. Free for students.',
+  path: '/',
+});
 
 const FEATURES = [
   {
@@ -54,44 +44,14 @@ const SOCIAL_PROOF = [
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-[#FAFAF9]">
-      {/* Nav */}
-      <nav className="border-b border-ink-200 bg-white">
-        <div className="max-w-6xl mx-auto flex items-center justify-between px-8 py-5">
-          <span className="text-[18px] font-bold text-ink-900 tracking-tight">
-            merit<span className="text-merit-blue-600">.</span>
-          </span>
-          <div className="flex items-center gap-4 flex-wrap">
-            <Link href="/about" className="text-[13px] font-medium text-ink-600 hover:text-ink-900 transition-colors">
-              About
-            </Link>
-            <Link href="/pricing" className="text-[13px] font-medium text-ink-600 hover:text-ink-900 transition-colors">
-              Pricing
-            </Link>
-            <Link href="/faq" className="text-[13px] font-medium text-ink-600 hover:text-ink-900 transition-colors">
-              FAQ
-            </Link>
-            <Link href="/contact" className="text-[13px] font-medium text-ink-600 hover:text-ink-900 transition-colors">
-              Contact
-            </Link>
-            <Link href="/login" className="text-[13px] font-medium text-ink-600 hover:text-ink-900 transition-colors">
-              Sign in
-            </Link>
-            <Link
-              href="/signup"
-              className="text-[13px] font-medium text-white bg-merit-blue-600 hover:bg-merit-blue-700 px-4 py-2 rounded-lg transition-colors"
-            >
-              Get started free
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <MarketingNav />
 
       {/* Hero */}
-      <section className="max-w-6xl mx-auto px-8 pt-20 pb-16 text-center">
+      <section className="max-w-6xl mx-auto px-4 sm:px-8 pt-16 md:pt-20 pb-12 md:pb-16 text-center">
         <p className="text-[12px] font-semibold text-merit-blue-600 uppercase tracking-widest mb-4">
           For high school students
         </p>
-        <h1 className="text-5xl lg:text-7xl font-bold text-ink-900 leading-tight tracking-tight mb-6">
+        <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-ink-900 leading-tight tracking-tight mb-6">
           Service hours you can<br className="hidden sm:block" /> actually prove.
         </h1>
         <p className="text-lg lg:text-xl text-ink-500 leading-relaxed mb-8 max-w-2xl mx-auto">
@@ -115,7 +75,7 @@ export default function LandingPage() {
       </section>
 
       {/* How it works */}
-      <section className="max-w-6xl mx-auto px-8 pb-20">
+      <section className="max-w-6xl mx-auto px-4 sm:px-8 pb-16 md:pb-20">
         <div className="rounded-3xl bg-white border border-ink-200 p-8 mb-10">
           <div className="flex items-center gap-3 justify-center mb-8">
             <div className="w-12 h-px bg-ink-200" />
@@ -143,7 +103,7 @@ export default function LandingPage() {
       </section>
 
       {/* Feature grid */}
-      <section className="max-w-6xl mx-auto px-8 pb-20">
+      <section className="max-w-6xl mx-auto px-4 sm:px-8 pb-16 md:pb-20">
         <div className="flex items-center gap-3 justify-center mb-8">
           <div className="w-12 h-px bg-ink-200" />
           <p className="text-[11px] font-semibold text-ink-400 uppercase tracking-widest">Features</p>

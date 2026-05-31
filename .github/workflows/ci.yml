@@ -38,7 +38,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
 
     env:
-      BASE: https://merit-frontend-nine.vercel.app
+      BASE: https://www.meritco.app
 
     steps:
       - name: Home page

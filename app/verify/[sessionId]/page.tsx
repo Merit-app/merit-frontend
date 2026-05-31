@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { CheckCircle2, Clock, XCircle, ShieldCheck } from 'lucide-react';
+import { buildMetadata } from '@/lib/seo';
 
 // ─── Types ────────────────────────────────────────────────────────────────
 
@@ -205,9 +206,8 @@ export async function generateMetadata({
 }: {
   params: Promise<{ sessionId: string }>;
 }): Promise<Metadata> {
-  return {
-    title: 'Session Verification — Merit',
-    description: 'Verify a student volunteer hour record on Merit.',
-    robots: 'noindex, nofollow',
-  };
+  return buildMetadata({
+    title: 'Session Verification',
+    description: 'Verify a student volunteer hour record on Merit. Independently confirm hours logged and supervisor-verified.',
+  });
 }

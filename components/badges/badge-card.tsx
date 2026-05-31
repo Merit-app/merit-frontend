@@ -6,6 +6,7 @@ import {
   Lock, Users, Heart, Calendar,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { formatDate } from '@/lib/format';
 
 // ── Icon map ──────────────────────────────────────────────────────────────────
 
@@ -43,16 +44,6 @@ const tierStyles = {
     label: 'Platinum',
   },
 };
-
-// ── Helper ────────────────────────────────────────────────────────────────────
-
-function formatDate(iso: string) {
-  try {
-    return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  } catch {
-    return '';
-  }
-}
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 

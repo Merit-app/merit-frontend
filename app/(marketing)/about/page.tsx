@@ -1,35 +1,21 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { MarketingFooter } from '@/components/marketing/footer';
+import { MarketingNav } from '@/components/marketing/nav';
+import { buildMetadata } from '@/lib/seo';
 
-export const metadata: Metadata = {
-  title: 'About Merit — Built for students',
-  description: 'About Merit — Built for students by students to make volunteer hours verifiable and shareable.',
-  openGraph: {
-    title: 'About Merit — Built for students',
-    description: 'About Merit — Built for students by students to make volunteer hours verifiable and shareable.',
-    type: 'website',
-    url: 'https://merit-frontend-nine.vercel.app/about',
-  },
-};
+export const metadata: Metadata = buildMetadata({
+  title: 'About',
+  description:
+    'Merit was built by a high school student in Vancouver, BC who was ' +
+    'tired of tracking volunteer hours in a spreadsheet.',
+  path: '/about',
+});
 
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-ink-50">
-      {/* Nav */}
-      <nav className="flex items-center justify-between px-8 py-5 border-b border-ink-200 bg-white">
-        <Link href="/" className="text-[18px] font-bold text-ink-900 tracking-tight">
-          merit<span className="text-merit-blue-600">.</span>
-        </Link>
-        <div className="flex items-center gap-4">
-          <Link href="/pricing" className="text-[13px] font-medium text-ink-600 hover:text-ink-900 transition-colors">Pricing</Link>
-          <Link href="/faq" className="text-[13px] font-medium text-ink-600 hover:text-ink-900 transition-colors">FAQ</Link>
-          <Link href="/login" className="text-[13px] font-medium text-ink-600 hover:text-ink-900 transition-colors">Sign in</Link>
-          <Link href="/signup" className="text-[13px] font-medium text-white bg-merit-blue-600 hover:bg-merit-blue-700 px-4 py-2 rounded-lg transition-colors">
-            Get started free
-          </Link>
-        </div>
-      </nav>
+      <MarketingNav />
 
       {/* Hero */}
       <section className="px-8 py-20 text-center max-w-4xl mx-auto">

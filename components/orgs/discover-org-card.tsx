@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Bookmark, CheckCircle, ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { DiscoverOrg } from '@/lib/types';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface Props {
   org: DiscoverOrg;
@@ -60,19 +61,24 @@ export function DiscoverOrgCard({ org, isFollowing, onToggleFollow }: Props) {
         </Link>
 
         {/* Bookmark button — top-right of header */}
-        <button
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleFollow(org.id); }}
-          aria-label={isFollowing ? 'Unfollow' : 'Bookmark'}
-          className="absolute top-2 right-2 z-10 w-8 h-8 rounded-full bg-black/20 hover:bg-black/30 backdrop-blur-sm flex items-center justify-center transition-colors"
-        >
-          <Bookmark
-            size={14}
-            className={cn(
-              'transition-colors',
-              isFollowing ? 'fill-white text-white' : 'text-white/90',
-            )}
-          />
-        </button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleFollow(org.id); }}
+              aria-label={isFollowing ? 'Unsave' : 'Save organization'}
+              className="absolute top-2 right-2 z-10 w-8 h-8 rounded-full bg-black/20 hover:bg-black/30 backdrop-blur-sm flex items-center justify-center transition-colors"
+            >
+              <Bookmark
+                size={14}
+                className={cn(
+                  'transition-colors',
+                  isFollowing ? 'fill-white text-white' : 'text-white/90',
+                )}
+              />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>{isFollowing ? 'Unsave organization' : 'Save organization'}</TooltipContent>
+        </Tooltip>
 
         {/* Initials/logo circle — bottom-left, overlapping into body */}
         <div className="absolute bottom-0 left-4 translate-y-1/2">

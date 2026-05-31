@@ -1,10 +1,13 @@
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 import { ProfileHero } from './_components/profile-hero';
 import { StatsRow } from './_components/stats-row';
 import { BadgesSection } from './_components/badges-section';
 import { OrgsSection } from './_components/orgs-section';
 import { PrivateProfile } from './_components/private-profile';
 import { BackButton } from './_components/back-button';
+import { buildMetadata } from '@/lib/seo';
+import { StripAuthTokens } from '@/components/auth/strip-auth-tokens';
 
 const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? '').replace(/\/$/, '');
 
@@ -54,6 +57,28 @@ async function fetchProfileOrgs(username: string) {
   }
 }
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ username: string }>;
+}): Promise<Metadata> {
+  const { username } = await params;
+  let profile: any = null;
+  try {
+    profile = await fetchProfile(username);
+  } catch {
+    return buildMetadata({ title: 'Profile not found', noIndex: true });
+  }
+  if (!profile) return buildMetadata({ title: 'Profile not found', noIndex: true });
+  if (profile.isPrivate) return buildMetadata({ title: `${username} — Profile`, noIndex: true });
+  return buildMetadata({
+    title: `${profile.name ?? username} — Volunteer Hours`,
+    description: `${profile.name ?? username} has logged ${profile.stats?.verifiedHours ?? 0} verified volunteer hours on Merit.`,
+    path: `/u/${username}`,
+    image: `https://meritco.app/api/og/profile/${username}`,
+  });
+}
+
 export default async function PublicProfilePage({
   params,
 }: {
@@ -89,6 +114,7 @@ export default async function PublicProfilePage({
 
   return (
     <div className="min-h-screen bg-ink-50">
+      <StripAuthTokens />
       <div className="max-w-2xl mx-auto px-4 py-10 space-y-8">
         <BackButton />
         <ProfileHero

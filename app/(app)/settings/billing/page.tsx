@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Check, Lock, Loader2 } from 'lucide-react';
+import { format, parseISO } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useMeritStore } from '@/lib/store';
@@ -227,13 +228,11 @@ export default function BillingPage() {
 
   const isPaid = plan === 'pro' || plan === 'premium';
   const nextBillingDate = billing?.currentPeriodEnd
-    ? new Date(billing.currentPeriodEnd).toLocaleDateString('en-US', {
-        year: 'numeric', month: 'long', day: 'numeric',
-      })
+    ? format(parseISO(billing.currentPeriodEnd), 'MMMM d, yyyy')
     : null;
 
   return (
-    <div className="max-w-2xl">
+    <div className="max-w-3xl">
       <div className="mb-6">
         <h2 className="text-h1 text-ink-900">Plan & billing</h2>
         <p className="text-small text-ink-500 mt-1">Manage your subscription and payment details.</p>
@@ -241,7 +240,7 @@ export default function BillingPage() {
 
       {/* Current plan banner (paid users only) */}
       {isPaid && (
-        <div className="rounded-xl border border-merit-blue-200 bg-merit-blue-50 p-5 mb-8 flex items-center justify-between">
+        <div className="rounded-xl border border-merit-blue-200 bg-merit-blue-50 p-5 mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <p className="text-[13px] font-medium text-ink-900 capitalize">{plan} plan</p>
             <p className="text-small text-ink-500 mt-0.5">
@@ -292,7 +291,7 @@ export default function BillingPage() {
       </div>
 
       {/* Plan cards */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <PlanCard
           name="Free"
           monthlyPrice="$0"

@@ -9,8 +9,9 @@ import { WelcomeBanner } from '@/components/dashboard/welcome-banner';
 import { BadgeStrip } from '@/components/dashboard/badge-strip';
 import { StreakDisplay } from '@/components/dashboard/streak-display';
 import { MilestoneCheckerClient } from '@/components/dashboard/milestone-checker-client';
+import { buildMetadata } from '@/lib/seo';
 
-export const metadata: Metadata = { title: 'Dashboard' };
+export const metadata: Metadata = buildMetadata({ title: 'Dashboard', noIndex: true });
 
 export default function DashboardPage() {
   return (

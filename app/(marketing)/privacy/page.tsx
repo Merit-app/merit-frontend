@@ -1,35 +1,18 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { MarketingFooter } from '@/components/marketing/footer';
+import { MarketingNav } from '@/components/marketing/nav';
+import { buildMetadata } from '@/lib/seo';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildMetadata({
   title: 'Privacy Policy',
-  description: 'Merit Privacy Policy — How we protect your data and use SMS verification for service hour verification.',
-  openGraph: {
-    title: 'Merit Privacy Policy',
-    description: 'Merit Privacy Policy — How we protect your data and use SMS verification for service hour verification.',
-    type: 'website',
-    url: 'https://merit-frontend-nine.vercel.app/privacy',
-  },
-};
+  path: '/privacy',
+});
 
 export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-[#FAFAF9]">
-      {/* Nav */}
-      <nav className="flex items-center justify-between px-8 py-5 border-b border-ink-200 bg-white">
-        <Link href="/" className="text-[18px] font-bold text-ink-900 tracking-tight">
-          merit<span className="text-merit-blue-600">.</span>
-        </Link>
-        <div className="flex items-center gap-4">
-          <Link href="/login" className="text-[13px] font-medium text-ink-600 hover:text-ink-900 transition-colors">
-            Sign in
-          </Link>
-          <Link href="/signup" className="text-[13px] font-medium text-white bg-merit-blue-600 hover:bg-merit-blue-700 px-4 py-2 rounded-lg transition-colors">
-            Get started free
-          </Link>
-        </div>
-      </nav>
+      <MarketingNav />
 
       {/* Content */}
       <div className="max-w-2xl mx-auto px-8 py-14">

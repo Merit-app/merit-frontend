@@ -1,15 +1,18 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { PDFViewer, PDFDownloadLink } from '@react-pdf/renderer';
 import { Lock, Download, FileText, Zap } from 'lucide-react';
+import QRCode from 'qrcode';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { MeritPdfDocument } from '@/lib/pdf-template';
 import { useMeritStore } from '@/lib/store';
 import { usePlan } from '@/lib/hooks/use-plan';
 import { cn } from '@/lib/utils';
+
+const VERIFY_BASE_URL = 'https://meritco.app/verify';
 
 type Template = 'classic' | 'modern' | 'nhs-formal';
 type DateRange = 'all' | 'school-year' | 'custom';
@@ -33,6 +36,7 @@ export default function PdfExportInner() {
   const [template,      setTemplate]      = useState<Template>('classic');
   const [dateRange,     setDateRange]     = useState<DateRange>('all');
   const [format,        setFormat]        = useState<'pdf' | 'csv'>('pdf');
+  const [qrCodes,       setQrCodes]       = useState<Record<string, string>>({});
 
   // Free plan: enforce 30-day lookback on "All time" selection
   const freeCutoff = useMemo(() => {
@@ -61,6 +65,25 @@ export default function PdfExportInner() {
 
   const hasVerified = filteredSessions.some((s) => s.status === 'verified');
 
+  // Generate QR codes for all filtered sessions
+  useEffect(() => {
+    if (!includeVerify) { setQrCodes({}); return; }
+    let cancelled = false;
+    const map: Record<string, string> = {};
+    Promise.all(
+      filteredSessions.map((session) =>
+        QRCode.toDataURL(`${VERIFY_BASE_URL}/${session.id}`, {
+          width: 120,
+          margin: 1,
+          color: { dark: '#0F172A', light: '#FFFFFF' },
+          type: 'image/png',
+        }).then((url) => { map[session.id] = url; })
+          .catch(() => { /* skip if generation fails */ })
+      )
+    ).then(() => { if (!cancelled) setQrCodes({ ...map }); });
+    return () => { cancelled = true; };
+  }, [filteredSessions, includeVerify]);
+
   const dateRangeLabel =
     dateRange === 'all' ? 'All time' :
     dateRange === 'school-year' ? 'This school year' : 'Custom range';
@@ -72,6 +95,7 @@ export default function PdfExportInner() {
       includeStats={includeStats}
       includeSupervisor={includeVerify}
       dateRange={dateRangeLabel}
+      qrCodes={qrCodes}
     />
   );
 

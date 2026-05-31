@@ -1,62 +1,81 @@
 import type { MetadataRoute } from 'next';
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://merit-frontend-nine.vercel.app';
+const BASE_URL = 'https://meritco.app';
+const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? '').replace(/\/$/, '');
 
-  return [
+async function getPublicProfiles(): Promise<{ username: string; updatedAt: string }[]> {
+  try {
+    const res = await fetch(`${API_URL}/profiles/sitemap`, {
+      next: { revalidate: 3600 }, // refresh hourly
+    });
+    if (!res.ok) return [];
+    const json = await res.json();
+    return json?.data ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const staticPages: MetadataRoute.Sitemap = [
     {
-      url: baseUrl,
+      url: BASE_URL,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 1.0,
     },
     {
-      url: `${baseUrl}/pricing`,
+      url: `${BASE_URL}/pricing`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/faq`,
+      url: `${BASE_URL}/faq`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/about`,
+      url: `${BASE_URL}/about`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/contact`,
+      url: `${BASE_URL}/contact`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/terms`,
+      url: `${BASE_URL}/terms`,
       lastModified: new Date(),
       changeFrequency: 'yearly',
       priority: 0.5,
     },
     {
-      url: `${baseUrl}/privacy`,
+      url: `${BASE_URL}/privacy`,
       lastModified: new Date(),
       changeFrequency: 'yearly',
       priority: 0.5,
     },
     {
-      url: `${baseUrl}/login`,
-      lastModified: new Date(),
-      changeFrequency: 'never',
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/signup`,
+      url: `${BASE_URL}/signup`,
       lastModified: new Date(),
       changeFrequency: 'never',
       priority: 0.7,
     },
   ];
+
+  // Fetch public profile pages
+  const profiles = await getPublicProfiles();
+  const profilePages: MetadataRoute.Sitemap = profiles.map(({ username, updatedAt }) => ({
+    url: `${BASE_URL}/u/${encodeURIComponent(username)}`,
+    lastModified: updatedAt ? new Date(updatedAt) : new Date(),
+    changeFrequency: 'weekly',
+    priority: 0.6,
+  }));
+
+  return [...staticPages, ...profilePages];
 }

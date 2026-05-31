@@ -47,6 +47,7 @@ export const useMeritStore = create<MeritStore>()(
       sessions: [],
       organizations: [],
       followedOrgIds: [],
+      isOrgAdmin: false,
 
       // ── Settings ────────────────────────────────────────────────────────
       notifications: defaultNotifications,
@@ -81,6 +82,8 @@ export const useMeritStore = create<MeritStore>()(
       setOrganizations: (organizations: Organization[]) => set({ organizations }),
 
       setFollowedOrgIds: (ids: string[]) => set({ followedOrgIds: ids }),
+
+      setIsOrgAdmin: (v: boolean) => set({ isOrgAdmin: v }),
 
       toggleFollowOptimistic: (orgId: string) =>
         set((state) => ({

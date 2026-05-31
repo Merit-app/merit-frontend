@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ShieldCheck, Building2, CheckCircle } from 'lucide-react';
+import { format, parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
 import type { Organization, Session } from '@/lib/types';
 
@@ -68,7 +69,7 @@ export function OrgCard({ org, sessions }: Props) {
         <span>{orgSessions.length} {orgSessions.length === 1 ? 'session' : 'sessions'}</span>
         {lastVisit && (
           <span>
-            Last: {new Date(lastVisit + 'T00:00:00').toLocaleDateString('en-CA', { month: 'short', day: 'numeric' })}
+            Last: {format(parseISO(lastVisit + 'T00:00:00'), 'MMM d')}
           </span>
         )}
       </div>

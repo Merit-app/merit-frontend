@@ -1,17 +1,17 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { MarketingFooter } from '@/components/marketing/footer';
+import { MarketingNav } from '@/components/marketing/nav';
+import { FAQJsonLd } from '@/components/seo/json-ld';
+import { buildMetadata } from '@/lib/seo';
 
-export const metadata: Metadata = {
-  title: 'Merit FAQ — Your questions answered',
-  description: 'Merit FAQ — Your questions answered about SMS verification, PDF export, school partnerships, and more.',
-  openGraph: {
-    title: 'Merit FAQ — Your questions answered',
-    description: 'Merit FAQ — Your questions answered about SMS verification, PDF export, school partnerships, and more.',
-    type: 'website',
-    url: 'https://merit-frontend-nine.vercel.app/faq',
-  },
-};
+export const metadata: Metadata = buildMetadata({
+  title: 'FAQ',
+  description:
+    'Answers to common questions about Merit — how verification works, ' +
+    'what programs are supported, and how to export your hours.',
+  path: '/faq',
+});
 
 const FAQS = [
   {
@@ -59,19 +59,8 @@ const FAQS = [
 export default function FAQPage() {
   return (
     <div className="min-h-screen bg-[#FAFAF9]">
-      {/* Nav */}
-      <nav className="flex items-center justify-between px-8 py-5 border-b border-ink-200 bg-white">
-        <Link href="/" className="text-[18px] font-bold text-ink-900 tracking-tight">
-          merit<span className="text-merit-blue-600">.</span>
-        </Link>
-        <div className="flex items-center gap-4">
-          <Link href="/pricing" className="text-[13px] font-medium text-ink-600 hover:text-ink-900 transition-colors">Pricing</Link>
-          <Link href="/login" className="text-[13px] font-medium text-ink-600 hover:text-ink-900 transition-colors">Sign in</Link>
-          <Link href="/signup" className="text-[13px] font-medium text-white bg-merit-blue-600 hover:bg-merit-blue-700 px-4 py-2 rounded-lg transition-colors">
-            Get started free
-          </Link>
-        </div>
-      </nav>
+      <FAQJsonLd />
+      <MarketingNav />
 
       {/* Content */}
       <div className="max-w-2xl mx-auto px-8 py-14">

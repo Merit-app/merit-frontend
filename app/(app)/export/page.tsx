@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import { PdfExportClient } from '@/components/export/pdf-export-client';
+import { buildMetadata } from '@/lib/seo';
 
-export const metadata: Metadata = { title: 'Export' };
+export const metadata: Metadata = buildMetadata({ title: 'Export Hours', noIndex: true });
 
 export default function ExportPage() {
   return (

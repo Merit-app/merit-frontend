@@ -15,17 +15,20 @@ import {
   ChevronUp,
   Award,
   Bookmark,
+  Trophy,
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { UserMenu } from './user-menu';
 import { SidebarAvatar } from '@/components/profile/sidebar-avatar';
-import { useMeritStore } from '@/lib/store';
+import { useMeritStore, useHydrationStore } from '@/lib/store';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 const primaryNav = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/hours', label: 'All sessions', icon: Clock },
   { href: '/organizations', label: 'Organizations', icon: Building2 },
+  { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
   { href: '/saved', label: 'Saved', icon: Bookmark },
   { href: '/badges', label: 'Badges', icon: Award },
   { href: '/export', label: 'Export', icon: FileDown },
@@ -120,13 +123,18 @@ function UpgradePrompt() {
             className={cn('transition-transform duration-150', !open && 'rotate-180')}
           />
         </button>
-        <button
-          onClick={() => setDismissed(true)}
-          aria-label="Dismiss"
-          className="text-ink-300 hover:text-ink-500 transition-colors"
-        >
-          <X size={13} />
-        </button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              onClick={() => setDismissed(true)}
+              aria-label="Dismiss"
+              className="text-ink-300 hover:text-ink-500 transition-colors"
+            >
+              <X size={13} />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>Dismiss</TooltipContent>
+        </Tooltip>
       </div>
     </div>
   );
@@ -134,6 +142,8 @@ function UpgradePrompt() {
 
 export function Sidebar() {
   const pathname = usePathname();
+  const isOrgAdmin = useMeritStore((s) => s.isOrgAdmin);
+  const hydrated = useHydrationStore((s) => s.hydrated);
 
   function isActive(href: string) {
     if (href === '/dashboard') return pathname === '/dashboard';
@@ -178,6 +188,16 @@ export function Sidebar() {
         {primaryNav.map(({ href, label, icon: Icon }) => (
           <NavItem key={href} href={href} label={label} icon={Icon} active={isActive(href)} />
         ))}
+
+        {/* Org dashboard — only shown to org admins */}
+        {hydrated && isOrgAdmin && (
+          <NavItem
+            href="/org/dashboard"
+            label="Org dashboard"
+            icon={Building2}
+            active={isActive('/org/dashboard')}
+          />
+        )}
 
         {/* Divider */}
         <div className="mx-1 my-2 h-px bg-ink-200" />

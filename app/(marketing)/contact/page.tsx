@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { MarketingNav } from '@/components/marketing/nav';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -61,20 +62,7 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen bg-ink-50">
-      {/* Nav */}
-      <nav className="flex items-center justify-between px-8 py-5 border-b border-ink-200 bg-white">
-        <Link href="/" className="text-[18px] font-bold text-ink-900 tracking-tight">
-          merit<span className="text-merit-blue-600">.</span>
-        </Link>
-        <div className="flex items-center gap-4">
-          <Link href="/about" className="text-[13px] font-medium text-ink-600 hover:text-ink-900 transition-colors">About</Link>
-          <Link href="/pricing" className="text-[13px] font-medium text-ink-600 hover:text-ink-900 transition-colors">Pricing</Link>
-          <Link href="/login" className="text-[13px] font-medium text-ink-600 hover:text-ink-900 transition-colors">Sign in</Link>
-          <Link href="/signup" className="text-[13px] font-medium text-white bg-merit-blue-600 hover:bg-merit-blue-700 px-4 py-2 rounded-lg transition-colors">
-            Get started free
-          </Link>
-        </div>
-      </nav>
+      <MarketingNav />
 
       <div className="max-w-2xl mx-auto px-8 py-20">
         <div className="text-center mb-12">

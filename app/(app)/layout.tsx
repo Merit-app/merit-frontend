@@ -9,6 +9,7 @@ import { CommandPalette } from '@/components/shell/command-palette';
 import { PageTransition } from '@/components/shell/page-transition';
 import { useMeritStore, useHydrationStore } from '@/lib/store';
 import { sessionsApi, orgsApi, usersApi, onboardingApi, mapSession, mapOrg, mapUser } from '@/lib/api';
+
 // Note: setFollowedOrgIds pulled via store selector below
 import { OnboardingModal } from '@/components/onboarding/onboarding-modal';
 
@@ -22,6 +23,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const setSessions = useMeritStore((s) => s.setSessions);
   const setOrganizations = useMeritStore((s) => s.setOrganizations);
   const setFollowedOrgIds = useMeritStore((s) => s.setFollowedOrgIds);
+  const setIsOrgAdmin = useMeritStore((s) => s.setIsOrgAdmin);
   const updateUser = useMeritStore((s) => s.updateUser);
   const logout = useMeritStore((s) => s.logout);
   const hydrated = useHydrationStore((s) => s.hydrated);
@@ -53,11 +55,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
     async function loadData() {
       try {
-        const [sessionsRes, orgsRes, userRes, followingRes] = await Promise.allSettled([
+        const [sessionsRes, orgsRes, userRes, followingRes, adminOrgsRes] = await Promise.allSettled([
           sessionsApi.list({ perPage: 200 }),
           orgsApi.me(),
           usersApi.me(),
           orgsApi.following(),
+          orgsApi.adminMine(),
         ]);
 
         if (sessionsRes.status === 'fulfilled') {
@@ -70,6 +73,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         }
         if (followingRes.status === 'fulfilled') {
           setFollowedOrgIds((followingRes.value.data ?? []).map((o: any) => o.id as string));
+        }
+        if (adminOrgsRes.status === 'fulfilled') {
+          setIsOrgAdmin((adminOrgsRes.value.data?.length ?? 0) > 0);
         }
         if (userRes.status === 'fulfilled') {
           const mappedUser = mapUser(userRes.value.data.user);

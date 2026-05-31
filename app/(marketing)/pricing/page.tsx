@@ -2,17 +2,16 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Check } from 'lucide-react';
 import { MarketingFooter } from '@/components/marketing/footer';
+import { MarketingNav } from '@/components/marketing/nav';
+import { buildMetadata } from '@/lib/seo';
 
-export const metadata: Metadata = {
-  title: 'Merit Pricing — Free, Pro, and Premium plans',
-  description: 'Merit Pricing — Free, Pro, and Premium plans for every student. Start free, upgrade when you need more verifications.',
-  openGraph: {
-    title: 'Merit Pricing — Free, Pro, and Premium plans',
-    description: 'Merit Pricing — Free, Pro, and Premium plans for every student. Start free, upgrade when you need more verifications.',
-    type: 'website',
-    url: 'https://merit-frontend-nine.vercel.app/pricing',
-  },
-};
+export const metadata: Metadata = buildMetadata({
+  title: 'Pricing',
+  description:
+    'Merit is free for students. Upgrade to Pro for unlimited exports ' +
+    'and modern PDF templates. No hidden fees.',
+  path: '/pricing',
+});
 
 const PLANS = [
   {
@@ -93,19 +92,7 @@ const INSTITUTIONAL = {
 export default function PricingPage() {
   return (
     <div className="min-h-screen bg-[#FAFAF9]">
-      {/* Nav */}
-      <nav className="flex items-center justify-between px-8 py-5 border-b border-ink-200 bg-white">
-        <Link href="/" className="text-[18px] font-bold text-ink-900 tracking-tight">
-          merit<span className="text-merit-blue-600">.</span>
-        </Link>
-        <div className="flex items-center gap-4">
-          <Link href="/faq" className="text-[13px] font-medium text-ink-600 hover:text-ink-900 transition-colors">FAQ</Link>
-          <Link href="/login" className="text-[13px] font-medium text-ink-600 hover:text-ink-900 transition-colors">Sign in</Link>
-          <Link href="/signup" className="text-[13px] font-medium text-white bg-merit-blue-600 hover:bg-merit-blue-700 px-4 py-2 rounded-lg transition-colors">
-            Get started free
-          </Link>
-        </div>
-      </nav>
+      <MarketingNav />
 
       {/* Header */}
       <section className="max-w-3xl mx-auto px-8 pt-16 pb-10 text-center">

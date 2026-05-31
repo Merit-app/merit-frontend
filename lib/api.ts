@@ -90,6 +90,9 @@ export function mapUser(raw: any): User {
     consentAccepted: raw.parental_consent_received ?? true,
     onboardingCompleted: raw.onboarding_completed ?? false,
     username: raw.username ?? undefined,
+    avatarUrl: raw.avatar_url ?? undefined,
+    profilePublic: raw.profile_public ?? true,
+    bio: raw.bio ?? undefined,
   };
 }
 
@@ -204,6 +207,21 @@ export const orgsApi = {
 
   getPublic: (slug: string) =>
     request<{ data: { org: any } }>('GET', `/orgs/${encodeURIComponent(slug)}`, undefined, true),
+
+  createOrg: (body: {
+    name: string; category: string; city: string; province?: string;
+    country?: string; websiteUrl?: string; description?: string;
+    contactEmail?: string; contactPhone?: string; isRecruiting?: boolean;
+  }) => request<{ data: { org: any } }>('POST', '/organizations', body),
+
+  adminMine: () => request<{ data: any[] }>('GET', '/organizations/admin/mine'),
+
+  dashboard: (orgId: string) => request<{ data: any }>('GET', `/organizations/${orgId}/dashboard`),
+
+  updateOrg: (orgId: string, body: {
+    description?: string; websiteUrl?: string;
+    contactEmail?: string; contactPhone?: string; isRecruiting?: boolean;
+  }) => request<{ data: { updated: boolean } }>('PATCH', `/organizations/${orgId}`, body),
 };
 
 // ─── Users API ────────────────────────────────────────────────────────────────
@@ -232,6 +250,8 @@ export const profilesApi = {
   me: () => request<{ data: { profile: any } }>('GET', '/profiles/me'),
   update: (body: { username?: string; bio?: string; profilePublic?: boolean; topBadgeIds?: string[] }) =>
     request<{ data: { profile: any } }>('PATCH', '/profiles/me', body),
+  uploadAvatar: (image: string, contentType: string) =>
+    request<{ data: { avatarUrl: string } }>('POST', '/profiles/me/avatar', { image, contentType }),
   checkUsername: (username: string) =>
     request<{ data: { available: boolean; reason?: string } }>('POST', '/profiles/check-username', { username }, true),
 };
@@ -263,6 +283,82 @@ export const orgClaimsApi = {
     request<{ data: { approved: boolean } }>('POST', `/org-claims/${claimId}/approve`, {}),
   reject: (claimId: string, reason?: string) =>
     request<{ data: { rejected: boolean } }>('POST', `/org-claims/${claimId}/reject`, { reason }),
+};
+
+// ─── Leaderboard API ─────────────────────────────────────────────────────────
+
+export type LeaderboardPeriod = 'all' | 'month' | 'week';
+export type LeaderboardType = 'global' | 'local' | 'school';
+
+export interface LeaderboardEntry {
+  rank: number;
+  userId: string | null;
+  name: string;
+  username: string | null;
+  avatarUrl: string | null;
+  school: string | null;
+  city: string | null;
+  verifiedHours: number;
+  sessionCount: number;
+  isCurrentUser: boolean;
+  isPrivate: boolean;
+  badges: { id: string; name: string; tier: string; iconName: string }[];
+}
+
+export interface LeaderboardResult {
+  entries: LeaderboardEntry[];
+  currentUserEntry: LeaderboardEntry | null;
+  currentUserRank: number | null;
+  totalParticipants: number;
+  period: LeaderboardPeriod;
+  type: LeaderboardType;
+}
+
+export const leaderboardApi = {
+  get: (params: {
+    type?: LeaderboardType;
+    period?: LeaderboardPeriod;
+    school?: string;
+    city?: string;
+    limit?: number;
+    offset?: number;
+  }) => {
+    const qs = new URLSearchParams();
+    if (params.type) qs.set('type', params.type);
+    if (params.period) qs.set('period', params.period);
+    if (params.school) qs.set('school', params.school);
+    if (params.city) qs.set('city', params.city);
+    if (params.limit != null) qs.set('limit', String(params.limit));
+    if (params.offset != null) qs.set('offset', String(params.offset));
+    return request<{ data: LeaderboardResult }>('GET', `/leaderboard?${qs}`);
+  },
+
+  getUserStats: (username: string) =>
+    request<{ data: any }>('GET', `/leaderboard/u/${username}`),
+
+  // Groups
+  createGroup: (body: { name: string; type?: 'school' | 'custom'; isPrivate?: boolean }) =>
+    request<{ data: { id: string; name: string; code: string; type: string; created_at: string } }>(
+      'POST',
+      '/leaderboard/groups',
+      body,
+    ),
+
+  joinGroup: (code: string) =>
+    request<{ data: { group: any; alreadyMember: boolean } }>(
+      'POST',
+      '/leaderboard/groups/join',
+      { code },
+    ),
+
+  myGroups: () =>
+    request<{ data: { groups: any[] } }>('GET', '/leaderboard/groups/mine'),
+
+  getGroup: (groupId: string) =>
+    request<{ data: { group: any; entries: any[]; totalParticipants: number } }>(
+      'GET',
+      `/leaderboard/groups/${groupId}`,
+    ),
 };
 
 // ─── Billing API ─────────────────────────────────────────────────────────────

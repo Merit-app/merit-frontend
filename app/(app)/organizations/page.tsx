@@ -1,11 +1,13 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
-import { Search, Building2, ChevronRight } from 'lucide-react';
+import { Search, Building2, Plus, ShieldCheck } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DiscoverOrgCard } from '@/components/orgs/discover-org-card';
+import { CreateOrgModal } from '@/components/orgs/create-org-modal';
+import { ClaimOrgModal } from '@/components/orgs/claim-org-modal';
 import { useMeritStore, useHydrationStore } from '@/lib/store';
 import { orgsApi, ApiError } from '@/lib/api';
 import { cn } from '@/lib/utils';
@@ -124,6 +126,9 @@ export default function OrganizationsPage() {
   const followedOrgIds = useMeritStore((s) => s.followedOrgIds);
   const toggleFollowOptimistic = useMeritStore((s) => s.toggleFollowOptimistic);
 
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [claimOrgId, setClaimOrgId] = useState<string | null>(null);
+  const [claimOrgName, setClaimOrgName] = useState('');
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState<string>('All');
   const [discoverOrgs, setDiscoverOrgs] = useState<DiscoverOrg[]>([]);
@@ -268,8 +273,48 @@ export default function OrganizationsPage() {
       <section>
         <h2 className="text-[16px] font-semibold text-ink-900 mb-4">Discover</h2>
 
+        {/* Action cards — create or claim */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+          <button
+            onClick={() => setCreateModalOpen(true)}
+            className="rounded-xl border-2 border-dashed border-border hover:border-ink-400 transition-colors p-4 cursor-pointer group text-left"
+          >
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-lg bg-ink-100 flex items-center justify-center shrink-0 group-hover:bg-ink-200 transition-colors">
+                <Plus className="w-4 h-4 text-ink-600" />
+              </div>
+              <div>
+                <p className="font-semibold text-[13px] text-ink-900">Add your organization</p>
+                <p className="text-[12px] text-ink-500 mt-0.5">
+                  Don't see your org? Add it so students can log hours here.
+                </p>
+              </div>
+            </div>
+          </button>
+          <button
+            onClick={() => {
+              // Open claim flow by searching for an existing org
+              // For now route to the discover feed — users can click Claim on org pages
+              window.location.href = '#discover-grid';
+            }}
+            className="rounded-xl border-2 border-dashed border-border hover:border-ink-400 transition-colors p-4 cursor-pointer group text-left"
+          >
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-lg bg-ink-100 flex items-center justify-center shrink-0 group-hover:bg-ink-200 transition-colors">
+                <ShieldCheck className="w-4 h-4 text-ink-600" />
+              </div>
+              <div>
+                <p className="font-semibold text-[13px] text-ink-900">Manage your org's page</p>
+                <p className="text-[12px] text-ink-500 mt-0.5">
+                  Already in Merit? Find it below and click Claim.
+                </p>
+              </div>
+            </div>
+          </button>
+        </div>
+
         {/* Search */}
-        <div className="relative mb-4">
+        <div className="relative mb-4" id="discover-grid">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-400 pointer-events-none" />
           <Input
             value={query}
@@ -346,6 +391,17 @@ export default function OrganizationsPage() {
           </>
         )}
       </section>
+
+      {/* Modals */}
+      <CreateOrgModal open={createModalOpen} onClose={() => setCreateModalOpen(false)} />
+      {claimOrgId && (
+        <ClaimOrgModal
+          open={!!claimOrgId}
+          onClose={() => { setClaimOrgId(null); setClaimOrgName(''); }}
+          orgId={claimOrgId}
+          orgName={claimOrgName}
+        />
+      )}
     </div>
   );
 }

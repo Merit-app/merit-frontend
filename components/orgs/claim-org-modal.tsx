@@ -101,7 +101,7 @@ export function ClaimOrgModal({ open, onClose, orgId, orgName }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md z-[100]">
+      <DialogContent className="sm:max-w-md overflow-visible">
 
         {claimState === 'form' && (
           <>

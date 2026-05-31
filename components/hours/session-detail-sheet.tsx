@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { StatusBadge } from './status-badge';
 import { TierBadge } from './tier-badge';
 import { useMeritStore } from '@/lib/store';
@@ -250,13 +251,18 @@ export function SessionDetailSheet({ session, open, onClose }: Props) {
               </button>
             )}
             {mode === 'edit' && (
-              <button
-                onClick={() => setMode('view')}
-                aria-label="Cancel editing"
-                className="text-ink-400 hover:text-ink-600 transition-colors"
-              >
-                <X size={18} />
-              </button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => setMode('view')}
+                    aria-label="Cancel editing"
+                    className="text-ink-400 hover:text-ink-600 transition-colors"
+                  >
+                    <X size={18} />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>Cancel editing</TooltipContent>
+              </Tooltip>
             )}
           </div>
         </SheetHeader>
