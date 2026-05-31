@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
-import { buildMetadata } from '@/lib/seo';
 import Link from 'next/link';
-import { CheckCircle, ShieldCheck, FileText, Clock, Target } from 'lucide-react';
-import { MarketingNav } from '@/components/marketing/nav';
+import { ChevronRight, CheckCircle2, FileText } from 'lucide-react';
+import { buildMetadata } from '@/lib/seo';
+import { FeatureExplorer } from '@/components/marketing/feature-explorer';
 
 export const metadata: Metadata = buildMetadata({
   title: 'Student Volunteer Hour Tracker',
@@ -12,178 +12,310 @@ export const metadata: Metadata = buildMetadata({
   path: '/',
 });
 
-const FEATURES = [
-  {
-    icon: ShieldCheck,
-    title: 'SMS-verified hours',
-    body: "Text your supervisor's number. They reply YES. Your hour is verified — no paperwork, no chasing emails.",
-  },
-  {
-    icon: Clock,
-    title: 'Track every session',
-    body: 'Log the date, organization, activity, and duration in under a minute. Every session is timestamped and stored.',
-  },
-  {
-    icon: FileText,
-    title: 'Export a signed PDF',
-    body: 'Generate a clean, credentialed PDF of your record whenever you need it — scholarships, applications, graduation requirements.',
-  },
-  {
-    icon: Target,
-    title: 'Built around your goal',
-    body: "Set your program's hour target and Merit tracks verified vs. pending separately — so you always know exactly where you stand.",
-  },
-];
+// ── Top nav ───────────────────────────────────────────────────────────────────
 
-const SOCIAL_PROOF = [
-  { name: 'Maya T.', school: 'Burnaby North Secondary', quote: 'I used to keep a spreadsheet. Merit replaced it in a week.' },
-  { name: 'Jordan K.', school: 'Eric Hamber Secondary', quote: 'My guidance counselor asked me to recommend this to everyone in my grade.' },
-  { name: 'Priya S.', school: 'Lord Byng Secondary', quote: 'The PDF export is exactly what UBC wanted for my scholarship application.' },
-];
+function TopNav() {
+  return (
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
+      <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+        <Link href="/" className="font-bold text-lg tracking-tight text-gray-900">
+          merit.
+        </Link>
+        <div className="hidden md:flex items-center gap-8 text-sm text-gray-600">
+          <Link href="/pricing" className="hover:text-gray-900 transition-colors">Pricing</Link>
+          <Link href="/about" className="hover:text-gray-900 transition-colors">About</Link>
+          <Link href="/faq" className="hover:text-gray-900 transition-colors">FAQ</Link>
+        </div>
+        <div className="flex items-center gap-3">
+          <Link href="/login" className="hidden md:block text-sm text-gray-600 hover:text-gray-900 transition-colors">
+            Log in
+          </Link>
+          <Link
+            href="/signup"
+            className="text-sm bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors font-medium"
+          >
+            Get started free
+          </Link>
+        </div>
+      </div>
+    </nav>
+  );
+}
+
+// ── Hero app mockup ───────────────────────────────────────────────────────────
+
+function AppMockup() {
+  return (
+    <div className="relative">
+      <div className="rounded-2xl border border-gray-200 shadow-2xl shadow-gray-200/60 overflow-hidden bg-white">
+        <div className="bg-gray-50 border-b border-gray-200 px-4 py-3 flex items-center gap-3">
+          <div className="flex gap-1.5">
+            <div className="w-3 h-3 rounded-full bg-red-400" />
+            <div className="w-3 h-3 rounded-full bg-yellow-400" />
+            <div className="w-3 h-3 rounded-full bg-green-400" />
+          </div>
+          <div className="flex-1 bg-white rounded-md border border-gray-200 px-3 py-1 text-xs text-gray-400 text-center">
+            meritco.app/dashboard
+          </div>
+        </div>
+
+        <div className="flex h-64 overflow-hidden">
+          <div className="w-36 border-r border-gray-100 bg-gray-50 p-3 flex flex-col gap-1 shrink-0">
+            <div className="text-xs font-bold text-gray-800 px-2 mb-2">merit.</div>
+            {[
+              { label: 'Dashboard', active: true },
+              { label: 'Sessions' },
+              { label: 'Organizations' },
+              { label: 'Badges' },
+              { label: 'Export' },
+            ].map((item) => (
+              <div
+                key={item.label}
+                className={`text-xs px-2 py-1.5 rounded-md ${
+                  item.active ? 'bg-white shadow-sm text-gray-900 font-medium' : 'text-gray-500'
+                }`}
+              >
+                {item.label}
+              </div>
+            ))}
+          </div>
+
+          <div className="flex-1 p-4 space-y-3 overflow-hidden">
+            <p className="text-xs font-semibold text-gray-800">Dashboard</p>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { label: 'Verified', value: '47h' },
+                { label: 'Sessions', value: '12' },
+                { label: 'Orgs', value: '4' },
+              ].map((stat) => (
+                <div key={stat.label} className="bg-gray-50 rounded-lg p-2 border border-gray-100">
+                  <p className="text-xs text-gray-400">{stat.label}</p>
+                  <p className="text-sm font-bold text-gray-900">{stat.value}</p>
+                </div>
+              ))}
+            </div>
+            <div className="space-y-1.5">
+              {[
+                { org: 'Vancouver Rotary', hrs: '4h', status: 'verified' },
+                { org: 'BC Youth Council', hrs: '3h', status: 'pending' },
+                { org: 'Red Cross', hrs: '6h', status: 'verified' },
+              ].map((session) => (
+                <div
+                  key={session.org}
+                  className="flex items-center justify-between bg-white rounded-lg border border-gray-100 px-2.5 py-2"
+                >
+                  <p className="text-xs font-medium text-gray-800">{session.org}</p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-500">{session.hrs}</span>
+                    <span
+                      className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${
+                        session.status === 'verified'
+                          ? 'bg-green-50 text-green-700'
+                          : 'bg-amber-50 text-amber-700'
+                      }`}
+                    >
+                      {session.status}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="absolute -bottom-4 -left-6 bg-white rounded-xl border border-gray-200 shadow-lg p-3 flex items-center gap-3 max-w-[200px]">
+        <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+          <CheckCircle2 className="w-4 h-4 text-green-600" />
+        </div>
+        <div>
+          <p className="text-xs font-semibold text-gray-800">Session verified</p>
+          <p className="text-xs text-gray-400">Supervisor replied YES</p>
+        </div>
+      </div>
+
+      <div className="absolute -top-4 -right-4 bg-white rounded-xl border border-gray-200 shadow-lg p-3 flex items-center gap-3">
+        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+          <FileText className="w-4 h-4 text-blue-600" />
+        </div>
+        <div>
+          <p className="text-xs font-semibold text-gray-800">PDF exported</p>
+          <p className="text-xs text-gray-400">47 verified hours</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#FAFAF9]">
-      <MarketingNav />
+    <div className="bg-white text-gray-900">
+      <TopNav />
 
       {/* Hero */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-8 pt-16 md:pt-20 pb-12 md:pb-16 text-center">
-        <p className="text-[12px] font-semibold text-merit-blue-600 uppercase tracking-widest mb-4">
-          For high school students
-        </p>
-        <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-ink-900 leading-tight tracking-tight mb-6">
-          Service hours you can<br className="hidden sm:block" /> actually prove.
-        </h1>
-        <p className="text-lg lg:text-xl text-ink-500 leading-relaxed mb-8 max-w-2xl mx-auto">
-          Merit logs your volunteer sessions, verifies them with your supervisor by SMS, and generates a signed PDF record — ready for scholarships, college apps, and graduation requirements.
-        </p>
-        <div className="flex items-center justify-center gap-3 flex-wrap">
-          <Link
-            href="/signup"
-            className="text-[14px] font-semibold text-white bg-merit-blue-600 hover:bg-merit-blue-700 px-6 py-3 rounded-lg transition-colors"
-          >
-            Start tracking for free
-          </Link>
-          <Link
-            href="/login"
-            className="text-[14px] font-medium text-ink-600 hover:text-ink-900 border border-ink-200 bg-white hover:bg-ink-50 px-6 py-3 rounded-lg transition-colors"
-          >
-            Sign in
-          </Link>
-        </div>
-        <p className="text-[12px] text-ink-400 mt-4">No credit card. No app download. Works in your browser.</p>
-      </section>
+      <section className="pt-32 pb-16 px-6 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div className="space-y-6">
+            <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 text-xs font-semibold px-3 py-1.5 rounded-full">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+              Free for students
+            </div>
 
-      {/* How it works */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-8 pb-16 md:pb-20">
-        <div className="rounded-3xl bg-white border border-ink-200 p-8 mb-10">
-          <div className="flex items-center gap-3 justify-center mb-8">
-            <div className="w-12 h-px bg-ink-200" />
-            <p className="text-[11px] font-semibold text-ink-400 uppercase tracking-widest">How it works</p>
-            <div className="w-12 h-px bg-ink-200" />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="rounded-2xl border border-ink-200 p-6 text-center hover:shadow-md hover:border-merit-blue-200 transition-all duration-200">
-              <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-merit-blue-50 flex items-center justify-center text-merit-blue-600 text-xl font-bold">1</div>
-              <h3 className="text-[15px] font-semibold text-ink-900 mb-2">Log your hours</h3>
-              <p className="text-[13px] text-ink-500 leading-relaxed">Fill out a quick form with your session details, organization, and supervisor.</p>
-            </div>
-            <div className="rounded-2xl border border-ink-200 p-6 text-center hover:shadow-md hover:border-merit-blue-200 transition-all duration-200">
-              <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-merit-blue-50 flex items-center justify-center text-merit-blue-600 text-xl font-bold">2</div>
-              <h3 className="text-[15px] font-semibold text-ink-900 mb-2">Supervisor verifies</h3>
-              <p className="text-[13px] text-ink-500 leading-relaxed">Your supervisor receives a text and confirms your session with one reply.</p>
-            </div>
-            <div className="rounded-2xl border border-ink-200 p-6 text-center hover:shadow-md hover:border-merit-blue-200 transition-all duration-200">
-              <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-merit-blue-50 flex items-center justify-center text-merit-blue-600 text-xl font-bold">3</div>
-              <h3 className="text-[15px] font-semibold text-ink-900 mb-2">Download PDF</h3>
-              <p className="text-[13px] text-ink-500 leading-relaxed">Export a verified PDF record for scholarships, college applications, and graduation.</p>
-            </div>
-          </div>
-        </div>
-      </section>
+            <h1 className="text-5xl lg:text-6xl font-bold tracking-tight text-gray-900 leading-[1.05]">
+              Service hours you can actually prove.
+            </h1>
 
-      {/* Feature grid */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-8 pb-16 md:pb-20">
-        <div className="flex items-center gap-3 justify-center mb-8">
-          <div className="w-12 h-px bg-ink-200" />
-          <p className="text-[11px] font-semibold text-ink-400 uppercase tracking-widest">Features</p>
-          <div className="w-12 h-px bg-ink-200" />
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {FEATURES.map(({ icon: Icon, title, body }) => (
-            <div key={title} className="bg-white rounded-xl border border-ink-200 p-6 hover:shadow-md hover:border-merit-blue-200 transition-all duration-200">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-lg bg-merit-blue-50 flex items-center justify-center shrink-0">
-                  <Icon size={18} className="text-merit-blue-600" />
-                </div>
-                <p className="text-[14px] font-semibold text-ink-900">{title}</p>
+            <p className="text-xl text-gray-500 leading-relaxed max-w-md">
+              Log hours, get verified by SMS, export a signed PDF. Takes two minutes.
+            </p>
+
+            <div className="flex items-center gap-4 pt-2">
+              <Link
+                href="/signup"
+                className="bg-gray-900 text-white text-sm font-semibold px-6 py-3.5 rounded-xl hover:bg-gray-700 transition-colors shadow-sm"
+              >
+                Start for free
+              </Link>
+              <a
+                href="#how-it-works"
+                className="text-sm text-gray-600 font-medium hover:text-gray-900 flex items-center gap-1.5"
+              >
+                See how it works
+                <ChevronRight className="w-4 h-4" />
+              </a>
+            </div>
+
+            <div className="flex items-center gap-3 pt-2">
+              <div className="flex -space-x-2">
+                {['KN', 'SR', 'JP', 'ML'].map((init) => (
+                  <div
+                    key={init}
+                    className="w-8 h-8 rounded-full border-2 border-white bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold"
+                  >
+                    {init}
+                  </div>
+                ))}
               </div>
-              <p className="text-[13px] text-ink-500 leading-relaxed">{body}</p>
+              <p className="text-sm text-gray-500">
+                Trusted by students at
+                <span className="font-medium text-gray-700">
+                  {' '}Burnaby South, Eric Hamber, Lord Byng
+                </span>
+              </p>
             </div>
-          ))}
+          </div>
+
+          <div className="relative">
+            <AppMockup />
+          </div>
         </div>
       </section>
 
-      {/* Social proof */}
-      <section className="border-t border-ink-200 bg-white">
-        <div className="max-w-6xl mx-auto px-8 py-16">
-          <div className="flex items-center gap-3 justify-center mb-8">
-            <div className="w-12 h-px bg-ink-200" />
-            <p className="text-[11px] font-semibold text-ink-400 uppercase tracking-widest">What students say</p>
-            <div className="w-12 h-px bg-ink-200" />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 w-full">
-            {SOCIAL_PROOF.map(({ name, school, quote }) => (
-              <div key={name} className="rounded-xl border border-ink-100 bg-ink-50 p-5">
-                <p className="text-[36px] text-merit-blue-200 leading-none mb-1 font-serif select-none">&ldquo;</p>
-                <p className="text-[13px] text-ink-700 leading-relaxed mb-4">{quote}</p>
-                <div>
-                  <p className="text-[12px] font-semibold text-ink-900">{name}</p>
-                  <p className="text-[11px] text-ink-400">{school}</p>
-                </div>
+      {/* Feature explorer (client component) */}
+      <FeatureExplorer />
+
+      {/* Stats strip */}
+      <section className="py-12 border-y border-gray-100 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            {[
+              { value: '2 min', label: 'Average time to log a session' },
+              { value: '< 30s', label: 'Average supervisor response' },
+              { value: '100%', label: 'PDF accepted rate' },
+              { value: 'Free', label: 'For every student' },
+            ].map((stat) => (
+              <div key={stat.label}>
+                <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
+                <p className="text-sm text-gray-500 mt-1">{stat.label}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA banner */}
-      <section className="bg-merit-blue-600">
-        <div className="max-w-3xl mx-auto px-8 py-14 text-center">
-          <h2 className="text-[28px] font-bold text-white mb-3">
-            Your record speaks for itself.
+      {/* Testimonials */}
+      <section className="py-24 px-6 max-w-4xl mx-auto">
+        <p className="text-xs font-semibold tracking-widest text-gray-400 uppercase text-center mb-14">
+          From students who&apos;ve used it
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {[
+            {
+              quote:
+                'My NHS advisor asked me what I was using. She wants to recommend it to the whole chapter.',
+              name: 'Jordan K.',
+              school: 'Eric Hamber Secondary',
+              grade: 'Grade 12',
+            },
+            {
+              quote:
+                "I've been using a spreadsheet for two years. I switched to Merit in one afternoon.",
+              name: 'Maya T.',
+              school: 'Burnaby North Secondary',
+              grade: 'Grade 11',
+            },
+            {
+              quote:
+                'The PDF has a QR code. My scholarship committee scanned it on the spot.',
+              name: 'Priya S.',
+              school: 'Lord Byng Secondary',
+              grade: 'Grade 12',
+            },
+          ].map((t) => (
+            <div key={t.name} className="space-y-4">
+              <p className="text-gray-700 leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-600">
+                  {t.name[0]}
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-gray-900">{t.name}</p>
+                  <p className="text-xs text-gray-400">
+                    {t.school} · {t.grade}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="py-24 px-6 bg-gray-900 text-white">
+        <div className="max-w-3xl mx-auto text-center space-y-6">
+          <h2 className="text-4xl md:text-5xl font-bold tracking-tight">
+            Your advisor will notice the difference.
           </h2>
-          <p className="text-[15px] text-merit-blue-100 mb-6">
-            Stop tracking hours in a spreadsheet. Start with Merit today — it takes two minutes.
-          </p>
+          <p className="text-gray-400 text-lg">Stop tracking hours in a spreadsheet.</p>
           <Link
             href="/signup"
-            className="inline-flex text-[14px] font-semibold text-merit-blue-600 bg-white hover:bg-merit-blue-50 px-6 py-3 rounded-lg transition-colors"
+            className="inline-block bg-white text-gray-900 font-semibold text-lg px-8 py-4 rounded-xl hover:bg-gray-100 transition-colors shadow-lg"
           >
             Create your free account
           </Link>
+          <p className="text-xs text-gray-500">
+            No credit card. No app download. Works in your browser.
+          </p>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-ink-200 bg-white">
-        <div className="max-w-6xl mx-auto px-8 py-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-[12px] text-ink-400">
-            <span>
-              merit<span className="text-merit-blue-600">.</span>
-              {' '}— Service hour tracking for students
-            </span>
-            <div className="flex flex-wrap items-center gap-4">
-              <Link href="/about" className="hover:text-ink-700 transition-colors">About</Link>
-              <Link href="/contact" className="hover:text-ink-700 transition-colors">Contact</Link>
-              <Link href="/pricing" className="hover:text-ink-700 transition-colors">Pricing</Link>
-              <Link href="/faq" className="hover:text-ink-700 transition-colors">FAQ</Link>
-              <Link href="/terms" className="hover:text-ink-700 transition-colors">Terms</Link>
-              <Link href="/privacy" className="hover:text-ink-700 transition-colors">Privacy</Link>
-              <Link href="/login" className="hover:text-ink-700 transition-colors">Sign in</Link>
-              <a href="mailto:hello@merit.app" className="hover:text-ink-700 transition-colors">hello@merit.app</a>
-            </div>
+      <footer className="border-t border-gray-100 py-12 px-6">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-2">
+            <span className="font-bold">merit.</span>
+            <span className="text-sm text-gray-400">Volunteer hours you can prove.</span>
           </div>
+          <div className="flex gap-8 text-sm text-gray-400">
+            <Link href="/pricing" className="hover:text-gray-700">Pricing</Link>
+            <Link href="/faq" className="hover:text-gray-700">FAQ</Link>
+            <Link href="/terms" className="hover:text-gray-700">Terms</Link>
+            <Link href="/privacy" className="hover:text-gray-700">Privacy</Link>
+            <a href="mailto:hello@meritco.app" className="hover:text-gray-700">Contact</a>
+          </div>
+          <p className="text-xs text-gray-400">Built in Vancouver, BC</p>
         </div>
       </footer>
     </div>
