@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, ChevronDown } from 'lucide-react';
 
 // ── Feature mockups ───────────────────────────────────────────────────────────
 
@@ -182,9 +182,12 @@ const FEATURES = [
   },
 ] as const;
 
+type FeatureId = (typeof FEATURES)[number]['id'];
+
 export function FeatureExplorer() {
-  const [active, setActive] = useState<(typeof FEATURES)[number]['id']>('log');
-  const activeFeature = FEATURES.find((f) => f.id === active)!;
+  // Desktop: default to first tab open; mobile: default collapsed (null)
+  const [desktopActive, setDesktopActive] = useState<FeatureId>('log');
+  const [mobileActive, setMobileActive] = useState<FeatureId | null>(null);
 
   return (
     <section className="py-24 px-6 max-w-6xl mx-auto" id="how-it-works">
@@ -195,14 +198,15 @@ export function FeatureExplorer() {
         <h2 className="text-4xl font-bold text-gray-900 tracking-tight">Simple by design.</h2>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      {/* ── Desktop: 2-column layout ── */}
+      <div className="hidden lg:grid grid-cols-2 gap-12 items-start">
         <div className="space-y-2">
           {FEATURES.map((feature) => (
             <button
               key={feature.id}
-              onClick={() => setActive(feature.id)}
-              className={`w-full text-left p-5 rounded-xl border transition-all duration-200 group ${
-                active === feature.id
+              onClick={() => setDesktopActive(feature.id)}
+              className={`w-full text-left p-5 rounded-xl border transition-all duration-200 ${
+                desktopActive === feature.id
                   ? 'border-gray-900 bg-gray-900 text-white shadow-lg'
                   : 'border-gray-200 bg-white hover:border-gray-300 text-gray-700'
               }`}
@@ -211,22 +215,22 @@ export function FeatureExplorer() {
                 <div>
                   <p
                     className={`text-sm font-semibold mb-1 ${
-                      active === feature.id ? 'text-white' : 'text-gray-900'
+                      desktopActive === feature.id ? 'text-white' : 'text-gray-900'
                     }`}
                   >
                     {feature.headline}
                   </p>
                   <p
                     className={`text-sm ${
-                      active === feature.id ? 'text-gray-300' : 'text-gray-500'
+                      desktopActive === feature.id ? 'text-gray-300' : 'text-gray-500'
                     }`}
                   >
                     {feature.body}
                   </p>
                 </div>
                 <ChevronRight
-                  className={`w-4 h-4 shrink-0 ml-4 transition-transform ${
-                    active === feature.id ? 'text-white rotate-90' : 'text-gray-400'
+                  className={`w-4 h-4 shrink-0 ml-4 ${
+                    desktopActive === feature.id ? 'text-white' : 'text-gray-400'
                   }`}
                 />
               </div>
@@ -234,11 +238,57 @@ export function FeatureExplorer() {
           ))}
         </div>
 
-        <div className="relative">
-          <div className="rounded-2xl border border-gray-200 shadow-xl overflow-hidden bg-white min-h-72 transition-all duration-300">
-            {activeFeature.mockup}
+        {/* Sticky mockup panel */}
+        <div className="sticky top-24">
+          <div className="rounded-2xl border border-gray-200 shadow-xl overflow-hidden bg-white min-h-72">
+            {FEATURES.find((f) => f.id === desktopActive)?.mockup ?? FEATURES[0].mockup}
           </div>
         </div>
+      </div>
+
+      {/* ── Mobile: accordion ── */}
+      <div className="lg:hidden space-y-2">
+        {FEATURES.map((feature) => {
+          const isOpen = mobileActive === feature.id;
+          return (
+            <div key={feature.id}>
+              <button
+                onClick={() => setMobileActive(isOpen ? null : feature.id)}
+                className={`w-full text-left p-5 rounded-xl border transition-all duration-200 ${
+                  isOpen
+                    ? 'border-gray-900 bg-gray-900 text-white rounded-b-none border-b-0'
+                    : 'border-gray-200 bg-white'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p
+                      className={`text-sm font-semibold mb-1 ${
+                        isOpen ? 'text-white' : 'text-gray-900'
+                      }`}
+                    >
+                      {feature.headline}
+                    </p>
+                    <p className={`text-sm ${isOpen ? 'text-gray-300' : 'text-gray-500'}`}>
+                      {feature.body}
+                    </p>
+                  </div>
+                  <ChevronDown
+                    className={`w-4 h-4 shrink-0 ml-4 transition-transform duration-200 ${
+                      isOpen ? 'text-white rotate-180' : 'text-gray-400'
+                    }`}
+                  />
+                </div>
+              </button>
+
+              {isOpen && (
+                <div className="border border-gray-900 border-t-0 rounded-b-xl overflow-hidden bg-white shadow-lg mb-2">
+                  {feature.mockup}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
     </section>
   );

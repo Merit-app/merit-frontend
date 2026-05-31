@@ -60,18 +60,18 @@ function AppMockup() {
         </div>
 
         <div className="flex h-64 overflow-hidden">
-          <div className="w-36 border-r border-gray-100 bg-gray-50 p-3 flex flex-col gap-1 shrink-0">
+          <div className="w-28 border-r border-gray-100 bg-gray-50 p-3 flex flex-col gap-1 shrink-0">
             <div className="text-xs font-bold text-gray-800 px-2 mb-2">merit.</div>
             {[
               { label: 'Dashboard', active: true },
               { label: 'Sessions' },
-              { label: 'Organizations' },
+              { label: 'Orgs' },
               { label: 'Badges' },
               { label: 'Export' },
             ].map((item) => (
               <div
                 key={item.label}
-                className={`text-xs px-2 py-1.5 rounded-md ${
+                className={`text-xs px-2 py-1.5 rounded-md truncate ${
                   item.active ? 'bg-white shadow-sm text-gray-900 font-medium' : 'text-gray-500'
                 }`}
               >
@@ -96,8 +96,8 @@ function AppMockup() {
             </div>
             <div className="space-y-1.5">
               {[
-                { org: 'Vancouver Rotary', hrs: '4h', status: 'verified' },
-                { org: 'BC Youth Council', hrs: '3h', status: 'pending' },
+                { org: 'Van. Rotary', hrs: '4h', status: 'verified' },
+                { org: 'BC Youth', hrs: '3h', status: 'pending' },
                 { org: 'Red Cross', hrs: '6h', status: 'verified' },
               ].map((session) => (
                 <div
@@ -124,7 +124,7 @@ function AppMockup() {
         </div>
       </div>
 
-      <div className="absolute -bottom-4 -left-6 bg-white rounded-xl border border-gray-200 shadow-lg p-3 flex items-center gap-3 max-w-[200px]">
+      <div className="absolute -bottom-4 -left-6 bg-white rounded-xl border border-gray-200 shadow-lg p-3 hidden md:flex items-center gap-3 max-w-[200px]">
         <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center shrink-0">
           <CheckCircle2 className="w-4 h-4 text-green-600" />
         </div>
@@ -134,7 +134,7 @@ function AppMockup() {
         </div>
       </div>
 
-      <div className="absolute -top-4 -right-4 bg-white rounded-xl border border-gray-200 shadow-lg p-3 flex items-center gap-3">
+      <div className="absolute -top-4 -right-4 bg-white rounded-xl border border-gray-200 shadow-lg p-3 hidden md:flex items-center gap-3">
         <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
           <FileText className="w-4 h-4 text-blue-600" />
         </div>
@@ -158,11 +158,6 @@ export default function LandingPage() {
       <section className="pt-32 pb-16 px-6 max-w-6xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <div className="space-y-6">
-            <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 text-xs font-semibold px-3 py-1.5 rounded-full">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-              Free for students
-            </div>
-
             <h1 className="text-5xl lg:text-6xl font-bold tracking-tight text-gray-900 leading-[1.05]">
               Service hours you can actually prove.
             </h1>
@@ -171,23 +166,7 @@ export default function LandingPage() {
               Log hours, get verified by SMS, export a signed PDF. Takes two minutes.
             </p>
 
-            <div className="flex items-center gap-4 pt-2">
-              <Link
-                href="/signup"
-                className="bg-gray-900 text-white text-sm font-semibold px-6 py-3.5 rounded-xl hover:bg-gray-700 transition-colors shadow-sm"
-              >
-                Start for free
-              </Link>
-              <a
-                href="#how-it-works"
-                className="text-sm text-gray-600 font-medium hover:text-gray-900 flex items-center gap-1.5"
-              >
-                See how it works
-                <ChevronRight className="w-4 h-4" />
-              </a>
-            </div>
-
-            <div className="flex items-center gap-3 pt-2">
+            <div className="flex items-center gap-3">
               <div className="flex -space-x-2">
                 {['KN', 'SR', 'JP', 'ML'].map((init) => (
                   <div
@@ -204,6 +183,22 @@ export default function LandingPage() {
                   {' '}Burnaby South, Eric Hamber, Lord Byng
                 </span>
               </p>
+            </div>
+
+            <div className="flex items-center gap-4 pt-1">
+              <Link
+                href="/signup"
+                className="bg-gray-900 text-white text-sm font-semibold px-6 py-3.5 rounded-xl hover:bg-gray-700 transition-colors shadow-sm"
+              >
+                Start for free
+              </Link>
+              <a
+                href="#how-it-works"
+                className="text-sm text-gray-600 font-medium hover:text-gray-900 flex items-center gap-1.5"
+              >
+                See how it works
+                <ChevronRight className="w-4 h-4" />
+              </a>
             </div>
           </div>
 
