@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useMeritStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
@@ -40,11 +41,11 @@ export function SidebarAvatar() {
     >
       {/* Avatar */}
       <div className={cn(
-        'w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-[13px] font-semibold overflow-hidden',
+        'w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-[13px] font-semibold overflow-hidden relative',
         !user.avatarUrl && `${color.bg} ${color.text}`,
       )}>
         {user.avatarUrl ? (
-          <img src={user.avatarUrl} alt={fullName} className="w-full h-full object-cover" />
+          <Image src={user.avatarUrl} alt={fullName} fill className="object-cover" sizes="36px" />
         ) : (
           initials
         )}

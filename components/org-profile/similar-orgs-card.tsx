@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { CheckCircle } from 'lucide-react';
 import type { SimilarOrg } from '@/lib/types';
@@ -46,9 +47,9 @@ export function OrgSimilarCard({ orgs, loading, basePath = '/organizations' }: P
             href={`${basePath}/${org.slug}`}
             className="flex items-center gap-3 group"
           >
-            <div className="w-10 h-10 rounded-xl bg-merit-blue-100 flex items-center justify-center text-[12px] font-bold text-merit-blue-700 shrink-0 overflow-hidden">
+            <div className="w-10 h-10 rounded-xl bg-merit-blue-100 flex items-center justify-center text-[12px] font-bold text-merit-blue-700 shrink-0 overflow-hidden relative">
               {org.logoUrl ? (
-                <img src={org.logoUrl} alt={org.name} className="w-full h-full object-cover rounded-xl" />
+                <Image src={org.logoUrl} alt={org.name} fill className="object-cover rounded-xl" sizes="40px" />
               ) : (
                 getInitials(org.name)
               )}

@@ -123,19 +123,21 @@ export const useMeritStore = create<MeritStore>()(
       storage: createJSONStorage(() => localStorage),
       // skipHydration prevents SSR/client mismatch — rehydrate in a useEffect
       skipHydration: true,
-      // accessToken is short-lived and high-value — keep it in memory only.
-      // On page refresh it will be null; the api.ts 401-retry flow re-acquires
-      // it from the persisted refreshToken automatically.
+      // Security: neither access token nor refresh token is persisted to localStorage.
+      // Both are kept in memory only. On page refresh the user will be redirected to
+      // /login to re-authenticate. This eliminates the XSS-based token-theft vector.
+      //
+      // Long-term improvement: migrate to httpOnly cookie-based session storage in the
+      // backend so the refresh token survives page reloads without being JS-accessible.
       partialize: (state) => ({
         isAuthed: state.isAuthed,
         user: state.user,
-        refreshToken: state.refreshToken,
-        expiresAt: state.expiresAt,
+        // accessToken: intentionally NOT persisted (high-value, short-lived)
+        // refreshToken: intentionally NOT persisted (XSS risk — do not add back)
         sessions: state.sessions,
         organizations: state.organizations,
         followedOrgIds: state.followedOrgIds,
         notifications: state.notifications,
-        // accessToken intentionally NOT persisted to localStorage
       }),
     },
   ),

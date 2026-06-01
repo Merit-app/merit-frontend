@@ -27,6 +27,7 @@ export interface Session {
   tier: VerificationTier;
   verifiedAt?: string;    // ISO datetime string
   notes?: string;
+  selfReported?: boolean;
 }
 
 export interface Organization {

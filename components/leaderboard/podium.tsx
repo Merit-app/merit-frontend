@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { Crown, Medal, Award } from 'lucide-react'
 
@@ -69,12 +70,12 @@ function PodiumAvatar({
       <config.icon className={`w-5 h-5 ${config.iconColor}`} />
 
       <div
-        className={`w-14 h-14 rounded-full ring-4 ${config.ringColor} overflow-hidden bg-primary/10 flex items-center justify-center ${
+        className={`w-14 h-14 rounded-full ring-4 ${config.ringColor} overflow-hidden bg-primary/10 flex items-center justify-center relative ${
           entry.isCurrentUser ? 'ring-primary' : ''
         }`}
       >
         {entry.avatarUrl && !entry.isPrivate ? (
-          <img src={entry.avatarUrl} alt={entry.name} className="w-full h-full object-cover" />
+          <Image src={entry.avatarUrl} alt={entry.name} fill className="object-cover" sizes="56px" />
         ) : (
           <span className="text-base font-bold text-primary">
             {entry.isPrivate ? '?' : initials}

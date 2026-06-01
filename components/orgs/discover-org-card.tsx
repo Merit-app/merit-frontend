@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { Bookmark, CheckCircle, ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -54,7 +55,7 @@ export function DiscoverOrgCard({ org, isFollowing, onToggleFollow }: Props) {
         {/* Cover image or flat color */}
         <Link href={`/organizations/${org.slug}`} className="block absolute inset-0">
           {org.coverUrl ? (
-            <img src={org.coverUrl} alt="" className="w-full h-full object-cover" />
+            <Image src={org.coverUrl} alt="" fill className="object-cover" sizes="(max-width: 768px) 100vw, 350px" />
           ) : (
             <div className={`w-full h-full ${headerColor(org.name)}`} />
           )}
@@ -84,11 +85,11 @@ export function DiscoverOrgCard({ org, isFollowing, onToggleFollow }: Props) {
         <div className="absolute bottom-0 left-4 translate-y-1/2">
           <Link href={`/organizations/${org.slug}`} tabIndex={-1}>
             <div className={cn(
-              'w-12 h-12 rounded-full border-2 border-white flex items-center justify-center text-sm font-semibold overflow-hidden',
+              'w-12 h-12 rounded-full border-2 border-white flex items-center justify-center text-sm font-semibold overflow-hidden relative',
               !org.logoUrl && `${color.bg} ${color.text}`,
             )}>
               {org.logoUrl ? (
-                <img src={org.logoUrl} alt={org.name} className="w-full h-full object-cover" />
+                <Image src={org.logoUrl} alt={org.name} fill className="object-cover" sizes="48px" />
               ) : (
                 getInitials(org.name)
               )}

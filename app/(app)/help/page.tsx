@@ -1,3 +1,6 @@
+﻿import type { Metadata } from 'next';
+export const metadata: Metadata = { title: 'Help — Merit', robots: { index: false, follow: false } };
+
 import Link from 'next/link';
 import { MessageCircle, FileText, Mail } from 'lucide-react';
 
@@ -73,3 +76,4 @@ export default function HelpPage() {
     </div>
   );
 }
+

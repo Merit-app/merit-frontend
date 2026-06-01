@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { Globe, CheckCircle, ShieldCheck, Clock } from 'lucide-react';
 
 interface Props {
@@ -71,7 +72,7 @@ export function OrgCoverHeader({
       {/* Cover */}
       <div className="relative h-36 sm:h-44">
         {coverUrl ? (
-          <img src={coverUrl} alt="" className="w-full h-full object-cover" />
+          <Image src={coverUrl} alt="" fill className="object-cover" sizes="100vw" />
         ) : (
           <div className={`w-full h-full bg-gradient-to-br ${coverGradient(name)}`} />
         )}
@@ -88,9 +89,9 @@ export function OrgCoverHeader({
       <div className="px-5 pb-5">
         {/* Logo overlapping cover */}
         <div className="relative -mt-8 mb-3 flex items-end justify-between">
-          <div className="w-16 h-16 rounded-2xl bg-white border-2 border-white shadow-sm flex items-center justify-center text-xl font-bold text-merit-blue-700 bg-merit-blue-100 shrink-0 overflow-hidden">
+          <div className="w-16 h-16 rounded-2xl bg-white border-2 border-white shadow-sm flex items-center justify-center text-xl font-bold text-merit-blue-700 bg-merit-blue-100 shrink-0 overflow-hidden relative">
             {logoUrl ? (
-              <img src={logoUrl} alt={name} className="w-full h-full object-cover rounded-2xl" />
+              <Image src={logoUrl} alt={name} fill className="object-cover rounded-2xl" sizes="64px" />
             ) : (
               <span>{getInitials(name)}</span>
             )}

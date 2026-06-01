@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useState } from 'react'
 import { Copy, Check, Share2, Trophy, Clock, Building2, GraduationCap } from 'lucide-react'
 import { toast } from 'sonner'
@@ -93,9 +94,9 @@ export function PersonalCard({
       <div className="rounded-2xl border-2 border-border bg-gradient-to-br from-background to-muted/30 p-6 space-y-5">
         {/* Header */}
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-full overflow-hidden bg-primary/10 flex items-center justify-center shrink-0 ring-2 ring-primary/20">
+          <div className="w-16 h-16 rounded-full overflow-hidden bg-primary/10 flex items-center justify-center shrink-0 ring-2 ring-primary/20 relative">
             {avatarUrl ? (
-              <img src={avatarUrl} alt={name} className="w-full h-full object-cover" />
+              <Image src={avatarUrl} alt={name} fill className="object-cover" sizes="64px" />
             ) : (
               <span className="text-xl font-bold text-primary">{initials}</span>
             )}

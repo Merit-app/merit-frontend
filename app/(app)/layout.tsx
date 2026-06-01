@@ -30,8 +30,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   const loaded = useRef(false);
 
-  // Token expiry check — Supabase expiresAt is Unix seconds
-  const isTokenValid = isAuthed && expiresAt != null && expiresAt * 1000 > Date.now();
+  const accessToken = useMeritStore((s) => s.accessToken);
+
+  // Token validity: must be authenticated, have an in-memory access token, and not expired.
+  // refreshToken is no longer persisted to localStorage — once the page is refreshed and
+  // accessToken is gone from memory, the user must re-authenticate.
+  const isTokenValid = isAuthed && accessToken != null && expiresAt != null && expiresAt * 1000 > Date.now();
 
   useEffect(() => {
     // Wait until the persist store has rehydrated from localStorage

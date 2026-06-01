@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { BadgeChip } from '@/components/badges/badge-chip'
 
@@ -49,9 +50,9 @@ export function RankRow({
       </div>
 
       {/* Avatar */}
-      <div className="w-9 h-9 rounded-full overflow-hidden shrink-0 bg-primary/10 flex items-center justify-center text-xs font-bold">
+      <div className="w-9 h-9 rounded-full overflow-hidden shrink-0 bg-primary/10 flex items-center justify-center text-xs font-bold relative">
         {avatarUrl && !isPrivate ? (
-          <img src={avatarUrl} alt={name} className="w-full h-full object-cover" />
+          <Image src={avatarUrl} alt={name} fill className="object-cover" sizes="36px" />
         ) : (
           <span className="text-primary">{isPrivate ? '?' : initials}</span>
         )}

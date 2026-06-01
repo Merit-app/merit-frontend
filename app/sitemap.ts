@@ -7,11 +7,14 @@ async function getPublicProfiles(): Promise<{ username: string; updatedAt: strin
   try {
     const res = await fetch(`${API_URL}/profiles/sitemap`, {
       next: { revalidate: 3600 }, // refresh hourly
+      signal: AbortSignal.timeout(5000), // 5-second timeout — never hang a build
     });
     if (!res.ok) return [];
     const json = await res.json();
-    return json?.data ?? [];
+    // Filter out any rows with null/empty usernames
+    return (json?.data ?? []).filter((u: any) => u?.username);
   } catch {
+    // Endpoint down or timed out — sitemap still generates with static pages
     return [];
   }
 }

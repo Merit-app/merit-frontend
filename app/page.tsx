@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ChevronRight, CheckCircle2, FileText } from 'lucide-react';
 import { buildMetadata } from '@/lib/seo';
 import { FeatureExplorer } from '@/components/marketing/feature-explorer';
+import { ProductDemo } from '@/components/marketing/product-demo';
 
 export const metadata: Metadata = buildMetadata({
   title: 'Student Volunteer Hour Tracker',
@@ -207,6 +208,9 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* Animated product demo (dark section) */}
+      <ProductDemo />
 
       {/* Feature explorer (client component) */}
       <FeatureExplorer />

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { badgesApi } from '@/lib/api';
+import { BadgeChip, type BadgeChipData } from '@/components/badges/badge-chip';
 
 interface EarnedBadge {
   id: string;
@@ -10,27 +11,6 @@ interface EarnedBadge {
   tier: 'bronze' | 'silver' | 'gold' | 'platinum';
   earnedAt: string;
 }
-
-const TIER_DOT: Record<EarnedBadge['tier'], string> = {
-  bronze: 'bg-amber-400',
-  silver: 'bg-slate-400',
-  gold: 'bg-yellow-400',
-  platinum: 'bg-sky-400',
-};
-
-const TIER_RING: Record<EarnedBadge['tier'], string> = {
-  bronze: 'ring-amber-200',
-  silver: 'ring-slate-200',
-  gold: 'ring-yellow-300',
-  platinum: 'ring-sky-200',
-};
-
-const TIER_BG: Record<EarnedBadge['tier'], string> = {
-  bronze: 'bg-amber-50',
-  silver: 'bg-slate-50',
-  gold: 'bg-yellow-50',
-  platinum: 'bg-sky-50',
-};
 
 export function BadgeStrip() {
   const [badges, setBadges] = useState<EarnedBadge[]>([]);
@@ -75,14 +55,11 @@ export function BadgeStrip() {
 
       <div className="flex flex-wrap gap-2">
         {badges.slice(0, 8).map((b) => (
-          <div
+          <BadgeChip
             key={b.id}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border ring-1 ${TIER_RING[b.tier]} ${TIER_BG[b.tier]}`}
-            title={`${b.name} · ${b.tier}`}
-          >
-            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${TIER_DOT[b.tier]}`} />
-            <span className="text-[12px] font-semibold text-ink-800 leading-none">{b.name}</span>
-          </div>
+            badge={b as BadgeChipData}
+            size="sm"
+          />
         ))}
         {badges.length > 8 && (
           <Link

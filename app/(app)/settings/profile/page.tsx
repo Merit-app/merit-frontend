@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -114,11 +115,11 @@ function ProfilePreviewCard({
       <div className="px-5 pb-4">
         <div className="flex items-end justify-between -mt-8 mb-3">
           <div
-            className="w-16 h-16 rounded-full ring-4 ring-white flex items-center justify-center text-[20px] font-semibold shrink-0 overflow-hidden"
+            className="w-16 h-16 rounded-full ring-4 ring-white flex items-center justify-center text-[20px] font-semibold shrink-0 overflow-hidden relative"
             style={avatarUrl ? {} : { background: color.bg, color: color.text }}
           >
             {avatarUrl ? (
-              <img src={avatarUrl} alt={name} className="w-full h-full object-cover" />
+              <Image src={avatarUrl} alt={name} fill className="object-cover" sizes="64px" />
             ) : (
               initials
             )}
@@ -594,11 +595,11 @@ function AvatarUploadSection({
     <div className="flex items-center gap-5">
       <div className="relative shrink-0">
         <div
-          className="w-20 h-20 rounded-full flex items-center justify-center text-[26px] font-semibold overflow-hidden"
+          className="w-20 h-20 rounded-full flex items-center justify-center text-[26px] font-semibold overflow-hidden relative"
           style={previewAvatarUrl ? {} : { background: color.bg, color: color.text }}
         >
           {previewAvatarUrl ? (
-            <img src={previewAvatarUrl} alt={fullName} className="w-full h-full object-cover" />
+            <Image src={previewAvatarUrl} alt={fullName} fill className="object-cover" sizes="80px" />
           ) : (
             initials
           )}

@@ -112,6 +112,7 @@ export function mapSession(raw: any): Session {
     tier: tier === 'verified_institutional' ? 'institution' : tier === 'verified_basic' ? 'supervisor' : null,
     verifiedAt: raw.verified_at ?? undefined,
     notes: raw.notes ?? undefined,
+    selfReported: raw.self_reported ?? false,
   };
 }
 
@@ -168,7 +169,8 @@ export const sessionsApi = {
     orgId?: string;
     newOrg?: { name: string; city?: string; state?: string; website?: string };
     date: string; hours: number; activity: string;
-    supervisorName: string; supervisorPhone?: string; supervisorEmail?: string;
+    supervisorName?: string; supervisorPhone?: string; supervisorEmail?: string;
+    selfReported?: boolean; trackerNote?: string;
   }) => request<{ data: { session: any } }>('POST', '/sessions', body),
   update: (id: string, body: { activity?: string; supervisorName?: string; supervisorPhone?: string; supervisorEmail?: string }) =>
     request<{ data: any }>('PATCH', `/sessions/${id}`, body),
@@ -222,6 +224,27 @@ export const orgsApi = {
     description?: string; websiteUrl?: string;
     contactEmail?: string; contactPhone?: string; isRecruiting?: boolean;
   }) => request<{ data: { updated: boolean } }>('PATCH', `/organizations/${orgId}`, body),
+
+  volunteers: (orgId: string) => request<{ data: { volunteers: any[] } }>('GET', `/organizations/${orgId}/volunteers`),
+
+  verifySession: (orgId: string, sessionId: string) =>
+    request<{ data: { verified: boolean } }>('POST', `/organizations/${orgId}/sessions/${sessionId}/verify`, {}),
+
+  disputeSession: (orgId: string, sessionId: string) =>
+    request<{ data: { disputed: boolean } }>('POST', `/organizations/${orgId}/sessions/${sessionId}/dispute`, {}),
+
+  inviteTeamMember: (orgId: string, email: string, role: 'coordinator' | 'admin') =>
+    request<{ data: { added: boolean; name: string; role: string } }>('POST', `/organizations/${orgId}/team/invite`, { email, role }),
+
+  removeTeamMember: (orgId: string, userId: string) =>
+    request<{ data: { removed: boolean } }>('DELETE', `/organizations/${orgId}/team/${userId}`),
+
+  exportCSV: (orgId: string): Promise<Blob> => {
+    const token = getAccessToken();
+    return fetch(`${BASE}/organizations/${orgId}/export`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    }).then((r) => r.blob());
+  },
 };
 
 // ─── Users API ────────────────────────────────────────────────────────────────

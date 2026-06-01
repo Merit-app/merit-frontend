@@ -7,6 +7,7 @@ import { RecentSessions } from '@/components/dashboard/recent-sessions';
 import { QuickActions } from '@/components/dashboard/quick-actions';
 import { WelcomeBanner } from '@/components/dashboard/welcome-banner';
 import { BadgeStrip } from '@/components/dashboard/badge-strip';
+import { SelfTrackedStat } from '@/components/dashboard/self-tracked-stat';
 import { StreakDisplay } from '@/components/dashboard/streak-display';
 import { MilestoneCheckerClient } from '@/components/dashboard/milestone-checker-client';
 import { buildMetadata } from '@/lib/seo';
@@ -22,6 +23,7 @@ export default function DashboardPage() {
       <WelcomeBanner />
       <GoalProgressCard />
       <StatsRow />
+      <SelfTrackedStat />
       <BadgeStrip />
       <ActivityChartClient />
       <RecentSessions />

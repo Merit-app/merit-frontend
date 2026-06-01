@@ -4,34 +4,14 @@ import { useState, useEffect } from 'react';
 import { badgesApi, profilesApi, ApiError } from '@/lib/api';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { tierStyles, type BadgeTier } from '@/components/badges/badge-chip';
 
 interface BadgeItem {
   id: string;
   name: string;
-  tier: 'bronze' | 'silver' | 'gold' | 'platinum';
+  tier: BadgeTier;
   earnedAt?: string;
 }
-
-const TIER_RING: Record<BadgeItem['tier'], string> = {
-  bronze: 'ring-amber-300',
-  silver: 'ring-slate-300',
-  gold: 'ring-yellow-400',
-  platinum: 'ring-sky-300',
-};
-
-const TIER_BG: Record<BadgeItem['tier'], string> = {
-  bronze: 'bg-amber-50',
-  silver: 'bg-slate-50',
-  gold: 'bg-yellow-50',
-  platinum: 'bg-sky-50',
-};
-
-const TIER_DOT: Record<BadgeItem['tier'], string> = {
-  bronze: 'bg-amber-400',
-  silver: 'bg-slate-400',
-  gold: 'bg-yellow-400',
-  platinum: 'bg-sky-400',
-};
 
 interface Props {
   initialTopBadgeIds: string[];
@@ -50,7 +30,7 @@ export function TopBadgesPicker({ initialTopBadgeIds }: Props) {
         .map((b: any) => ({
           id: b.badge.id,
           name: b.badge.name,
-          tier: b.badge.tier,
+          tier: b.badge.tier as BadgeTier,
           earnedAt: b.earnedAt,
         }));
       setEarned(items);
@@ -108,20 +88,20 @@ export function TopBadgesPicker({ initialTopBadgeIds }: Props) {
       <div className="flex flex-wrap gap-2">
         {earned.map((b) => {
           const isSelected = selected.includes(b.id);
+          const style = tierStyles[b.tier] ?? tierStyles.bronze;
           return (
             <button
               key={b.id}
               type="button"
               onClick={() => toggle(b.id)}
               className={cn(
-                'flex items-center gap-2 px-3 py-2 rounded-xl border ring-1 transition-all text-left',
-                TIER_RING[b.tier],
-                TIER_BG[b.tier],
+                'flex items-center gap-2 px-3 py-2 rounded-xl border transition-all text-left',
+                style.pill,
                 isSelected ? 'opacity-100 shadow-sm' : 'opacity-60 hover:opacity-90',
               )}
             >
-              <span className={cn('w-2 h-2 rounded-full shrink-0', TIER_DOT[b.tier])} />
-              <span className="text-[13px] font-semibold text-ink-900 leading-tight">{b.name}</span>
+              <span className={cn('w-2 h-2 rounded-full shrink-0', style.dot)} />
+              <span className="text-[13px] font-semibold leading-tight">{b.name}</span>
               {isSelected && (
                 <span className="ml-1 text-[10px] font-bold text-merit-blue-600 uppercase">Pinned</span>
               )}
