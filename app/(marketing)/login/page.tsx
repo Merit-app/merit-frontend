@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Building2, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -163,6 +163,23 @@ function LoginForm() {
             Create one
           </Link>
         </p>
+
+        {/* Cross-promotion to org login */}
+        <div className="mt-6 pt-6 border-t border-ink-200">
+          <Link
+            href="/org/login"
+            className="group flex items-center gap-3 p-3 rounded-xl bg-ink-50 hover:bg-ink-100 transition-colors"
+          >
+            <div className="w-9 h-9 rounded-lg bg-white border border-ink-200 flex items-center justify-center shrink-0">
+              <Building2 className="w-4 h-4 text-ink-700" />
+            </div>
+            <div className="flex-1 min-w-0 text-left">
+              <p className="text-sm font-semibold text-ink-900">Managing a nonprofit?</p>
+              <p className="text-xs text-ink-500">Sign in to your organization account</p>
+            </div>
+            <ArrowRight className="w-4 h-4 text-ink-400 group-hover:text-ink-700 group-hover:translate-x-0.5 transition-all shrink-0" />
+          </Link>
+        </div>
       </div>
     </div>
   );

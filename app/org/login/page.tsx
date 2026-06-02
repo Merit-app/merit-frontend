@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { Loader2, Eye, EyeOff } from 'lucide-react';
+import { Loader2, Eye, EyeOff, User, ArrowRight } from 'lucide-react';
 import { useMeritStore } from '@/lib/store';
 import { orgAuthApi, mapUser, ApiError } from '@/lib/api';
 
@@ -75,6 +75,21 @@ export default function OrgLoginPage() {
       </div>
 
       <div className="w-full max-w-sm bg-gray-900 border border-gray-800 rounded-2xl p-8">
+        {/* Cross-promotion to student login */}
+        <Link
+          href="/login"
+          className="group flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors mb-6 border border-white/10"
+        >
+          <div className="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
+            <User className="w-4 h-4 text-gray-400" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-white">Tracking your own volunteer hours?</p>
+            <p className="text-xs text-gray-500">Student sign in</p>
+          </div>
+          <ArrowRight className="w-4 h-4 text-gray-500 group-hover:text-white group-hover:translate-x-0.5 transition-all shrink-0" />
+        </Link>
+
         <h1 className="text-xl font-bold text-white mb-6">Sign in to your organization</h1>
 
         {serverError && (
