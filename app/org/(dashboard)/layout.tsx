@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { useQuery } from '@tanstack/react-query';
 import { useMeritStore, useHydrationStore } from '@/lib/store';
-import { authApi } from '@/lib/api';
+import { authApi, orgOnboardingApi } from '@/lib/api';
+import { OrgOnboardingModal } from '@/components/org/onboarding-modal';
 import {
   LayoutDashboard,
   Users,
@@ -42,8 +44,25 @@ export default function OrgDashboardLayout({ children }: { children: React.React
   const clearOrgState = useMeritStore((s) => s.clearOrgState);
   const logout = useMeritStore((s) => s.logout);
   const [showOrgPicker, setShowOrgPicker] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   const currentOrg = adminOrgs.find((o) => o.id === currentOrgId) ?? adminOrgs[0];
+
+  // Check if onboarding is needed — only after hydration and auth
+  const { data: onboardingData } = useQuery({
+    queryKey: ['org-onboarding', currentOrg?.id],
+    queryFn: () => orgOnboardingApi.check(currentOrg!.id),
+    enabled: !!currentOrg?.id && isAuthed,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // TanStack Query v5 removed onSuccess — use useEffect instead
+  useEffect(() => {
+    if (onboardingData && !(onboardingData as any).data?.onboarding_completed) {
+      const t = setTimeout(() => setShowOnboarding(true), 500);
+      return () => clearTimeout(t);
+    }
+  }, [onboardingData]);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -191,6 +210,15 @@ export default function OrgDashboardLayout({ children }: { children: React.React
         </div>
         <div className="p-8">{children}</div>
       </main>
+
+      {/* Onboarding walkthrough — shown once to new org admins */}
+      {showOnboarding && currentOrg && (
+        <OrgOnboardingModal
+          orgId={currentOrg.id}
+          orgName={currentOrg.name}
+          onComplete={() => setShowOnboarding(false)}
+        />
+      )}
     </div>
   );
 }

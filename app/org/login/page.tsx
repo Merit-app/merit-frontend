@@ -53,7 +53,9 @@ export default function OrgLoginPage() {
         if (err.status === 401) {
           setServerError('Invalid email or password.');
         } else if (err.status === 403) {
-          setServerError('This account has no organization access. Ask your coordinator to invite you.');
+          setServerError(
+            'No organization access found. Ask your coordinator to invite you, or claim your org page.',
+          );
         } else {
           setServerError(err.message || 'Something went wrong. Try again.');
         }

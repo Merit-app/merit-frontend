@@ -477,6 +477,35 @@ export const orgVolunteersApi = {
   },
 };
 
+export const orgOnboardingApi = {
+  check: (orgId: string) =>
+    request<{ data: { onboarding_completed: boolean; onboarding_completed_at: string | null } }>(
+      'GET', `/org/${orgId}/onboarding`,
+    ),
+  complete: (orgId: string) =>
+    request<{ data: { completed: boolean } }>('POST', `/org/${orgId}/onboarding/complete`, {}),
+};
+
+export const orgSignupApi = {
+  signup: (data: {
+    email: string;
+    password: string;
+    name: string;
+    orgId: string;
+    role?: string;
+    token?: string;
+  }) =>
+    request<{
+      data: {
+        user: any;
+        org: { id: string; name: string; slug: string; role: string };
+        accessToken: string | null;
+        refreshToken: string | null;
+        expiresAt: number | null;
+      };
+    }>('POST', '/auth/org/signup', data, true),
+};
+
 // ─── Billing API ─────────────────────────────────────────────────────────────
 
 export const billingApi = {
