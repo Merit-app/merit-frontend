@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import type { MeritStore, Session, Organization, User, NotificationPreferences } from './types';
+import type { MeritStore, Session, Organization, User, NotificationPreferences, OrgSummary } from './types';
 
 // ── Hydration flag — separate tiny store so it never gets persisted ────────────
 export const useHydrationStore = create<{ hydrated: boolean; setHydrated: () => void }>((set) => ({
@@ -49,6 +49,10 @@ export const useMeritStore = create<MeritStore>()(
       followedOrgIds: [],
       isOrgAdmin: false,
 
+      // ── Org platform ────────────────────────────────────────────────────
+      currentOrgId: null,
+      adminOrgs: [],
+
       // ── Settings ────────────────────────────────────────────────────────
       notifications: defaultNotifications,
 
@@ -84,6 +88,12 @@ export const useMeritStore = create<MeritStore>()(
       setFollowedOrgIds: (ids: string[]) => set({ followedOrgIds: ids }),
 
       setIsOrgAdmin: (v: boolean) => set({ isOrgAdmin: v }),
+
+      setCurrentOrgId: (id: string) => set({ currentOrgId: id }),
+
+      setAdminOrgs: (orgs: OrgSummary[]) => set({ adminOrgs: orgs }),
+
+      clearOrgState: () => set({ currentOrgId: null, adminOrgs: [] }),
 
       toggleFollowOptimistic: (orgId: string) =>
         set((state) => ({
@@ -138,6 +148,9 @@ export const useMeritStore = create<MeritStore>()(
         organizations: state.organizations,
         followedOrgIds: state.followedOrgIds,
         notifications: state.notifications,
+        // Org platform context persists so re-loading lands on the right org
+        currentOrgId: state.currentOrgId,
+        adminOrgs: state.adminOrgs,
       }),
     },
   ),

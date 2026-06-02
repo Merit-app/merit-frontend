@@ -1,0 +1,122 @@
+'use client';
+
+import { useParams } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
+import { orgEventsApi } from '@/lib/api';
+import { Calendar, Plus, Users, Clock } from 'lucide-react';
+import Link from 'next/link';
+
+function EventCard({ event, orgId }: { event: any; orgId: string }) {
+  return (
+    <Link
+      href={`/org/${orgId}/events/${event.id}`}
+      className="bg-gray-900 border border-gray-800 rounded-2xl p-5 hover:border-gray-700 transition-colors block"
+    >
+      <div className="flex items-start justify-between gap-4 mb-3">
+        <div>
+          <p className="font-semibold text-white">{event.title}</p>
+          {event.location && <p className="text-gray-400 text-sm mt-0.5">📍 {event.location}</p>}
+        </div>
+        <span className={`text-xs px-2.5 py-1 rounded-full font-medium shrink-0 ${
+          event.status === 'published'  ? 'bg-green-500/10 text-green-400'  :
+          event.status === 'completed'  ? 'bg-gray-700 text-gray-400'       :
+          event.status === 'cancelled'  ? 'bg-red-500/10 text-red-400'      :
+                                          'bg-amber-500/10 text-amber-400'
+        }`}>
+          {event.status}
+        </span>
+      </div>
+      <div className="flex items-center gap-4 text-xs text-gray-500 flex-wrap">
+        <div className="flex items-center gap-1.5">
+          <Calendar className="w-3.5 h-3.5" />
+          {new Date(event.start_time).toLocaleDateString('en-CA', {
+            weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit',
+          })}
+        </div>
+        <div className="flex items-center gap-1.5">
+          <Users className="w-3.5 h-3.5" />
+          {event.signup_count ?? 0}
+          {event.max_volunteers ? ` / ${event.max_volunteers}` : ''} volunteers
+        </div>
+        {event.hours_value && (
+          <div className="flex items-center gap-1.5">
+            <Clock className="w-3.5 h-3.5" />
+            {event.hours_value}h
+          </div>
+        )}
+      </div>
+    </Link>
+  );
+}
+
+export default function EventsPage() {
+  const { orgId } = useParams<{ orgId: string }>();
+
+  const { data: res, isLoading } = useQuery({
+    queryKey: ['org-events', orgId],
+    queryFn: () => orgEventsApi.list(orgId),
+  });
+  const events: any[] = (res as any)?.data ?? [];
+
+  const upcoming = events.filter(
+    (e) => new Date(e.start_time) > new Date() && e.status !== 'cancelled' && e.status !== 'completed',
+  );
+  const past = events.filter(
+    (e) => new Date(e.start_time) <= new Date() || e.status === 'completed' || e.status === 'cancelled',
+  );
+
+  return (
+    <div className="space-y-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-white">Events</h1>
+          <p className="text-gray-400 text-sm mt-1">Volunteer shifts and opportunities</p>
+        </div>
+        <Link
+          href={`/org/${orgId}/events/new`}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white text-gray-900 text-sm font-semibold hover:bg-gray-100 transition-colors"
+        >
+          <Plus className="w-4 h-4" />
+          Create event
+        </Link>
+      </div>
+
+      {isLoading ? (
+        Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="h-28 bg-gray-900 rounded-2xl animate-pulse" />
+        ))
+      ) : (
+        <>
+          <div className="space-y-3">
+            <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
+              Upcoming ({upcoming.length})
+            </h2>
+            {upcoming.length === 0 ? (
+              <div className="bg-gray-900 border border-gray-800 rounded-2xl p-10 text-center">
+                <Calendar className="w-8 h-8 text-gray-700 mx-auto mb-3" />
+                <p className="text-gray-500 text-sm mb-4">No upcoming events</p>
+                <Link
+                  href={`/org/${orgId}/events/new`}
+                  className="text-sm bg-gray-800 text-gray-300 px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+                >
+                  Create your first event →
+                </Link>
+              </div>
+            ) : (
+              upcoming.map((e) => <EventCard key={e.id} event={e} orgId={orgId} />)
+            )}
+          </div>
+
+          {past.length > 0 && (
+            <div className="space-y-3">
+              <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
+                Past ({past.length})
+              </h2>
+              {past.map((e) => <EventCard key={e.id} event={e} orgId={orgId} />)}
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}

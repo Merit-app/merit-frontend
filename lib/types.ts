@@ -130,6 +130,16 @@ export interface NotificationPreferences {
   productUpdates: boolean;
 }
 
+// ─── Org platform types ──────────────────────────────────────────────────────
+
+export interface OrgSummary {
+  id: string;
+  name: string;
+  slug: string;
+  logoUrl?: string;
+  role: 'owner' | 'admin' | 'coordinator';
+}
+
 // ─── Store shape ─────────────────────────────────────────────────────────────
 
 export interface MeritStore {
@@ -146,6 +156,10 @@ export interface MeritStore {
   followedOrgIds: string[];
   isOrgAdmin: boolean;
 
+  // Org platform
+  currentOrgId: string | null;
+  adminOrgs: OrgSummary[];
+
   // Settings
   notifications: NotificationPreferences;
 
@@ -157,6 +171,9 @@ export interface MeritStore {
   setOrganizations: (organizations: Organization[]) => void;
   setFollowedOrgIds: (ids: string[]) => void;
   setIsOrgAdmin: (v: boolean) => void;
+  setCurrentOrgId: (id: string) => void;
+  setAdminOrgs: (orgs: OrgSummary[]) => void;
+  clearOrgState: () => void;
   toggleFollowOptimistic: (orgId: string) => void;
   addSession: (session: Session) => void;
   updateSession: (id: string, patch: Partial<Session>) => void;

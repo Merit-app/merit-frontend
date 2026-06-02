@@ -384,6 +384,99 @@ export const leaderboardApi = {
     ),
 };
 
+// ─── Org Platform API ────────────────────────────────────────────────────────
+
+export const orgAuthApi = {
+  login: (email: string, password: string) =>
+    request<{ data: { user: any; orgs: any[]; defaultOrgId: string; accessToken: string; refreshToken: string; expiresAt: number } }>(
+      'POST', '/auth/login/org', { email, password }, true,
+    ),
+};
+
+export const orgEventsApi = {
+  list: (orgId: string, params?: { status?: string; upcoming?: boolean }) => {
+    const qs = new URLSearchParams();
+    if (params?.status) qs.set('status', params.status);
+    if (params?.upcoming != null) qs.set('upcoming', String(params.upcoming));
+    const suffix = qs.toString() ? `?${qs}` : '';
+    return request<{ data: any[] }>('GET', `/org/${orgId}/events${suffix}`);
+  },
+  create: (orgId: string, data: {
+    title: string; description?: string; location?: string; locationUrl?: string;
+    program?: string; startTime: string; endTime: string;
+    maxVolunteers?: number; hoursValue?: number; autoLogHours?: boolean;
+  }) => request<{ data: any }>('POST', `/org/${orgId}/events`, data),
+  get: (orgId: string, eventId: string) =>
+    request<{ data: any }>('GET', `/org/${orgId}/events/${eventId}`),
+  publish: (orgId: string, eventId: string) =>
+    request<{ data: any }>('POST', `/org/${orgId}/events/${eventId}/publish`, {}),
+  checkIn: (orgId: string, eventId: string, userId: string) =>
+    request<{ data: any }>('POST', `/org/${orgId}/events/${eventId}/checkin/${userId}`, {}),
+  complete: (orgId: string, eventId: string) =>
+    request<{ data: any }>('POST', `/org/${orgId}/events/${eventId}/complete`, {}),
+  signup: (orgId: string, eventId: string) =>
+    request<{ data: any }>('POST', `/org/${orgId}/events/${eventId}/signup`, {}),
+};
+
+export const orgReportsApi = {
+  grantReport: (orgId: string, from: string, to: string): Promise<Blob> => {
+    const token = getAccessToken();
+    return fetch(`${BASE}/org/${orgId}/reports/grant?from=${from}&to=${to}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    }).then((r) => {
+      if (!r.ok) throw new ApiError(r.status, undefined, 'Report generation failed');
+      return r.blob();
+    });
+  },
+  impact: (orgId: string) =>
+    request<{ data: any }>('GET', `/org/${orgId}/reports/impact`),
+  certificate: (orgId: string, userId: string, coordinatorName: string): Promise<Blob> => {
+    const token = getAccessToken();
+    return fetch(`${BASE}/org/${orgId}/certificates`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({ userId, coordinatorName }),
+    }).then((r) => {
+      if (!r.ok) throw new ApiError(r.status, undefined, 'Certificate generation failed');
+      return r.blob();
+    });
+  },
+};
+
+export const orgMessagesApi = {
+  send: (orgId: string, data: { message: string; filter: 'all' | 'event' | 'active_30d' | 'active_90d'; eventId?: string }) =>
+    request<{ data: { sent: number; failed: number } }>('POST', `/org/${orgId}/messages`, data),
+  history: (orgId: string) =>
+    request<{ data: any[] }>('GET', `/org/${orgId}/messages`),
+};
+
+export const orgInvitesApi = {
+  create: (orgId: string, email: string, role: 'coordinator' | 'admin') =>
+    request<{ data: any }>('POST', `/org/${orgId}/invites`, { email, role }),
+  getByToken: (token: string) =>
+    request<{ data: any }>('GET', `/org/invites/${token}`, undefined, true),
+  accept: (token: string) =>
+    request<{ data: any }>('POST', `/org/invites/${token}/accept`, {}),
+};
+
+export const orgVolunteersApi = {
+  list: (orgId: string) =>
+    request<{ data: any[] }>('GET', `/organizations/${orgId}/volunteers`),
+  verify: (orgId: string, sessionId: string) =>
+    request<{ data: any }>('POST', `/organizations/${orgId}/sessions/${sessionId}/verify`, {}),
+  dispute: (orgId: string, sessionId: string) =>
+    request<{ data: any }>('POST', `/organizations/${orgId}/sessions/${sessionId}/dispute`, {}),
+  export: (orgId: string): Promise<Blob> => {
+    const token = getAccessToken();
+    return fetch(`${BASE}/organizations/${orgId}/export`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    }).then((r) => r.blob());
+  },
+};
+
 // ─── Billing API ─────────────────────────────────────────────────────────────
 
 export const billingApi = {

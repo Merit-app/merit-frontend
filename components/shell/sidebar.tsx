@@ -140,6 +140,23 @@ function UpgradePrompt() {
   );
 }
 
+function OrgDashboardLink() {
+  const adminOrgs = useMeritStore((s) => s.adminOrgs);
+  const currentOrgId = useMeritStore((s) => s.currentOrgId);
+  const pathname = usePathname();
+  const orgId = currentOrgId ?? adminOrgs[0]?.id;
+  if (!orgId) return null;
+  const href = `/org/${orgId}/dashboard`;
+  return (
+    <NavItem
+      href={href}
+      label="Org dashboard"
+      icon={Building2}
+      active={pathname.startsWith('/org/')}
+    />
+  );
+}
+
 export function Sidebar() {
   const pathname = usePathname();
   const isOrgAdmin = useMeritStore((s) => s.isOrgAdmin);
@@ -189,14 +206,9 @@ export function Sidebar() {
           <NavItem key={href} href={href} label={label} icon={Icon} active={isActive(href)} />
         ))}
 
-        {/* Org dashboard — only shown to org admins */}
+        {/* Org dashboard — only shown to org admins, links to new standalone platform */}
         {hydrated && isOrgAdmin && (
-          <NavItem
-            href="/org/dashboard"
-            label="Org dashboard"
-            icon={Building2}
-            active={isActive('/org/dashboard')}
-          />
+          <OrgDashboardLink />
         )}
 
         {/* Divider */}
