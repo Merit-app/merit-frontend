@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ChevronRight, CheckCircle2, FileText } from 'lucide-react';
+import { CheckCircle2, FileText, Building2 } from 'lucide-react';
 import { buildMetadata } from '@/lib/seo';
 import { FeatureExplorer } from '@/components/marketing/feature-explorer';
 import { ProductDemo } from '@/components/marketing/product-demo';
+import { HeroCTA } from '@/components/marketing/hero-cta';
 
 export const metadata: Metadata = buildMetadata({
   title: 'Student Volunteer Hour Tracker',
@@ -28,6 +29,13 @@ function TopNav() {
           <Link href="/faq" className="hover:text-gray-900 transition-colors">FAQ</Link>
         </div>
         <div className="flex items-center gap-3">
+          <Link
+            href="/org"
+            className="hidden md:flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+          >
+            <Building2 className="w-3.5 h-3.5" />
+            For organizations
+          </Link>
           <Link href="/login" className="hidden md:block text-sm text-gray-600 hover:text-gray-900 transition-colors">
             Log in
           </Link>
@@ -186,20 +194,8 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <div className="flex items-center gap-4 pt-1">
-              <Link
-                href="/signup"
-                className="bg-gray-900 text-white text-sm font-semibold px-6 py-3.5 rounded-xl hover:bg-gray-700 transition-colors shadow-sm"
-              >
-                Start for free
-              </Link>
-              <a
-                href="#how-it-works"
-                className="text-sm text-gray-600 font-medium hover:text-gray-900 flex items-center gap-1.5"
-              >
-                See how it works
-                <ChevronRight className="w-4 h-4" />
-              </a>
+            <div className="pt-1">
+              <HeroCTA />
             </div>
           </div>
 

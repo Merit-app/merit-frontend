@@ -145,15 +145,53 @@ function OrgDashboardLink() {
   const currentOrgId = useMeritStore((s) => s.currentOrgId);
   const pathname = usePathname();
   const orgId = currentOrgId ?? adminOrgs[0]?.id;
+  const orgName = adminOrgs.find((o) => o.id === orgId)?.name ?? adminOrgs[0]?.name;
   if (!orgId) return null;
   const href = `/org/${orgId}/dashboard`;
+  const isActive = pathname.startsWith('/org/');
   return (
-    <NavItem
-      href={href}
-      label="Org dashboard"
-      icon={Building2}
-      active={pathname.startsWith('/org/')}
-    />
+    <>
+      {/* Section divider + label */}
+      <div className="mx-1 mt-2 mb-1 h-px bg-ink-200" />
+      <p className="px-3 py-1 text-[10px] font-semibold text-ink-400 uppercase tracking-widest">
+        Organization
+      </p>
+
+      {/* Org dashboard link */}
+      <a
+        href={href}
+        className={cn(
+          'group relative flex items-center gap-2.5 rounded-[6px] px-3 py-2 transition-colors duration-100',
+          'text-ink-700 hover:bg-ink-100 hover:text-ink-900 text-[13px] font-medium',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merit-blue-600 focus-visible:ring-offset-1',
+          isActive && 'bg-ink-100 text-ink-900',
+        )}
+      >
+        {isActive && (
+          <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-merit-blue-600 rounded-full" />
+        )}
+        <Building2
+          size={16}
+          strokeWidth={isActive ? 2 : 1.75}
+          className={cn('shrink-0', isActive ? 'text-merit-blue-600' : 'text-ink-500 group-hover:text-ink-700')}
+        />
+        <span className="flex-1 truncate">{orgName ?? 'Org Dashboard'}</span>
+        <span className="text-[9px] font-bold bg-merit-blue-600/10 text-merit-blue-600 px-1.5 py-0.5 rounded-full shrink-0">
+          ORG
+        </span>
+      </a>
+
+      {/* Multi-org hint */}
+      {adminOrgs.length > 1 && (
+        <p className="px-3 text-[10px] text-ink-400">
+          +{adminOrgs.length - 1} more org{adminOrgs.length > 2 ? 's' : ''}{' '}
+          ·{' '}
+          <a href="/org" className="underline hover:text-ink-700">
+            Switch
+          </a>
+        </p>
+      )}
+    </>
   );
 }
 
@@ -211,8 +249,9 @@ export function Sidebar() {
           <OrgDashboardLink />
         )}
 
-        {/* Divider */}
-        <div className="mx-1 my-2 h-px bg-ink-200" />
+        {/* Divider before secondary nav (hidden when org section already has one) */}
+        {(!hydrated || !isOrgAdmin) && <div className="mx-1 my-2 h-px bg-ink-200" />}
+        {hydrated && isOrgAdmin && <div className="mx-1 mt-2 h-px bg-ink-200" />}
 
         {/* Secondary nav */}
         {secondaryNav.map(({ href, label, icon: Icon }) => (

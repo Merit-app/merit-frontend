@@ -24,6 +24,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const setOrganizations = useMeritStore((s) => s.setOrganizations);
   const setFollowedOrgIds = useMeritStore((s) => s.setFollowedOrgIds);
   const setIsOrgAdmin = useMeritStore((s) => s.setIsOrgAdmin);
+  const setAdminOrgs = useMeritStore((s) => s.setAdminOrgs);
   const updateUser = useMeritStore((s) => s.updateUser);
   const logout = useMeritStore((s) => s.logout);
   const hydrated = useHydrationStore((s) => s.hydrated);
@@ -79,7 +80,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           setFollowedOrgIds((followingRes.value.data ?? []).map((o: any) => o.id as string));
         }
         if (adminOrgsRes.status === 'fulfilled') {
-          setIsOrgAdmin((adminOrgsRes.value.data?.length ?? 0) > 0);
+          const rawOrgs = adminOrgsRes.value.data ?? [];
+          setIsOrgAdmin(rawOrgs.length > 0);
+          // Populate adminOrgs so the sidebar can link directly to the first org
+          setAdminOrgs(
+            rawOrgs.map((o: any) => ({
+              id: o.id,
+              name: o.name,
+              slug: o.slug ?? o.id,
+              logoUrl: o.logo_url ?? undefined,
+              role: (o.role as 'owner' | 'admin' | 'coordinator') ?? 'coordinator',
+            })),
+          );
         }
         if (userRes.status === 'fulfilled') {
           const mappedUser = mapUser(userRes.value.data.user);
