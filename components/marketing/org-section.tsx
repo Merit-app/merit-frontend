@@ -2,12 +2,8 @@
 
 import { motion, type Variants } from 'framer-motion';
 import Link from 'next/link';
-import {
-  ArrowRight, Users, Calendar, MessageSquare, BarChart3, Award, FileText,
-  CheckCircle2, Building2,
-} from 'lucide-react';
-import { PhoneFlip } from './phone-flip';
-import { DualityDemo } from './duality-demo';
+import { ArrowRight, Users, BarChart3, CheckCircle2, Building2 } from 'lucide-react';
+import { OrgShowcase } from './org-showcase';
 
 const container: Variants = {
   hidden: { opacity: 0 },
@@ -25,15 +21,6 @@ const item: Variants = {
     transition: { type: 'spring', stiffness: 300, damping: 30 },
   },
 };
-
-const FEATURES = [
-  { icon: Calendar, label: 'Event & shift scheduling', desc: 'Create shifts, manage signups, auto-check-in' },
-  { icon: MessageSquare, label: 'Bulk SMS to volunteers', desc: 'Reach all, an event group, or active members' },
-  { icon: Award, label: 'Volunteer certificates', desc: 'Personalized letters for college applications' },
-  { icon: FileText, label: 'Grant impact reports', desc: 'Professional PDF ready for grant committees' },
-  { icon: Users, label: 'Team management', desc: 'Invite coordinators and admins by email' },
-  { icon: CheckCircle2, label: 'SMS-verified hours', desc: 'Every session verified. Funders trust the data.' },
-];
 
 const STEPS = [
   {
@@ -116,10 +103,9 @@ export function OrgSection() {
           </motion.div>
         </div>
 
-        {/* Phone flip teaser + synchronized duality demo */}
+        {/* Notion-style laptop feature showcase */}
         <motion.div variants={item}>
-          <PhoneFlip />
-          <DualityDemo />
+          <OrgShowcase />
         </motion.div>
 
         {/* 3-step user journey cards */}
@@ -141,39 +127,6 @@ export function OrgSection() {
               </div>
               <p className="font-bold text-white text-lg mb-2">{s.title}</p>
               <p className="text-gray-400 text-sm leading-relaxed">{s.desc}</p>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* Feature grid */}
-        <motion.div variants={item} className="mt-32 mb-16 text-center">
-          <p className="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-3">
-            Everything you need
-          </p>
-          <h2 className="text-3xl md:text-4xl font-bold text-white">
-            One dashboard.
-            <br />
-            <span className="text-gray-500">All your volunteer ops.</span>
-          </h2>
-        </motion.div>
-
-        <motion.div
-          variants={container}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"
-        >
-          {FEATURES.map((f) => (
-            <motion.div
-              key={f.label}
-              variants={item}
-              whileHover={{ y: -4 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-              className="bg-[#131313] border border-white/5 rounded-2xl p-6 hover:border-white/10 transition-colors"
-            >
-              <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center mb-4">
-                <f.icon className="w-5 h-5 text-white" />
-              </div>
-              <p className="font-semibold text-white mb-2">{f.label}</p>
-              <p className="text-sm text-gray-500 leading-relaxed">{f.desc}</p>
             </motion.div>
           ))}
         </motion.div>
