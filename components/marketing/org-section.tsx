@@ -6,7 +6,8 @@ import {
   ArrowRight, Users, Calendar, MessageSquare, BarChart3, Award, FileText,
   CheckCircle2, Building2,
 } from 'lucide-react';
-import { OrgDemo } from './org-demo';
+import { PhoneFlip } from './phone-flip';
+import { DualityDemo } from './duality-demo';
 
 const container: Variants = {
   hidden: { opacity: 0 },
@@ -115,9 +116,10 @@ export function OrgSection() {
           </motion.div>
         </div>
 
-        {/* Animated laptop + phone demo */}
+        {/* Phone flip teaser + synchronized duality demo */}
         <motion.div variants={item}>
-          <OrgDemo />
+          <PhoneFlip />
+          <DualityDemo />
         </motion.div>
 
         {/* 3-step user journey cards */}
