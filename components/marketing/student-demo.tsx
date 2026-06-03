@@ -5,9 +5,7 @@ import {
   motion, AnimatePresence, useReducedMotion, useMotionValue, animate,
   type Transition,
 } from 'framer-motion';
-import {
-  CheckCircle2, Clock, Send, FileDown, Sparkles, ShieldCheck, MessageSquare,
-} from 'lucide-react';
+import { CheckCircle2, Clock, Send, FileDown, Sparkles } from 'lucide-react';
 
 // ── Physics ───────────────────────────────────────────────────────────────────
 const SP: Transition = { type: 'spring', stiffness: 280, damping: 30 };
@@ -87,57 +85,6 @@ export function StudentDemo() {
               {s.studentScreen === 'export' && <SExportScreen key="exp" />}
             </AnimatePresence>
           </Phone>
-
-          {/* Floating: awaiting (step 1) */}
-          <AnimatePresence>
-            {step === 1 && (
-              <motion.div key="await" initial={{ opacity: 0, x: -20, y: 10 }} animate={{ opacity: 1, x: 0, y: 0 }} exit={{ opacity: 0, x: -10 }} transition={SPB} className="absolute -bottom-2 -left-4 md:-left-12 bg-white/85 backdrop-blur-xl border border-gray-200 rounded-2xl shadow-xl p-3 w-44 z-20">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
-                    <Clock className="w-4 h-4 text-amber-600" />
-                  </div>
-                  <div>
-                    <p className="text-[9px] text-gray-500 font-bold uppercase tracking-wide">Pending</p>
-                    <p className="text-[11px] text-gray-900 font-semibold">Awaiting reply...</p>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Floating: verified (step 2) */}
-          <AnimatePresence>
-            {step === 2 && (
-              <motion.div key="ver-card" initial={{ opacity: 0, scale: 0.8, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9 }} transition={{ ...SPB, delay: 0.5 }} className="absolute -bottom-2 -left-4 md:-left-12 bg-white/85 backdrop-blur-xl border border-green-200 rounded-2xl shadow-xl p-3 w-44 z-20">
-                <div className="flex items-center gap-2">
-                  <motion.div animate={{ scale: [0, 1.3, 1] }} transition={{ ...SPB, delay: 0.6 }} className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center shrink-0">
-                    <ShieldCheck className="w-4 h-4 text-green-600" />
-                  </motion.div>
-                  <div>
-                    <p className="text-[9px] text-gray-500 font-bold uppercase tracking-wide">Verified ✓</p>
-                    <p className="text-[11px] text-gray-900 font-semibold">4 hours confirmed</p>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Floating: PDF (step 3) */}
-          <AnimatePresence>
-            {step === 3 && (
-              <motion.div key="pdf-card" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} transition={SPB} className="absolute -bottom-2 -right-4 md:-right-10 bg-white/85 backdrop-blur-xl border border-gray-200 rounded-2xl shadow-xl p-3 w-44 z-20">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center shrink-0">
-                    <ShieldCheck className="w-4 h-4 text-green-600" />
-                  </div>
-                  <div>
-                    <p className="text-[9px] text-gray-500 font-bold uppercase tracking-wide">PDF verified</p>
-                    <p className="text-[11px] text-gray-900 font-semibold">QR-signed · Food Bank</p>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
 
         {/* Divider */}
@@ -160,25 +107,6 @@ export function StudentDemo() {
               {s.supervisorScreen === 'done' && <SupDoneScreen key="done" />}
             </AnimatePresence>
           </Phone>
-
-          {/* Floating: SMS incoming (step 1) */}
-          <AnimatePresence>
-            {step === 1 && (
-              <motion.div key="sms-notif" initial={{ opacity: 0, y: -20, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -10 }} transition={SPB} className="absolute -top-4 -right-4 md:-right-10 bg-white/85 backdrop-blur-xl border border-gray-200 rounded-2xl shadow-xl p-3 w-52 z-20">
-                <div className="flex items-start gap-2">
-                  <div className="w-8 h-8 rounded-full bg-green-500 grid place-items-center shrink-0">
-                    <MessageSquare className="w-4 h-4 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-[9px] text-gray-500 font-bold uppercase tracking-wide">Messages · now</p>
-                    <p className="text-[11px] text-gray-900 font-semibold leading-snug mt-0.5">
-                      Merit: Verify Sarah&apos;s 4h at Vancouver Food Bank? Reply YES
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
       </div>
 
