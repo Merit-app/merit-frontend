@@ -4,6 +4,7 @@ import { motion, type Variants } from 'framer-motion';
 import Link from 'next/link';
 import {
   ArrowRight, Users, Calendar, MessageSquare, BarChart3, Award, FileText,
+  CheckCircle2, Building2,
 } from 'lucide-react';
 import { OrgDemo } from './org-demo';
 
@@ -25,122 +26,202 @@ const item: Variants = {
 };
 
 const FEATURES = [
-  { icon: Users, title: 'Volunteer management', desc: 'See every volunteer, every session, every hour. Search, filter, export.' },
-  { icon: Calendar, title: 'Events & shifts', desc: 'Create volunteer shifts in 30 seconds. Auto-text everyone. Check in arrivals on the day.' },
-  { icon: MessageSquare, title: 'Bulk SMS', desc: 'Send announcements to all volunteers, event attendees, or active groups.' },
-  { icon: BarChart3, title: 'Grant reports', desc: 'Generate professional impact PDFs in one click. Ready for grant committees.' },
-  { icon: Award, title: 'Certificates', desc: "Issue personalized recognition letters for volunteers' college applications." },
-  { icon: FileText, title: 'Verified hours', desc: 'Every session SMS-verified. Funders trust your data because they should.' },
+  { icon: Calendar, label: 'Event & shift scheduling', desc: 'Create shifts, manage signups, auto-check-in' },
+  { icon: MessageSquare, label: 'Bulk SMS to volunteers', desc: 'Reach all, an event group, or active members' },
+  { icon: Award, label: 'Volunteer certificates', desc: 'Personalized letters for college applications' },
+  { icon: FileText, label: 'Grant impact reports', desc: 'Professional PDF ready for grant committees' },
+  { icon: Users, label: 'Team management', desc: 'Invite coordinators and admins by email' },
+  { icon: CheckCircle2, label: 'SMS-verified hours', desc: 'Every session verified. Funders trust the data.' },
+];
+
+const STEPS = [
+  {
+    step: '01',
+    title: 'Volunteers log their own hours',
+    desc: 'Students use the Merit app to log sessions. You see every pending session in your dashboard — no chasing spreadsheets.',
+    icon: Users,
+    color: 'text-blue-400',
+    bg: 'bg-blue-500/10',
+  },
+  {
+    step: '02',
+    title: 'You verify in one click',
+    desc: 'See every pending session. Click Verify. The student gets notified instantly and their PDF updates. No emails. No paper.',
+    icon: CheckCircle2,
+    color: 'text-green-400',
+    bg: 'bg-green-500/10',
+  },
+  {
+    step: '03',
+    title: 'Run events, get grant reports',
+    desc: 'Create volunteer shifts, check in arrivals, send bulk SMS, and generate professional grant impact reports in one click.',
+    icon: BarChart3,
+    color: 'text-amber-400',
+    bg: 'bg-amber-500/10',
+  },
 ];
 
 export function OrgSection() {
   return (
-    <motion.section
-      variants={container}
-      initial="hidden"
-      animate="visible"
-      className="max-w-6xl mx-auto px-6 pt-20 pb-32"
-    >
-      {/* Hero */}
-      <div className="text-center max-w-3xl mx-auto mb-20">
+    <div className="bg-[#0A0A0A] text-white">
+      <motion.section
+        variants={container}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.1 }}
+        className="max-w-6xl mx-auto px-6 pt-32 pb-32"
+      >
+        {/* Section hero */}
+        <div className="text-center max-w-3xl mx-auto mb-20">
+          <motion.div
+            variants={item}
+            className="inline-flex items-center gap-2 bg-white/5 border border-white/10 text-gray-300 text-xs font-medium px-3 py-1.5 rounded-full mb-8"
+          >
+            <Building2 className="w-3.5 h-3.5" />
+            Merit for organizations
+          </motion.div>
+
+          <motion.h2
+            variants={item}
+            className="text-5xl md:text-6xl font-bold tracking-tight text-white leading-[1.05] mb-6"
+          >
+            Your volunteer program,
+            <br />
+            <span className="text-gray-500">finally organized.</span>
+          </motion.h2>
+
+          <motion.p
+            variants={item}
+            className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed mb-10"
+          >
+            Manage volunteers, run events, send announcements, and generate grant reports — all
+            from one dashboard. Students log hours themselves. You just verify.
+          </motion.p>
+
+          <motion.div variants={item} className="flex items-center justify-center gap-3 flex-wrap">
+            <Link
+              href="/org/login"
+              className="bg-white text-gray-900 font-semibold px-7 py-3.5 rounded-full hover:bg-gray-200 transition-colors flex items-center gap-2 shadow-sm"
+            >
+              Sign in to your organization
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link
+              href="/org"
+              className="text-gray-400 font-medium px-7 py-3.5 rounded-full hover:bg-white/5 transition-colors"
+            >
+              Learn more
+            </Link>
+          </motion.div>
+        </div>
+
+        {/* Animated laptop + phone demo */}
+        <motion.div variants={item}>
+          <OrgDemo />
+        </motion.div>
+
+        {/* 3-step user journey cards */}
+        <motion.div
+          variants={container}
+          className="mt-32 grid grid-cols-1 md:grid-cols-3 gap-4"
+        >
+          {STEPS.map((s) => (
+            <motion.div
+              key={s.step}
+              variants={item}
+              className="bg-[#131313] border border-white/5 rounded-2xl p-6 hover:border-white/10 transition-colors"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <span className="text-gray-600 font-mono font-bold text-sm">{s.step}</span>
+                <div className={`w-8 h-8 rounded-xl ${s.bg} flex items-center justify-center`}>
+                  <s.icon className={`w-4 h-4 ${s.color}`} />
+                </div>
+              </div>
+              <p className="font-bold text-white text-lg mb-2">{s.title}</p>
+              <p className="text-gray-400 text-sm leading-relaxed">{s.desc}</p>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* Feature grid */}
+        <motion.div variants={item} className="mt-32 mb-16 text-center">
+          <p className="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-3">
+            Everything you need
+          </p>
+          <h2 className="text-3xl md:text-4xl font-bold text-white">
+            One dashboard.
+            <br />
+            <span className="text-gray-500">All your volunteer ops.</span>
+          </h2>
+        </motion.div>
+
+        <motion.div
+          variants={container}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"
+        >
+          {FEATURES.map((f) => (
+            <motion.div
+              key={f.label}
+              variants={item}
+              whileHover={{ y: -4 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              className="bg-[#131313] border border-white/5 rounded-2xl p-6 hover:border-white/10 transition-colors"
+            >
+              <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center mb-4">
+                <f.icon className="w-5 h-5 text-white" />
+              </div>
+              <p className="font-semibold text-white mb-2">{f.label}</p>
+              <p className="text-sm text-gray-500 leading-relaxed">{f.desc}</p>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* Cross-promo: explain to students seeing the page */}
         <motion.div
           variants={item}
-          className="inline-flex items-center gap-2 bg-white/5 border border-white/10 text-gray-300 text-xs font-medium px-3 py-1.5 rounded-full mb-8"
+          className="mt-32 bg-white/5 border border-white/10 rounded-2xl p-8 text-center max-w-2xl mx-auto"
         >
-          <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
-          Built for nonprofits and volunteer coordinators
-        </motion.div>
-
-        <motion.h1
-          variants={item}
-          className="text-5xl md:text-7xl font-bold tracking-tight text-white leading-[1.05] mb-6"
-        >
-          Your volunteer program,
-          <br />
-          <span className="text-gray-500">finally organized.</span>
-        </motion.h1>
-
-        <motion.p
-          variants={item}
-          className="text-xl text-gray-400 max-w-xl mx-auto mb-10 leading-relaxed"
-        >
-          Manage volunteers, run events, send announcements, and generate grant reports — all from
-          one dashboard. Students log hours themselves. You just verify.
-        </motion.p>
-
-        <motion.div variants={item} className="flex items-center justify-center gap-3 flex-wrap">
+          <p className="text-gray-400 text-sm mb-1">Already using Merit as a student?</p>
+          <p className="text-white font-semibold text-lg mb-2">
+            This is what your supervisors see.
+          </p>
+          <p className="text-gray-500 text-sm mb-6">
+            When you submit a session, it appears in your organization&apos;s dashboard. One tap from
+            them and you&apos;re verified.
+          </p>
           <Link
-            href="/org/login"
-            className="bg-white text-black font-semibold px-7 py-3.5 rounded-full text-base hover:bg-gray-200 transition-colors flex items-center gap-2 shadow-sm"
+            href="/signup"
+            className="text-sm text-white font-medium underline hover:text-gray-300 transition-colors"
           >
-            Sign in to your organization
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-          <Link
-            href="/org/join"
-            className="text-gray-400 font-medium px-7 py-3.5 rounded-full text-base hover:bg-white/5 transition-colors"
-          >
-            Accept an invitation
+            Start tracking your hours →
           </Link>
         </motion.div>
 
-        <motion.p variants={item} className="text-xs text-gray-600 mt-4">
-          Claim your org page free. No setup fee.
-        </motion.p>
-      </div>
-
-      {/* Demo */}
-      <motion.div variants={item}>
-        <OrgDemo />
-      </motion.div>
-
-      {/* Features */}
-      <motion.div variants={item} className="mt-32 mb-16 text-center">
-        <p className="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-3">
-          Everything you need
-        </p>
-        <h2 className="text-3xl md:text-4xl font-bold text-white">
-          One dashboard.
-          <br />
-          <span className="text-gray-500">All your volunteer ops.</span>
-        </h2>
-      </motion.div>
-
-      <motion.div
-        variants={container}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"
-      >
-        {FEATURES.map((f) => (
-          <motion.div
-            key={f.title}
-            variants={item}
-            whileHover={{ y: -4 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-            className="bg-[#131313] border border-white/5 rounded-2xl p-6 hover:border-white/10 transition-colors"
-          >
-            <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center mb-4">
-              <f.icon className="w-5 h-5 text-white" />
-            </div>
-            <p className="font-semibold text-white mb-2">{f.title}</p>
-            <p className="text-sm text-gray-500 leading-relaxed">{f.desc}</p>
-          </motion.div>
-        ))}
-      </motion.div>
-
-      {/* CTA */}
-      <motion.div variants={item} className="mt-32 text-center max-w-2xl mx-auto">
-        <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-          Ready to organize your volunteer program?
-        </h2>
-        <p className="text-gray-400 mb-8">It takes 2 minutes to claim your org. Free for nonprofits.</p>
-        <Link
-          href="/org"
-          className="inline-flex items-center gap-2 bg-white text-black font-semibold px-8 py-4 rounded-full hover:bg-gray-200 transition-colors shadow-lg"
-        >
-          Get started
-          <ArrowRight className="w-4 h-4" />
-        </Link>
-      </motion.div>
-    </motion.section>
+        {/* CTA */}
+        <motion.div variants={item} className="mt-24 text-center max-w-2xl mx-auto">
+          <h3 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            Ready to organize your volunteer program?
+          </h3>
+          <p className="text-gray-400 mb-8">
+            Claim your org page in 2 minutes. Free for nonprofits.
+          </p>
+          <div className="flex items-center justify-center gap-4 flex-wrap">
+            <Link
+              href="/org/login"
+              className="inline-flex items-center gap-2 bg-white text-black font-semibold px-8 py-4 rounded-full hover:bg-gray-200 transition-colors shadow-lg"
+            >
+              Sign in to your org
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link
+              href="/organizations"
+              className="text-gray-400 hover:text-white text-sm transition-colors"
+            >
+              Browse organizations
+            </Link>
+          </div>
+        </motion.div>
+      </motion.section>
+    </div>
   );
 }
