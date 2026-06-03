@@ -297,6 +297,25 @@ export const onboardingApi = {
 
 // ─── Org Claims API ──────────────────────────────────────────────────────────
 
+// ─── Org Profile API ─────────────────────────────────────────────────────────
+
+export const orgProfileApi = {
+  update: (orgId: string, data: {
+    name?: string;
+    description?: string;
+    website_url?: string;
+    contact_email?: string;
+    contact_phone?: string;
+    is_recruiting?: boolean;
+  }) => request<{ data: any }>('PATCH', `/organizations/${orgId}/profile`, data),
+
+  uploadImage: (orgId: string, kind: 'logo' | 'cover', base64: string, mimeType: string) =>
+    request<{ data: { url: string } }>('POST', `/organizations/${orgId}/logo?type=${kind}`, {
+      base64,
+      mimeType,
+    }),
+};
+
 export const orgClaimsApi = {
   submit: (body: { orgId: string; role: string; workEmail: string }) =>
     request<{ data: { claimId: string; autoApproved: boolean } }>('POST', '/org-claims', body),

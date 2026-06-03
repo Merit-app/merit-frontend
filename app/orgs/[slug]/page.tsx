@@ -6,6 +6,7 @@ import { OrgAboutCard } from '@/components/org-profile/about-card';
 import { OrgCommunityCard } from '@/components/org-profile/community-card';
 import { OrgVolunteersCard } from '@/components/org-profile/volunteers-card';
 import { OrgSimilarCard } from '@/components/org-profile/similar-orgs-card';
+import { ClaimButton } from '@/components/orgs/claim-button';
 import type { OrgStats, SimilarOrg } from '@/lib/types';
 
 const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? '').replace(/\/$/, '');
@@ -77,13 +78,22 @@ export default async function PublicOrgPage({ params }: { params: Promise<{ slug
           isRecruiting={org.isRecruiting ?? false}
           showClaimLink={false}
           actions={
-            <Link
-              href={`/signup?ref=volunteer&org=${org.id}`}
-              className="h-8 px-3 rounded-lg bg-merit-blue-600 hover:bg-merit-blue-700 flex items-center gap-1.5 text-[12px] font-medium text-white transition-colors shadow-sm"
-            >
-              <Plus size={13} />
-              Volunteer here
-            </Link>
+            <div className="flex items-center gap-2">
+              {!org.claimed && (
+                <ClaimButton
+                  orgId={org.id}
+                  orgName={org.name}
+                  orgWebsiteUrl={org.website_url ?? org.website ?? null}
+                />
+              )}
+              <Link
+                href={`/signup?ref=volunteer&org=${org.id}`}
+                className="h-8 px-3 rounded-lg bg-merit-blue-600 hover:bg-merit-blue-700 flex items-center gap-1.5 text-[12px] font-medium text-white transition-colors shadow-sm"
+              >
+                <Plus size={13} />
+                Volunteer here
+              </Link>
+            </div>
           }
         />
 
