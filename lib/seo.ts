@@ -76,6 +76,10 @@ export function buildMetadata({
       images: [ogImage],
       creator: siteConfig.twitter,
     },
+    icons: {
+      icon: '/favicon.ico',
+      shortcut: '/favicon.ico',
+    },
     robots: noIndex
       ? { index: false, follow: false }
       : {

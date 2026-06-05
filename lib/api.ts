@@ -297,6 +297,19 @@ export const onboardingApi = {
 
 // ─── Org Claims API ──────────────────────────────────────────────────────────
 
+// ─── Org Billing API ─────────────────────────────────────────────────────────
+
+export const orgBillingApi = {
+  get: (orgId: string) =>
+    request<{ data: { plan: string; status: string; currentPeriodEnd: string | null; cancelAtPeriodEnd: boolean } }>(
+      'GET', `/org/${orgId}/billing`,
+    ),
+  createCheckout: (orgId: string, plan: 'pro' | 'enterprise', interval: 'monthly' | 'yearly') =>
+    request<{ data: { url: string } }>('POST', `/org/${orgId}/billing/checkout`, { plan, interval }),
+  openPortal: (orgId: string) =>
+    request<{ data: { url: string } }>('POST', `/org/${orgId}/billing/portal`, {}),
+};
+
 // ─── Org Profile API ─────────────────────────────────────────────────────────
 
 export const orgProfileApi = {
