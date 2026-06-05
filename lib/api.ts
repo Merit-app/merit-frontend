@@ -329,6 +329,17 @@ export const orgProfileApi = {
     }),
 };
 
+// ─── Volunteer interest ("I volunteer here") ─────────────────────────────────
+
+export const volunteerInterestApi = {
+  register: (orgId: string) =>
+    request<{ data: { registered: boolean; orgName: string } }>('POST', `/organizations/${orgId}/interest`, {}),
+  unregister: (orgId: string) =>
+    request<{ data: { unregistered: boolean } }>('DELETE', `/organizations/${orgId}/interest`),
+  status: (orgId: string) =>
+    request<{ data: { registered: boolean } }>('GET', `/organizations/${orgId}/interest/status`),
+};
+
 export const orgClaimsApi = {
   submit: (body: { orgId: string; role: string; workEmail: string }) =>
     request<{ data: { claimId: string; autoApproved: boolean } }>('POST', '/org-claims', body),
