@@ -1,16 +1,15 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { PasswordInput } from '@/components/ui/password-input';
+import { Label } from '@/components/ui/label';
 import { authApi, ApiError } from '@/lib/api';
 import { cn } from '@/lib/utils';
 
@@ -26,20 +25,40 @@ const schema = z
 
 type FormData = z.infer<typeof schema>;
 
-function ResetPasswordForm() {
+export default function ResetPasswordPage() {
   const router = useRouter();
-  const params = useSearchParams();
-  const token = params.get('token') ?? params.get('access_token') ?? '';
-
+  const [token, setToken] = useState('');
+  const [tokenReady, setTokenReady] = useState(false);
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
-  // If no token present, redirect to forgot-password
+  // Supabase sends the access_token in the URL hash:
+  //   /reset-password#access_token=XXX&type=recovery&...
+  // Hash fragments are client-only — never in query params, never on the server.
   useEffect(() => {
-    if (!token) {
-      router.replace('/forgot-password');
+    const hash = window.location.hash.slice(1); // strip leading #
+    const hashParams = new URLSearchParams(hash);
+    const accessToken = hashParams.get('access_token');
+
+    if (accessToken) {
+      setToken(accessToken);
+      // Scrub the token from the URL bar so it's not visible / shared
+      window.history.replaceState(null, '', window.location.pathname);
+    } else {
+      // Fall back to query param for any custom reset links
+      const qParams = new URLSearchParams(window.location.search);
+      const qToken = qParams.get('token') ?? qParams.get('access_token') ?? '';
+      if (qToken) {
+        setToken(qToken);
+      } else {
+        // No token at all — send back to forgot-password
+        router.replace('/forgot-password');
+        return;
+      }
     }
-  }, [token, router]);
+
+    setTokenReady(true);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const {
     register,
@@ -69,69 +88,15 @@ function ResetPasswordForm() {
     }
   }
 
-  if (!token) return null;
-
-  return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-      {serverError && (
-        <div className="rounded-lg bg-danger/8 border border-danger/20 px-3 py-2.5">
-          <p className="text-[13px] text-danger">{serverError}</p>
-        </div>
-      )}
-
-      <div className="space-y-1.5">
-        <Label htmlFor="newPassword" className="text-[13px] font-medium text-ink-900">
-          New password
-        </Label>
-        <PasswordInput
-          id="newPassword"
-          placeholder="••••••••"
-          error={!!errors.newPassword}
-          autoComplete="new-password"
-          autoFocus
-          {...register('newPassword')}
-        />
-        {errors.newPassword && (
-          <p className="text-[13px] text-danger">{errors.newPassword.message}</p>
-        )}
+  // Still resolving token from hash
+  if (!tokenReady) {
+    return (
+      <div className="min-h-screen bg-ink-50 flex items-center justify-center">
+        <Loader2 className="w-5 h-5 animate-spin text-ink-400" />
       </div>
+    );
+  }
 
-      <div className="space-y-1.5">
-        <Label htmlFor="confirmPassword" className="text-[13px] font-medium text-ink-900">
-          Confirm new password
-        </Label>
-        <PasswordInput
-          id="confirmPassword"
-          placeholder="••••••••"
-          error={!!errors.confirmPassword}
-          autoComplete="new-password"
-          {...register('confirmPassword')}
-          className={cn(errors.confirmPassword && 'border-danger')}
-        />
-        {errors.confirmPassword && (
-          <p className="text-[13px] text-danger">{errors.confirmPassword.message}</p>
-        )}
-      </div>
-
-      <Button
-        type="submit"
-        disabled={loading}
-        className="w-full bg-merit-blue-600 hover:bg-merit-blue-700 active:scale-[0.98] text-white font-medium transition-all duration-100"
-      >
-        {loading ? (
-          <>
-            <Loader2 size={15} className="mr-2 animate-spin" />
-            Updating...
-          </>
-        ) : (
-          'Update password'
-        )}
-      </Button>
-    </form>
-  );
-}
-
-export default function ResetPasswordPage() {
   return (
     <div className="min-h-screen bg-ink-50 flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
@@ -145,9 +110,62 @@ export default function ResetPasswordPage() {
 
         {/* Card */}
         <div className="bg-white rounded-xl border border-ink-200 p-8">
-          <Suspense fallback={<div className="h-32 animate-pulse rounded-lg bg-ink-100" />}>
-            <ResetPasswordForm />
-          </Suspense>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            {serverError && (
+              <div className="rounded-lg bg-danger/8 border border-danger/20 px-3 py-2.5">
+                <p className="text-[13px] text-danger">{serverError}</p>
+              </div>
+            )}
+
+            <div className="space-y-1.5">
+              <Label htmlFor="newPassword" className="text-[13px] font-medium text-ink-900">
+                New password
+              </Label>
+              <PasswordInput
+                id="newPassword"
+                placeholder="••••••••"
+                error={!!errors.newPassword}
+                autoComplete="new-password"
+                autoFocus
+                {...register('newPassword')}
+              />
+              {errors.newPassword && (
+                <p className="text-[13px] text-danger">{errors.newPassword.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="confirmPassword" className="text-[13px] font-medium text-ink-900">
+                Confirm new password
+              </Label>
+              <PasswordInput
+                id="confirmPassword"
+                placeholder="••••••••"
+                error={!!errors.confirmPassword}
+                autoComplete="new-password"
+                {...register('confirmPassword')}
+                className={cn(errors.confirmPassword && 'border-danger')}
+              />
+              {errors.confirmPassword && (
+                <p className="text-[13px] text-danger">{errors.confirmPassword.message}</p>
+              )}
+            </div>
+
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-merit-blue-600 hover:bg-merit-blue-700 active:scale-[0.98] text-white font-medium transition-all duration-100"
+            >
+              {loading ? (
+                <>
+                  <Loader2 size={15} className="mr-2 animate-spin" />
+                  Updating...
+                </>
+              ) : (
+                'Update password'
+              )}
+            </Button>
+          </form>
         </div>
 
         <p className="mt-5 text-center text-small text-ink-500">

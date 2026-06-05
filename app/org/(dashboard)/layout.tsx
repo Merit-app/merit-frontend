@@ -236,8 +236,17 @@ export default function OrgDashboardLayout({ children }: { children: React.React
             Student dashboard
           </a>
 
+          {/* Sign out */}
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-red-400/70 hover:text-red-400 hover:bg-red-400/5 transition-colors w-full"
+          >
+            <LogOut className="w-4 h-4 shrink-0" />
+            Sign out
+          </button>
+
           {/* User row */}
-          <div className="flex items-center gap-3 px-3 py-3 mt-1 border-t border-gray-800">
+          <div className="flex items-center gap-3 px-3 py-2.5 mt-1 border-t border-gray-800">
             <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-xs font-bold text-white shrink-0">
               {user?.firstName?.[0] ?? '?'}
             </div>
@@ -245,10 +254,8 @@ export default function OrgDashboardLayout({ children }: { children: React.React
               <p className="text-white text-xs font-medium truncate">
                 {user?.firstName} {user?.lastName}
               </p>
+              <p className="text-gray-600 text-[10px] truncate">{user?.email}</p>
             </div>
-            <button onClick={handleLogout} className="text-gray-500 hover:text-red-400 transition-colors" aria-label="Sign out">
-              <LogOut className="w-4 h-4" />
-            </button>
           </div>
         </div>
       </aside>
