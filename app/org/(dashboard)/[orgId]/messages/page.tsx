@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { orgMessagesApi, orgEventsApi } from '@/lib/api';
+import { orgMessagesApi, orgEventsApi, orgBillingApi } from '@/lib/api';
 import { toast } from 'sonner';
 import { Send, Loader2 } from 'lucide-react';
+import { UpgradeGate } from '@/components/org/upgrade-gate';
 
 type Filter = 'all' | 'event' | 'active_30d' | 'active_90d';
 
@@ -24,9 +25,19 @@ export default function MessagesPage() {
   const [selectedEvent, setSelectedEvent] = useState('');
   const [isSending, setIsSending] = useState(false);
 
+  const { data: billingRes } = useQuery({
+    queryKey: ['org-billing-plan', orgId],
+    queryFn: () => orgBillingApi.get(orgId),
+    retry: false,
+    staleTime: 5 * 60 * 1000,
+  });
+  const orgPlan = (billingRes as any)?.data?.plan ?? null;
+  const isPro = orgPlan === 'pro' || orgPlan === 'enterprise';
+
   const { data: historyRes, refetch } = useQuery({
     queryKey: ['org-messages', orgId],
     queryFn: () => orgMessagesApi.history(orgId),
+    enabled: isPro,
   });
   const history: any[] = (historyRes as any)?.data ?? [];
 
@@ -63,6 +74,16 @@ export default function MessagesPage() {
       setIsSending(false);
     }
   };
+
+  if (orgPlan && !isPro) {
+    return (
+      <UpgradeGate
+        orgId={orgId}
+        feature="Bulk SMS"
+        description="Send announcements to all your volunteers, event attendees, or recently active members with one tap."
+      />
+    );
+  }
 
   return (
     <div className="max-w-2xl space-y-6">

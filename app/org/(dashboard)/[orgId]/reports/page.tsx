@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
-import { orgReportsApi } from '@/lib/api';
+import { orgReportsApi, orgBillingApi } from '@/lib/api';
 import { toast } from 'sonner';
 import { Download, FileText, Loader2 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { UpgradeGate } from '@/components/org/upgrade-gate';
 
 const PRESETS = [
   {
@@ -34,6 +36,25 @@ export default function ReportsPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [from, setFrom] = useState(`${new Date().getFullYear()}-01-01`);
   const [to, setTo] = useState(new Date().toISOString().split('T')[0]);
+
+  const { data: billingRes } = useQuery({
+    queryKey: ['org-billing-plan', orgId],
+    queryFn: () => orgBillingApi.get(orgId),
+    retry: false,
+    staleTime: 5 * 60 * 1000,
+  });
+  const orgPlan = (billingRes as any)?.data?.plan ?? null;
+  const isPro = orgPlan === 'pro' || orgPlan === 'enterprise';
+
+  if (orgPlan && !isPro) {
+    return (
+      <UpgradeGate
+        orgId={orgId}
+        feature="Grant Reports"
+        description="Generate professional impact PDFs for any date range. Formatted for grant committee submissions."
+      />
+    );
+  }
 
   const handleGrantReport = async () => {
     setIsGenerating(true);

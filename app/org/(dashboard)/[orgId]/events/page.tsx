@@ -2,9 +2,10 @@
 
 import { useParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { orgEventsApi } from '@/lib/api';
+import { orgEventsApi, orgBillingApi } from '@/lib/api';
 import { Calendar, Plus, Users, Clock } from 'lucide-react';
 import Link from 'next/link';
+import { UpgradeGate } from '@/components/org/upgrade-gate';
 
 function EventCard({ event, orgId }: { event: any; orgId: string }) {
   return (
@@ -52,9 +53,19 @@ function EventCard({ event, orgId }: { event: any; orgId: string }) {
 export default function EventsPage() {
   const { orgId } = useParams<{ orgId: string }>();
 
+  const { data: billingRes } = useQuery({
+    queryKey: ['org-billing-plan', orgId],
+    queryFn: () => orgBillingApi.get(orgId),
+    retry: false,
+    staleTime: 5 * 60 * 1000,
+  });
+  const orgPlan = (billingRes as any)?.data?.plan ?? null;
+  const isPro = orgPlan === 'pro' || orgPlan === 'enterprise';
+
   const { data: res, isLoading } = useQuery({
     queryKey: ['org-events', orgId],
     queryFn: () => orgEventsApi.list(orgId),
+    enabled: isPro,
   });
   const events: any[] = (res as any)?.data ?? [];
 
@@ -64,6 +75,17 @@ export default function EventsPage() {
   const past = events.filter(
     (e) => new Date(e.start_time) <= new Date() || e.status === 'completed' || e.status === 'cancelled',
   );
+
+  // Show upgrade gate for Basic plan (only after billing data resolves)
+  if (orgPlan && !isPro) {
+    return (
+      <UpgradeGate
+        orgId={orgId}
+        feature="Events & Shifts"
+        description="Create volunteer shifts, auto-text all volunteers when you publish, and check in arrivals on the day. Hours log automatically when complete."
+      />
+    );
+  }
 
   return (
     <div className="space-y-8">

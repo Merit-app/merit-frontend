@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { orgVolunteersApi, orgReportsApi } from '@/lib/api';
+import { orgVolunteersApi, orgReportsApi, orgBillingApi } from '@/lib/api';
 import { toast } from 'sonner';
 import { Download, Loader2, Search } from 'lucide-react';
+import { UpgradeGate } from '@/components/org/upgrade-gate';
 
 export default function CertificatesPage() {
   const { orgId } = useParams<{ orgId: string }>();
@@ -13,11 +14,31 @@ export default function CertificatesPage() {
   const [coordinatorName, setCoordinatorName] = useState('');
   const [generating, setGenerating] = useState<string | null>(null);
 
+  const { data: billingRes } = useQuery({
+    queryKey: ['org-billing-plan', orgId],
+    queryFn: () => orgBillingApi.get(orgId),
+    retry: false,
+    staleTime: 5 * 60 * 1000,
+  });
+  const orgPlan = (billingRes as any)?.data?.plan ?? null;
+  const isPro = orgPlan === 'pro' || orgPlan === 'enterprise';
+
   const { data: res } = useQuery({
     queryKey: ['org-volunteers', orgId],
     queryFn: () => orgVolunteersApi.list(orgId),
+    enabled: isPro,
   });
   const volunteers: any[] = (res as any)?.data ?? [];
+
+  if (orgPlan && !isPro) {
+    return (
+      <UpgradeGate
+        orgId={orgId}
+        feature="Volunteer Certificates"
+        description="Issue personalized recognition letters for volunteers to use in college applications and scholarship submissions."
+      />
+    );
+  }
 
   const filtered = volunteers.filter((v) =>
     !search || v.student?.name?.toLowerCase().includes(search.toLowerCase()),

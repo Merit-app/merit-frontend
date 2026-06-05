@@ -431,6 +431,13 @@ function OrgSettingsInner() {
     tabParam && TABS.some((t) => t.id === tabParam) ? tabParam : 'organization',
   );
 
+  // Show success toast after Stripe redirect with ?success=1
+  useEffect(() => {
+    if (searchParams.get('success') === '1') {
+      toast.success('Subscription activated! Welcome to Pro. 🎉');
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const { data: dashRes } = useQuery({
     queryKey: ['org-dashboard', orgId],
     queryFn: () => orgsApi.dashboard(orgId),
