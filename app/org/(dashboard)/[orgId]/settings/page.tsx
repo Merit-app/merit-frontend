@@ -269,9 +269,10 @@ function BillingTab({ orgId }: { orgId: string }) {
     {
       id: 'pro',
       name: 'Pro',
-      price: { monthly: 49, yearly: 470 },
+      price: { monthly: 29, yearly: 249 },
       description: 'For active volunteer programs',
       features: [
+        'Everything in Free',
         'Unlimited volunteers',
         'Event creation + day-of check-in',
         'Bulk SMS to all volunteers',
@@ -285,7 +286,7 @@ function BillingTab({ orgId }: { orgId: string }) {
     {
       id: 'enterprise',
       name: 'Enterprise',
-      price: { monthly: 149, yearly: 1430 },
+      price: { monthly: 99, yearly: 849 },
       description: 'For large organizations and federations',
       features: [
         'Everything in Pro',
@@ -342,7 +343,7 @@ function BillingTab({ orgId }: { orgId: string }) {
           const displayPrice = billingInterval === 'yearly' && plan.id !== 'basic' ? monthlyEquiv : plan.price.monthly;
 
           return (
-            <div key={plan.id} className={`rounded-2xl border p-5 flex flex-col ${
+            <div key={plan.id} className={`rounded-2xl border p-5 flex flex-col h-full ${
               plan.highlight && !isCurrent ? 'border-white/20 bg-white/5' : 'border-gray-800 bg-gray-900'
             } ${isCurrent ? 'border-green-500/30' : ''}`}>
               {plan.highlight && (
