@@ -96,7 +96,7 @@ export function OrgShowcase() {
       </div>
 
       {/* Tabs left, laptop right */}
-      <div className="grid grid-cols-1 lg:grid-cols-[380px,1fr] gap-8 lg:gap-16 items-center">
+      <div className="grid grid-cols-1 lg:grid-cols-[380px,1fr] gap-6 lg:gap-16 items-center">
         {/* Feature tabs */}
         <div className="space-y-1">
           {FEATURES.map((f, i) => {
@@ -139,10 +139,14 @@ export function OrgShowcase() {
               </button>
             );
           })}
+          {/* Mobile-only: show feature description below tabs (no laptop on small screens) */}
+          <div className="lg:hidden mt-2 px-1">
+            <p className="text-sm text-gray-400 leading-relaxed">{feature.description}</p>
+          </div>
         </div>
 
-        {/* Laptop */}
-        <div className="relative">
+        {/* Laptop — hidden on mobile, visible lg+ */}
+        <div className="hidden lg:block relative">
           <div className="relative aspect-[16/10] rounded-xl bg-gradient-to-b from-gray-600 to-gray-800 p-[6px] shadow-2xl">
             <div className="absolute top-[3px] left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-gray-500" />
             <div className="w-full h-full rounded-lg bg-[#0A0A0A] overflow-hidden border border-gray-700">

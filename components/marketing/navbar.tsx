@@ -46,7 +46,7 @@ export function MarketingNavbar() {
         bg-white/70 border-gray-200/60
         data-[tab=organizations]:bg-black/70 data-[tab=organizations]:border-white/10"
     >
-      <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-2 sm:gap-4">
         {/* Logo */}
         <Link
           href="/"
@@ -69,7 +69,7 @@ export function MarketingNavbar() {
               <button
                 key={t}
                 onClick={() => scrollTo(t)}
-                className="relative px-4 sm:px-5 py-1.5 text-sm font-medium rounded-full z-10"
+                className="relative px-2.5 sm:px-4 md:px-5 py-1.5 text-xs sm:text-sm font-medium rounded-full z-10 whitespace-nowrap"
               >
                 <span
                   className={`relative z-10 transition-colors duration-300 ${
@@ -107,7 +107,7 @@ export function MarketingNavbar() {
             </Link>
             <Link
               href="/signup"
-              className="bg-black text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-gray-800 transition-colors"
+              className="bg-black text-white text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 rounded-full hover:bg-gray-800 transition-colors whitespace-nowrap"
             >
               Get started
             </Link>
@@ -122,7 +122,7 @@ export function MarketingNavbar() {
             </Link>
             <Link
               href="/org"
-              className="bg-white text-black text-sm font-semibold px-4 py-2 rounded-full hover:bg-gray-200 transition-colors"
+              className="bg-white text-black text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 rounded-full hover:bg-gray-200 transition-colors whitespace-nowrap"
             >
               Learn more
             </Link>

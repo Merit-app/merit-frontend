@@ -57,7 +57,7 @@ export function OrgSection() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.1 }}
-        className="max-w-6xl mx-auto px-6 pt-32 pb-32"
+        className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 sm:pt-32 pb-24 sm:pb-32"
       >
         {/* Section hero */}
         <div className="text-center max-w-3xl mx-auto mb-20">

@@ -28,7 +28,7 @@ export function StudentSection() {
       variants={container}
       initial="hidden"
       animate="visible"
-      className="max-w-6xl mx-auto px-6 pt-20 pb-32"
+      className="max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-32"
     >
       {/* Hero */}
       <div className="text-center max-w-3xl mx-auto mb-20">

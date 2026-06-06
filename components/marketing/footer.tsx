@@ -3,7 +3,7 @@ import Link from 'next/link';
 export function MarketingFooter() {
   return (
     <footer className="border-t border-ink-200 bg-white">
-      <div className="max-w-3xl mx-auto px-8 py-8">
+      <div className="max-w-3xl mx-auto px-4 sm:px-8 py-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-[12px] text-ink-400">
           <span>
             merit<span className="text-merit-blue-600">.</span>

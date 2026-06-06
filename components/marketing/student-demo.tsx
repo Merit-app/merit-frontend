@@ -55,7 +55,7 @@ export function StudentDemo() {
       onMouseLeave={() => setPaused(false)}
     >
       {/* Step progress tabs */}
-      <div className="flex gap-1 mb-12 max-w-xl mx-auto">
+      <div className="flex gap-1 mb-10 md:mb-12 w-full max-w-xl mx-auto px-2 md:px-0">
         {STEPS.map((st, i) => (
           <button key={st.id} onClick={() => { setStep(i); progress.set(0); }} className="flex-1 py-2 text-left group">
             <p className={`text-[11px] font-semibold mb-2 transition-colors ${i === step ? 'text-gray-900' : 'text-gray-400 group-hover:text-gray-600'}`}>
@@ -73,7 +73,7 @@ export function StudentDemo() {
       </div>
 
       {/* Two phones */}
-      <div className="flex items-center justify-center gap-6 md:gap-10 lg:gap-16">
+      <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-10 lg:gap-16">
         {/* Student phone */}
         <div className="relative flex flex-col items-center">
           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Student</p>
@@ -96,8 +96,8 @@ export function StudentDemo() {
           <div className="w-px h-16 bg-gray-200" />
         </div>
 
-        {/* Supervisor phone */}
-        <div className="relative flex flex-col items-center">
+        {/* Supervisor phone — hidden on mobile, shown md+ */}
+        <div className="hidden md:flex flex-col items-center">
           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Supervisor</p>
           <Phone>
             <AnimatePresence mode="wait">
@@ -124,7 +124,7 @@ export function StudentDemo() {
 // ── Phone shell ───────────────────────────────────────────────────────────────
 function Phone({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative w-[230px] h-[480px] rounded-[3rem] shadow-2xl border overflow-hidden bg-gray-900 border-gray-800">
+    <div className="relative w-[200px] h-[420px] md:w-[230px] md:h-[480px] rounded-[3rem] shadow-2xl border overflow-hidden bg-gray-900 border-gray-800">
       <div className="absolute inset-[8px] rounded-[2.5rem] overflow-hidden bg-white">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-6 rounded-b-2xl z-30 bg-gray-900" />
         <div className="absolute top-2 left-6 right-6 flex items-center justify-between z-20">
