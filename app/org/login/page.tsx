@@ -5,14 +5,12 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { Loader2, Eye, EyeOff, User, ArrowRight } from 'lucide-react';
-import { useMeritStore } from '@/lib/store';
-import { orgAuthApi, mapUser, ApiError } from '@/lib/api';
+import { useOrgStore } from '@/lib/store';
+import { orgAuthApi, ApiError } from '@/lib/api';
 
 export default function OrgLoginPage() {
   const router = useRouter();
-  const login = useMeritStore((s) => s.login);
-  const setAdminOrgs = useMeritStore((s) => s.setAdminOrgs);
-  const setCurrentOrgId = useMeritStore((s) => s.setCurrentOrgId);
+  const orgLogin = useOrgStore((s) => s.orgLogin);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -28,23 +26,23 @@ export default function OrgLoginPage() {
       const res = await orgAuthApi.login(email, password);
       const { user: rawUser, orgs, defaultOrgId, accessToken, refreshToken, expiresAt } = res.data;
 
-      // Map raw user → typed User, store alongside tokens
-      login(mapUser(rawUser), {
+      // Normalise logo_url → logoUrl
+      const mappedOrgs = (orgs ?? []).map((o: any) => ({
+        id: o.id,
+        name: o.name,
+        slug: o.slug ?? o.id,
+        logoUrl: o.logo_url ?? undefined,
+        role: o.role as 'owner' | 'admin' | 'coordinator',
+      }));
+
+      orgLogin({
+        user: { id: rawUser.id, name: rawUser.name, email: rawUser.email, plan: rawUser.plan ?? 'free' },
+        orgs: mappedOrgs,
+        defaultOrgId: defaultOrgId ?? mappedOrgs[0]?.id ?? '',
         accessToken,
         refreshToken,
         expiresAt: expiresAt ?? Math.floor(Date.now() / 1000) + 3600,
       });
-
-      // Store org context — normalise logo_url → logoUrl
-      const mappedOrgs = (orgs ?? []).map((o: any) => ({
-        id: o.id,
-        name: o.name,
-        slug: o.slug,
-        logoUrl: o.logo_url ?? undefined,
-        role: o.role,
-      }));
-      setAdminOrgs(mappedOrgs);
-      setCurrentOrgId(defaultOrgId ?? mappedOrgs[0]?.id);
 
       toast.success('Welcome back!');
       router.push(`/org/${defaultOrgId ?? mappedOrgs[0]?.id}/dashboard`);

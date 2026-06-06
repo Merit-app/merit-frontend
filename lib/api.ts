@@ -4,7 +4,9 @@
 
 import type { User, Session, Organization } from './types';
 
-const BASE = (process.env.NEXT_PUBLIC_API_URL ?? '').replace(/\/$/, '');
+// .trim() guards against a stray trailing newline/space in the env var, which
+// would otherwise produce an invalid fetch URL ("could not reach server").
+const BASE = (process.env.NEXT_PUBLIC_API_URL ?? '').trim().replace(/\/+$/, '');
 
 export class ApiError extends Error {
   constructor(
@@ -24,6 +26,52 @@ function getStore() {
 }
 function getAccessToken(): string | null { return getStore().getState().accessToken ?? null; }
 function getRefreshToken(): string | null { return getStore().getState().refreshToken ?? null; }
+
+// ── Org-specific store accessors ──────────────────────────────────────────────
+function getOrgStore() {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { useOrgStore } = require('./store');
+  return useOrgStore;
+}
+function getOrgAccessToken(): string | null { return getOrgStore().getState().orgAccessToken ?? null; }
+function getOrgRefreshToken(): string | null { return getOrgStore().getState().orgRefreshToken ?? null; }
+
+/** Like request() but reads from useOrgStore. Used for all org-admin API calls. */
+async function orgRequest<T>(method: string, path: string, body?: unknown, isPublic = false): Promise<T> {
+  const token = isPublic ? null : getOrgAccessToken();
+  let res = await makeRequest(method, path, body, token);
+
+  if (res.status === 401 && !isPublic) {
+    const refreshToken = getOrgRefreshToken();
+    if (refreshToken) {
+      try {
+        const refreshRes = await makeRequest('POST', '/auth/refresh', { refreshToken }, null);
+        if (refreshRes.ok) {
+          const d = await refreshRes.json();
+          const s = d?.data;
+          if (s?.accessToken) {
+            getOrgStore().getState().setOrgTokens(s.accessToken, s.refreshToken, s.expiresAt);
+            res = await makeRequest(method, path, body, s.accessToken);
+          }
+        } else {
+          getOrgStore().getState().orgLogout();
+          throw new ApiError(401, 'session_expired', 'Your session has expired. Please sign in again.');
+        }
+      } catch (e) {
+        if (e instanceof ApiError) throw e;
+        getOrgStore().getState().orgLogout();
+        throw new ApiError(401, 'session_expired', 'Session error. Please sign in again.');
+      }
+    }
+  }
+
+  if (!res.ok) {
+    let payload: any = {};
+    try { payload = await res.json(); } catch { /* ignore */ }
+    throw new ApiError(res.status, payload?.code, payload?.message ?? res.statusText);
+  }
+  return res.json() as Promise<T>;
+}
 
 async function makeRequest(method: string, path: string, body?: unknown, token?: string | null): Promise<Response> {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
@@ -218,29 +266,30 @@ export const orgsApi = {
 
   adminMine: () => request<{ data: any[] }>('GET', '/organizations/admin/mine'),
 
-  dashboard: (orgId: string) => request<{ data: any }>('GET', `/organizations/${orgId}/dashboard`),
+  // Org-admin-only endpoints — use orgRequest so they work with the persisted org token
+  dashboard: (orgId: string) => orgRequest<{ data: any }>('GET', `/organizations/${orgId}/dashboard`),
 
   updateOrg: (orgId: string, body: {
     description?: string; websiteUrl?: string;
     contactEmail?: string; contactPhone?: string; isRecruiting?: boolean;
-  }) => request<{ data: { updated: boolean } }>('PATCH', `/organizations/${orgId}`, body),
+  }) => orgRequest<{ data: { updated: boolean } }>('PATCH', `/organizations/${orgId}`, body),
 
-  volunteers: (orgId: string) => request<{ data: { volunteers: any[] } }>('GET', `/organizations/${orgId}/volunteers`),
+  volunteers: (orgId: string) => orgRequest<{ data: { volunteers: any[] } }>('GET', `/organizations/${orgId}/volunteers`),
 
   verifySession: (orgId: string, sessionId: string) =>
-    request<{ data: { verified: boolean } }>('POST', `/organizations/${orgId}/sessions/${sessionId}/verify`, {}),
+    orgRequest<{ data: { verified: boolean } }>('POST', `/organizations/${orgId}/sessions/${sessionId}/verify`, {}),
 
   disputeSession: (orgId: string, sessionId: string) =>
-    request<{ data: { disputed: boolean } }>('POST', `/organizations/${orgId}/sessions/${sessionId}/dispute`, {}),
+    orgRequest<{ data: { disputed: boolean } }>('POST', `/organizations/${orgId}/sessions/${sessionId}/dispute`, {}),
 
   inviteTeamMember: (orgId: string, email: string, role: 'coordinator' | 'admin') =>
-    request<{ data: { added: boolean; name: string; role: string } }>('POST', `/organizations/${orgId}/team/invite`, { email, role }),
+    orgRequest<{ data: { added: boolean; name: string; role: string } }>('POST', `/organizations/${orgId}/team/invite`, { email, role }),
 
   removeTeamMember: (orgId: string, userId: string) =>
-    request<{ data: { removed: boolean } }>('DELETE', `/organizations/${orgId}/team/${userId}`),
+    orgRequest<{ data: { removed: boolean } }>('DELETE', `/organizations/${orgId}/team/${userId}`),
 
   exportCSV: (orgId: string): Promise<Blob> => {
-    const token = getAccessToken();
+    const token = getOrgAccessToken();
     return fetch(`${BASE}/organizations/${orgId}/export`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     }).then((r) => r.blob());
@@ -301,13 +350,13 @@ export const onboardingApi = {
 
 export const orgBillingApi = {
   get: (orgId: string) =>
-    request<{ data: { plan: string; status: string; currentPeriodEnd: string | null; cancelAtPeriodEnd: boolean } }>(
+    orgRequest<{ data: { plan: string; status: string; currentPeriodEnd: string | null; cancelAtPeriodEnd: boolean } }>(
       'GET', `/org/${orgId}/billing`,
     ),
   createCheckout: (orgId: string, plan: 'pro' | 'enterprise', interval: 'monthly' | 'yearly') =>
-    request<{ data: { url: string } }>('POST', `/org/${orgId}/billing/checkout`, { plan, interval }),
+    orgRequest<{ data: { url: string } }>('POST', `/org/${orgId}/billing/checkout`, { plan, interval }),
   openPortal: (orgId: string) =>
-    request<{ data: { url: string } }>('POST', `/org/${orgId}/billing/portal`, {}),
+    orgRequest<{ data: { url: string } }>('POST', `/org/${orgId}/billing/portal`, {}),
 };
 
 // ─── Org Profile API ─────────────────────────────────────────────────────────
@@ -320,10 +369,10 @@ export const orgProfileApi = {
     contact_email?: string;
     contact_phone?: string;
     is_recruiting?: boolean;
-  }) => request<{ data: any }>('PATCH', `/organizations/${orgId}/profile`, data),
+  }) => orgRequest<{ data: any }>('PATCH', `/organizations/${orgId}/profile`, data),
 
   uploadImage: (orgId: string, kind: 'logo' | 'cover', base64: string, mimeType: string) =>
-    request<{ data: { url: string } }>('POST', `/organizations/${orgId}/logo?type=${kind}`, {
+    orgRequest<{ data: { url: string } }>('POST', `/organizations/${orgId}/logo?type=${kind}`, {
       base64,
       mimeType,
     }),
@@ -442,28 +491,28 @@ export const orgEventsApi = {
     if (params?.status) qs.set('status', params.status);
     if (params?.upcoming != null) qs.set('upcoming', String(params.upcoming));
     const suffix = qs.toString() ? `?${qs}` : '';
-    return request<{ data: any[] }>('GET', `/org/${orgId}/events${suffix}`);
+    return orgRequest<{ data: any[] }>('GET', `/org/${orgId}/events${suffix}`);
   },
   create: (orgId: string, data: {
     title: string; description?: string; location?: string; locationUrl?: string;
     program?: string; startTime: string; endTime: string;
     maxVolunteers?: number; hoursValue?: number; autoLogHours?: boolean;
-  }) => request<{ data: any }>('POST', `/org/${orgId}/events`, data),
+  }) => orgRequest<{ data: any }>('POST', `/org/${orgId}/events`, data),
   get: (orgId: string, eventId: string) =>
-    request<{ data: any }>('GET', `/org/${orgId}/events/${eventId}`),
+    orgRequest<{ data: any }>('GET', `/org/${orgId}/events/${eventId}`),
   publish: (orgId: string, eventId: string) =>
-    request<{ data: any }>('POST', `/org/${orgId}/events/${eventId}/publish`, {}),
+    orgRequest<{ data: any }>('POST', `/org/${orgId}/events/${eventId}/publish`, {}),
   checkIn: (orgId: string, eventId: string, userId: string) =>
-    request<{ data: any }>('POST', `/org/${orgId}/events/${eventId}/checkin/${userId}`, {}),
+    orgRequest<{ data: any }>('POST', `/org/${orgId}/events/${eventId}/checkin/${userId}`, {}),
   complete: (orgId: string, eventId: string) =>
-    request<{ data: any }>('POST', `/org/${orgId}/events/${eventId}/complete`, {}),
+    orgRequest<{ data: any }>('POST', `/org/${orgId}/events/${eventId}/complete`, {}),
   signup: (orgId: string, eventId: string) =>
-    request<{ data: any }>('POST', `/org/${orgId}/events/${eventId}/signup`, {}),
+    orgRequest<{ data: any }>('POST', `/org/${orgId}/events/${eventId}/signup`, {}),
 };
 
 export const orgReportsApi = {
   grantReport: (orgId: string, from: string, to: string): Promise<Blob> => {
-    const token = getAccessToken();
+    const token = getOrgAccessToken();
     return fetch(`${BASE}/org/${orgId}/reports/grant?from=${from}&to=${to}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     }).then((r) => {
@@ -472,9 +521,9 @@ export const orgReportsApi = {
     });
   },
   impact: (orgId: string) =>
-    request<{ data: any }>('GET', `/org/${orgId}/reports/impact`),
+    orgRequest<{ data: any }>('GET', `/org/${orgId}/reports/impact`),
   certificate: (orgId: string, userId: string, coordinatorName: string): Promise<Blob> => {
-    const token = getAccessToken();
+    const token = getOrgAccessToken();
     return fetch(`${BASE}/org/${orgId}/certificates`, {
       method: 'POST',
       headers: {
@@ -491,29 +540,30 @@ export const orgReportsApi = {
 
 export const orgMessagesApi = {
   send: (orgId: string, data: { message: string; filter: 'all' | 'event' | 'active_30d' | 'active_90d'; eventId?: string }) =>
-    request<{ data: { sent: number; failed: number } }>('POST', `/org/${orgId}/messages`, data),
+    orgRequest<{ data: { sent: number; failed: number } }>('POST', `/org/${orgId}/messages`, data),
   history: (orgId: string) =>
-    request<{ data: any[] }>('GET', `/org/${orgId}/messages`),
+    orgRequest<{ data: any[] }>('GET', `/org/${orgId}/messages`),
 };
 
 export const orgInvitesApi = {
   create: (orgId: string, email: string, role: 'coordinator' | 'admin') =>
-    request<{ data: any }>('POST', `/org/${orgId}/invites`, { email, role }),
+    orgRequest<{ data: any }>('POST', `/org/${orgId}/invites`, { email, role }),
   getByToken: (token: string) =>
     request<{ data: any }>('GET', `/org/invites/${token}`, undefined, true),
   accept: (token: string) =>
+    // accept uses the STUDENT token because the invitee may not yet be in the org store
     request<{ data: any }>('POST', `/org/invites/${token}/accept`, {}),
 };
 
 export const orgVolunteersApi = {
   list: (orgId: string) =>
-    request<{ data: any[] }>('GET', `/organizations/${orgId}/volunteers`),
+    orgRequest<{ data: any[] }>('GET', `/organizations/${orgId}/volunteers`),
   verify: (orgId: string, sessionId: string) =>
-    request<{ data: any }>('POST', `/organizations/${orgId}/sessions/${sessionId}/verify`, {}),
+    orgRequest<{ data: any }>('POST', `/organizations/${orgId}/sessions/${sessionId}/verify`, {}),
   dispute: (orgId: string, sessionId: string) =>
-    request<{ data: any }>('POST', `/organizations/${orgId}/sessions/${sessionId}/dispute`, {}),
+    orgRequest<{ data: any }>('POST', `/organizations/${orgId}/sessions/${sessionId}/dispute`, {}),
   export: (orgId: string): Promise<Blob> => {
-    const token = getAccessToken();
+    const token = getOrgAccessToken();
     return fetch(`${BASE}/organizations/${orgId}/export`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     }).then((r) => r.blob());
@@ -522,11 +572,11 @@ export const orgVolunteersApi = {
 
 export const orgOnboardingApi = {
   check: (orgId: string) =>
-    request<{ data: { onboarding_completed: boolean; onboarding_completed_at: string | null } }>(
+    orgRequest<{ data: { onboarding_completed: boolean; onboarding_completed_at: string | null } }>(
       'GET', `/org/${orgId}/onboarding`,
     ),
   complete: (orgId: string) =>
-    request<{ data: { completed: boolean } }>('POST', `/org/${orgId}/onboarding/complete`, {}),
+    orgRequest<{ data: { completed: boolean } }>('POST', `/org/${orgId}/onboarding/complete`, {}),
 };
 
 export const orgSignupApi = {

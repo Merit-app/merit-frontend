@@ -140,6 +140,42 @@ export interface OrgSummary {
   role: 'owner' | 'admin' | 'coordinator';
 }
 
+export interface OrgUser {
+  id: string;
+  name: string;
+  email: string;
+  plan: string;
+}
+
+/** Separate persisted store for org-admin auth. Lives at localStorage key 'merit-org-auth'. */
+export interface OrgStore {
+  // Auth — persisted so page refresh keeps the org session alive
+  orgIsAuthed: boolean;
+  orgAccessToken: string | null;
+  orgRefreshToken: string | null;
+  orgExpiresAt: number | null; // Unix seconds
+  orgUser: OrgUser | null;
+
+  // Org context — also persisted
+  currentOrgId: string | null;
+  adminOrgs: OrgSummary[];
+
+  // Actions
+  orgLogin: (params: {
+    user: OrgUser;
+    orgs: OrgSummary[];
+    defaultOrgId: string;
+    accessToken: string;
+    refreshToken: string;
+    expiresAt: number;
+  }) => void;
+  orgLogout: () => void;
+  setOrgTokens: (accessToken: string, refreshToken: string, expiresAt: number) => void;
+  setCurrentOrgId: (id: string | null) => void;
+  setAdminOrgs: (orgs: OrgSummary[]) => void;
+  clearOrgState: () => void;
+}
+
 // ─── Store shape ─────────────────────────────────────────────────────────────
 
 export interface MeritStore {

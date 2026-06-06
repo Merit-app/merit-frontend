@@ -1,8 +1,6 @@
-import Link from 'next/link';
 import type { OrgStats } from '@/lib/types';
 
 interface Props {
-  orgId: string;
   stats: OrgStats | null;
   loading?: boolean;
 }
@@ -16,7 +14,7 @@ function Stat({ label, value }: { label: string; value: string }) {
   );
 }
 
-export function OrgCommunityCard({ orgId, stats, loading }: Props) {
+export function OrgCommunityCard({ stats, loading }: Props) {
   if (loading) {
     return (
       <div className="bg-white rounded-xl border border-ink-200 p-5">
@@ -38,10 +36,7 @@ export function OrgCommunityCard({ orgId, stats, loading }: Props) {
       <div className="bg-white rounded-xl border border-ink-200 p-5">
         <h2 className="text-[15px] font-semibold text-ink-900 mb-3">Merit Community</h2>
         <p className="text-sm text-ink-500">
-          Be the first Merit student to volunteer here.{' '}
-          <Link href={`/log?org=${orgId}`} className="text-merit-blue-600 hover:underline font-medium">
-            Log a session to get started.
-          </Link>
+          No volunteer sessions logged yet. Be the first!
         </p>
       </div>
     );

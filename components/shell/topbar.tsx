@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { useMeritStore } from '@/lib/store';
 import { useCommandPalette } from '@/hooks/use-command-palette';
 import { UserMenu } from './user-menu';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 const PAGE_TITLES: Record<string, string> = {
   '/dashboard': 'Dashboard',
@@ -88,6 +89,9 @@ export function Topbar() {
             <span className="hidden sm:inline">Search</span>
             <kbd className="hidden sm:inline ml-1 text-[11px] text-ink-400 font-medium bg-ink-100 px-1 rounded">⌘K</kbd>
           </button>
+
+          {/* Theme toggle */}
+          <ThemeToggle variant="topbar" />
 
           {/* Notifications */}
           <button

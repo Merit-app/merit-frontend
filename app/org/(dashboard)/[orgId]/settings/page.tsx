@@ -8,6 +8,7 @@ import {
   orgsApi, orgProfileApi, orgInvitesApi, orgBillingApi,
   authApi, usersApi, mapUser, ApiError,
 } from '@/lib/api';
+import { useOrgStore } from '@/lib/store';
 import { toast } from 'sonner';
 import {
   Building2, Users, CreditCard, Lock, Loader2,
@@ -32,7 +33,12 @@ const INPUT_CLASS =
 function OrgSettingsInner() {
   const { orgId } = useParams<{ orgId: string }>();
   const searchParams = useSearchParams();
+  // Use the org store for role — accurate and independent of student auth
+  const orgUser = useOrgStore((s) => s.orgUser);
   const currentUser = useMeritStore((s) => s.user);
+  const orgAdminOrgs = useOrgStore((s) => s.adminOrgs);
+  // Role from org store (set at org login) — fallback if the API call fails
+  const storeRole = orgAdminOrgs.find((o) => o.id === orgId)?.role;
 
   const [activeTab, setActiveTab] = useState<Tab>(() => {
     const t = searchParams.get('tab') as Tab | null;
@@ -56,7 +62,7 @@ function OrgSettingsInner() {
       return {
         org: d?.org ?? null,
         admins: (d?.admins ?? []) as any[],
-        userRole: (d?.userRole ?? 'coordinator') as Role,
+        userRole: (d?.userRole ?? null) as Role | null,
       };
     },
     retry: 2,
@@ -65,7 +71,8 @@ function OrgSettingsInner() {
 
   const org = orgData?.org ?? null;
   const admins = orgData?.admins ?? [];
-  const userRole = orgData?.userRole ?? 'coordinator';
+  // Prefer fresh API role; fall back to login-time store role; last resort: coordinator
+  const userRole = (orgData?.userRole ?? storeRole ?? 'coordinator') as Role;
   const canEdit = ROLE_RANK[userRole] >= ROLE_RANK['admin'];
 
   const TABS: { id: Tab; label: string; icon: React.ElementType }[] = [
@@ -125,7 +132,7 @@ function OrgSettingsInner() {
           <OrganizationTab orgId={orgId} org={org} canEdit={canEdit} />
         )}
         {activeTab === 'team' && (
-          <TeamTab orgId={orgId} admins={admins} userRole={userRole} currentUserId={currentUser?.id} />
+          <TeamTab orgId={orgId} admins={admins} userRole={userRole} currentUserId={orgUser?.id ?? currentUser?.id} />
         )}
         {activeTab === 'account' && <AccountTab />}
         {activeTab === 'password' && <PasswordTab />}

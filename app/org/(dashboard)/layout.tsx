@@ -4,8 +4,9 @@ import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
-import { useMeritStore, useHydrationStore } from '@/lib/store';
+import { useOrgStore, useHydrationStore } from '@/lib/store';
 import { authApi, orgOnboardingApi, orgBillingApi } from '@/lib/api';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { OrgOnboardingModal } from '@/components/org/onboarding-modal';
 import {
   LayoutDashboard,
@@ -36,31 +37,37 @@ export default function OrgDashboardLayout({ children }: { children: React.React
   const router = useRouter();
   const pathname = usePathname();
   const hydrated = useHydrationStore((s) => s.hydrated);
-  const user = useMeritStore((s) => s.user);
-  const isAuthed = useMeritStore((s) => s.isAuthed);
-  const adminOrgs = useMeritStore((s) => s.adminOrgs);
-  const currentOrgId = useMeritStore((s) => s.currentOrgId);
-  const setCurrentOrgId = useMeritStore((s) => s.setCurrentOrgId);
-  const clearOrgState = useMeritStore((s) => s.clearOrgState);
-  const logout = useMeritStore((s) => s.logout);
+  const orgUser = useOrgStore((s) => s.orgUser);
+  const orgIsAuthed = useOrgStore((s) => s.orgIsAuthed);
+  const orgAccessToken = useOrgStore((s) => s.orgAccessToken);
+  const orgExpiresAt = useOrgStore((s) => s.orgExpiresAt);
+  const adminOrgs = useOrgStore((s) => s.adminOrgs);
+  const currentOrgId = useOrgStore((s) => s.currentOrgId);
+  const setCurrentOrgId = useOrgStore((s) => s.setCurrentOrgId);
+  const orgLogout = useOrgStore((s) => s.orgLogout);
 
   const [showOrgPicker, setShowOrgPicker] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardingChecked, setOnboardingChecked] = useState(false);
+
+  // The org token is persisted to localStorage (unlike student token).
+  // A token is valid if it exists and hasn't expired.
+  const isOrgTokenValid = orgIsAuthed && orgAccessToken != null && orgExpiresAt != null && orgExpiresAt * 1000 > Date.now();
 
   const currentOrg = adminOrgs.find((o) => o.id === currentOrgId) ?? adminOrgs[0];
 
   // ── Auth guard ──────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!hydrated) return;
-    if (!isAuthed || !adminOrgs.length) {
+    if (!orgIsAuthed || !isOrgTokenValid || !adminOrgs.length) {
+      orgLogout();
       router.push('/org/login');
     }
-  }, [hydrated, isAuthed, adminOrgs.length]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [hydrated, orgIsAuthed, isOrgTokenValid, adminOrgs.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Onboarding check — robust version ──────────────────────────────────────
   useEffect(() => {
-    if (!currentOrg?.id || onboardingChecked || !isAuthed) return;
+    if (!currentOrg?.id || onboardingChecked || !orgIsAuthed) return;
 
     const check = async () => {
       try {
@@ -78,7 +85,7 @@ export default function OrgDashboardLayout({ children }: { children: React.React
     };
 
     check();
-  }, [currentOrg?.id, onboardingChecked, isAuthed]);
+  }, [currentOrg?.id, onboardingChecked, orgIsAuthed]);
 
   // Reset check when org changes
   useEffect(() => {
@@ -90,7 +97,7 @@ export default function OrgDashboardLayout({ children }: { children: React.React
   const { data: billingRes } = useQuery({
     queryKey: ['org-billing-plan', currentOrg?.id],
     queryFn: () => orgBillingApi.get(currentOrg!.id),
-    enabled: !!currentOrg?.id && isAuthed,
+    enabled: !!currentOrg?.id && orgIsAuthed,
     staleTime: 5 * 60 * 1000,
     retry: false,
   });
@@ -99,13 +106,12 @@ export default function OrgDashboardLayout({ children }: { children: React.React
 
   const handleLogout = async () => {
     try { await authApi.logout(); } catch { /* non-fatal */ }
-    logout();
-    clearOrgState();
+    orgLogout();
     router.push('/org/login');
   };
 
   if (!hydrated) return null;
-  if (!isAuthed || !adminOrgs.length) return null;
+  if (!orgIsAuthed || !isOrgTokenValid || !adminOrgs.length) return null;
   if (!currentOrg) return null;
 
   const orgBase = `/org/${currentOrg.id}`;
@@ -206,6 +212,9 @@ export default function OrgDashboardLayout({ children }: { children: React.React
             </div>
           )}
 
+          {/* Theme toggle */}
+          <ThemeToggle variant="sidebar" />
+
           {/* Settings — pinned to bottom */}
           <Link
             href={`${orgBase}/settings`}
@@ -248,13 +257,13 @@ export default function OrgDashboardLayout({ children }: { children: React.React
           {/* User row */}
           <div className="flex items-center gap-3 px-3 py-2.5 mt-1 border-t border-gray-800">
             <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-xs font-bold text-white shrink-0">
-              {user?.firstName?.[0] ?? '?'}
+              {orgUser?.name?.[0] ?? '?'}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-white text-xs font-medium truncate">
-                {user?.firstName} {user?.lastName}
+                {orgUser?.name}
               </p>
-              <p className="text-gray-600 text-[10px] truncate">{user?.email}</p>
+              <p className="text-gray-600 text-[10px] truncate">{orgUser?.email}</p>
             </div>
           </div>
         </div>

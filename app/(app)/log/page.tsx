@@ -333,8 +333,8 @@ export default function LogPage() {
                       <Calendar
                         mode="single"
                         selected={field.value ? new Date(field.value + 'T00:00:00') : undefined}
-                        onSelect={(d) => { if (d) { field.onChange(format(d, 'yyyy-MM-dd')); setCalOpen(false); } }}
-                        disabled={(d) => d > new Date()}
+                        onSelect={(d: Date | undefined) => { if (d) { field.onChange(format(d, 'yyyy-MM-dd')); setCalOpen(false); } }}
+                        disabled={(d: Date) => d > new Date()}
                       />
                     </PopoverContent>
                   </Popover>
@@ -362,8 +362,8 @@ export default function LogPage() {
                       <Calendar
                         mode="single"
                         selected={field.value ? new Date(field.value + 'T00:00:00') : undefined}
-                        onSelect={(d) => { if (d) { field.onChange(format(d, 'yyyy-MM-dd')); setCalOpen(false); } }}
-                        disabled={(d) => d > new Date()}
+                        onSelect={(d: Date | undefined) => { if (d) { field.onChange(format(d, 'yyyy-MM-dd')); setCalOpen(false); } }}
+                        disabled={(d: Date) => d > new Date()}
                       />
                     </PopoverContent>
                   </Popover>

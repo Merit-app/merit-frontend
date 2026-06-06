@@ -5,8 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { Loader2, Eye, EyeOff, Building2, CheckCircle2 } from 'lucide-react';
-import { useMeritStore } from '@/lib/store';
-import { orgSignupApi, mapUser, ApiError } from '@/lib/api';
+import { useOrgStore } from '@/lib/store';
+import { orgSignupApi, ApiError } from '@/lib/api';
 
 const inputClass =
   'w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-3 text-sm placeholder-gray-600 focus:outline-none focus:border-white transition-colors';
@@ -19,9 +19,7 @@ function SetupForm() {
   const orgName = searchParams.get('orgName');
   const inviteToken = searchParams.get('token');
 
-  const login = useMeritStore((s) => s.login);
-  const setAdminOrgs = useMeritStore((s) => s.setAdminOrgs);
-  const setCurrentOrgId = useMeritStore((s) => s.setCurrentOrgId);
+  const orgLogin = useOrgStore((s) => s.orgLogin);
 
   const [step, setStep] = useState<'account' | 'done'>('account');
   const [isLoading, setIsLoading] = useState(false);
@@ -57,22 +55,20 @@ function SetupForm() {
 
       const { user: rawUser, org, accessToken, refreshToken, expiresAt } = res.data;
 
-      // Store tokens + user
-      login(mapUser(rawUser), {
+      orgLogin({
+        user: { id: rawUser.id, name: rawUser.name, email: rawUser.email, plan: rawUser.plan ?? 'free' },
+        orgs: [{
+          id: org.id,
+          name: org.name,
+          slug: org.slug ?? org.id,
+          logoUrl: undefined,
+          role: org.role as 'owner' | 'admin' | 'coordinator',
+        }],
+        defaultOrgId: org.id,
         accessToken: accessToken ?? '',
         refreshToken: refreshToken ?? '',
         expiresAt: expiresAt ?? Math.floor(Date.now() / 1000) + 3600,
       });
-
-      // Store org context
-      setAdminOrgs([{
-        id: org.id,
-        name: org.name,
-        slug: org.slug ?? org.id,
-        logoUrl: undefined,
-        role: org.role as 'owner' | 'admin' | 'coordinator',
-      }]);
-      setCurrentOrgId(org.id);
 
       setStep('done');
       setTimeout(() => router.push(`/org/${org.id}/dashboard`), 1500);

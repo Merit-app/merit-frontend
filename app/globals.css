@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* ─── Dark mode — class-based via next-themes ──────────────────────────────── */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* ─── Merit Design Tokens ─────────────────────────────────────────────────── */
 
 @theme {

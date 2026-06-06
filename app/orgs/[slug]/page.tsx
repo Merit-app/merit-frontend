@@ -9,7 +9,7 @@ import { ClaimButton } from '@/components/orgs/claim-button';
 import { VolunteerInterestButton } from '@/components/orgs/volunteer-interest-button';
 import type { OrgStats, SimilarOrg } from '@/lib/types';
 
-const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? '').replace(/\/$/, '');
+const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? '').trim().replace(/\/+$/, '');
 
 async function fetchOrg(slug: string) {
   const res = await fetch(`${API_URL}/orgs/${encodeURIComponent(slug)}`, { next: { revalidate: 300 } });
@@ -105,7 +105,6 @@ export default async function PublicOrgPage({ params }: { params: Promise<{ slug
         />
 
         <OrgCommunityCard
-          orgId={org.id}
           stats={stats}
           loading={false}
         />

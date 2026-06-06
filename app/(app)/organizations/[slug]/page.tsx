@@ -3,13 +3,14 @@
 import { use, useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Plus, Bookmark } from 'lucide-react';
+import { Bookmark } from 'lucide-react';
 import { OrgCoverHeader } from '@/components/org-profile/cover-header';
 import { OrgAboutCard } from '@/components/org-profile/about-card';
 import { OrgCommunityCard } from '@/components/org-profile/community-card';
 import { OrgVolunteersCard } from '@/components/org-profile/volunteers-card';
 import { OrgSimilarCard } from '@/components/org-profile/similar-orgs-card';
 import { ClaimOrgModal } from '@/components/orgs/claim-org-modal';
+import { VolunteerInterestButton } from '@/components/orgs/volunteer-interest-button';
 import { useMeritStore } from '@/lib/store';
 import { orgsApi, orgClaimsApi, ApiError } from '@/lib/api';
 import { cn } from '@/lib/utils';
@@ -117,8 +118,6 @@ export default function AppOrgProfilePage({ params }: { params: Promise<{ slug: 
 
   if (!org) return null;
 
-  const orgSlugForLog = org.slug ?? org.id;
-
   return (
     <div className="px-4 py-6 md:px-8 max-w-4xl mx-auto space-y-4">
       {/* Breadcrumb */}
@@ -162,14 +161,12 @@ export default function AppOrgProfilePage({ params }: { params: Promise<{ slug: 
               </span>
             </button>
 
-            {/* Volunteer CTA */}
-            <Link
-              href={`/log?org=${orgSlugForLog}`}
-              className="h-8 px-3 rounded-lg bg-merit-blue-600 hover:bg-merit-blue-700 flex items-center gap-1.5 text-[12px] font-medium text-white transition-colors shadow-sm"
-            >
-              <Plus size={13} />
-              I volunteer here
-            </Link>
+            {/* Volunteer interest toggle — no log-hours redirect */}
+            <VolunteerInterestButton
+              orgId={org.id}
+              orgName={org.name}
+              orgSlug={org.slug ?? org.id}
+            />
           </>
         }
       />
@@ -185,7 +182,6 @@ export default function AppOrgProfilePage({ params }: { params: Promise<{ slug: 
 
       {/* Community Stats */}
       <OrgCommunityCard
-        orgId={org.id}
         stats={stats}
         loading={!stats && loading}
       />
