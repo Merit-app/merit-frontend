@@ -72,7 +72,15 @@ export default function ResetPasswordPage() {
     setServerError(null);
     try {
       await authApi.resetPassword(token, data.newPassword);
-      router.replace('/login?message=password-updated');
+      // If this reset began on the org side, return the user to the org login.
+      let dest = '/login?message=password-updated';
+      try {
+        if (localStorage.getItem('merit-reset-context') === 'org') {
+          dest = '/org/login?message=password-updated';
+        }
+        localStorage.removeItem('merit-reset-context');
+      } catch { /* ignore */ }
+      router.replace(dest);
     } catch (err) {
       if (err instanceof ApiError) {
         if (err.status === 400) {

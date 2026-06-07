@@ -17,6 +17,10 @@ export default function OrgForgotPasswordPage() {
     setLoading(true);
     setServerError(null);
     try {
+      // Remember this reset began on the org side so the reset page can send the
+      // user back to /org/login afterward (survives the email-link navigation in
+      // the same browser; harmlessly falls back to student login otherwise).
+      try { localStorage.setItem('merit-reset-context', 'org'); } catch { /* ignore */ }
       await authApi.requestPasswordReset(email.trim());
       setSent(true);
     } catch (err) {
