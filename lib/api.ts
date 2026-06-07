@@ -288,6 +288,9 @@ export const orgsApi = {
   removeTeamMember: (orgId: string, userId: string) =>
     orgRequest<{ data: { removed: boolean } }>('DELETE', `/organizations/${orgId}/team/${userId}`),
 
+  deleteOrg: (orgId: string) =>
+    orgRequest<{ data: { deleted: boolean } }>('DELETE', `/organizations/${orgId}`),
+
   exportCSV: (orgId: string): Promise<Blob> => {
     const token = getOrgAccessToken();
     return fetch(`${BASE}/organizations/${orgId}/export`, {

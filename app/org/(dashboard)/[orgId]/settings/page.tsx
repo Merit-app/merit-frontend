@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, Suspense } from 'react';
-import { useParams, useSearchParams } from 'next/navigation';
+import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMeritStore } from '@/lib/store';
 import {
@@ -14,7 +14,7 @@ import {
   Building2, Users, CreditCard, Lock, Loader2,
   Eye, EyeOff, X, UserPlus, Crown, Shield,
   User as UserIcon, Check, Camera, AlertCircle,
-  ExternalLink,
+  ExternalLink, Trash2,
 } from 'lucide-react';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -129,7 +129,7 @@ function OrgSettingsInner() {
       {/* Tab content */}
       <div>
         {activeTab === 'organization' && (
-          <OrganizationTab orgId={orgId} org={org} canEdit={canEdit} />
+          <OrganizationTab orgId={orgId} org={org} canEdit={canEdit} isOwner={userRole === 'owner'} />
         )}
         {activeTab === 'team' && (
           <TeamTab orgId={orgId} admins={admins} userRole={userRole} currentUserId={orgUser?.id ?? currentUser?.id} />
@@ -153,7 +153,7 @@ export default function OrgSettingsPage() {
 }
 
 // ── ORGANIZATION TAB ──────────────────────────────────────────────────────────
-function OrganizationTab({ orgId, org, canEdit }: { orgId: string; org: any; canEdit: boolean }) {
+function OrganizationTab({ orgId, org, canEdit, isOwner }: { orgId: string; org: any; canEdit: boolean; isOwner: boolean }) {
   const qc = useQueryClient();
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -329,7 +329,105 @@ function OrganizationTab({ orgId, org, canEdit }: { orgId: string; org: any; can
         </div>
         <ExternalLink className="w-4 h-4 text-gray-500 group-hover:text-white transition-colors" />
       </a>
+
+      {/* Danger Zone — owner only */}
+      {isOwner && <DangerZone orgId={orgId} orgName={org.name ?? 'this organization'} />}
     </div>
+  );
+}
+
+// ── DANGER ZONE (delete org — owner only) ─────────────────────────────────────
+function DangerZone({ orgId, orgName }: { orgId: string; orgName: string }) {
+  const router = useRouter();
+  const orgLogout = useOrgStore((s) => s.orgLogout);
+  const [open, setOpen] = useState(false);
+  const [confirmText, setConfirmText] = useState('');
+  const [deleting, setDeleting] = useState(false);
+
+  const canDelete = confirmText.trim() === orgName.trim();
+
+  const handleDelete = async () => {
+    if (!canDelete) return;
+    setDeleting(true);
+    try {
+      await orgsApi.deleteOrg(orgId);
+      toast.success('Organization deleted');
+      orgLogout();
+      router.push('/org/login');
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : 'Failed to delete organization');
+      setDeleting(false);
+    }
+  };
+
+  return (
+    <>
+      <div className="bg-red-500/5 border border-red-500/20 rounded-2xl p-5">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div>
+            <h3 className="text-red-400 font-semibold text-sm">Delete organization</h3>
+            <p className="text-gray-500 text-xs mt-1 max-w-md">
+              Permanently delete <span className="text-gray-300">{orgName}</span> and all its data —
+              events, messages, team, and reports. Volunteers&apos; logged hours are kept but unlinked.
+              This cannot be undone.
+            </p>
+          </div>
+          <button
+            onClick={() => { setOpen(true); setConfirmText(''); }}
+            className="shrink-0 flex items-center gap-2 text-sm font-medium text-red-400 border border-red-500/30 hover:bg-red-500/10 px-4 py-2 rounded-xl transition-colors"
+          >
+            <Trash2 className="w-4 h-4" />
+            Delete organization
+          </button>
+        </div>
+      </div>
+
+      {open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => !deleting && setOpen(false)}>
+          <div className="w-full max-w-md bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-4" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center shrink-0">
+                <AlertCircle className="w-5 h-5 text-red-400" />
+              </div>
+              <h3 className="text-white font-bold">Delete {orgName}?</h3>
+            </div>
+            <p className="text-gray-400 text-sm">
+              This permanently deletes the organization and all its data. This action
+              <span className="text-red-400 font-medium"> cannot be undone</span>.
+            </p>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1.5">
+                Type <span className="text-gray-300 font-medium">{orgName}</span> to confirm
+              </label>
+              <input
+                value={confirmText}
+                onChange={(e) => setConfirmText(e.target.value)}
+                placeholder={orgName}
+                autoFocus
+                className="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-2.5 text-sm placeholder-gray-600 focus:outline-none focus:border-red-500/50"
+              />
+            </div>
+            <div className="flex gap-3 justify-end pt-2">
+              <button
+                onClick={() => setOpen(false)}
+                disabled={deleting}
+                className="px-4 py-2 rounded-xl text-sm text-gray-400 hover:text-white border border-gray-700 transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={!canDelete || deleting}
+                className="px-4 py-2 rounded-xl text-sm font-semibold bg-red-600 text-white hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+              >
+                {deleting && <Loader2 className="w-4 h-4 animate-spin" />}
+                {deleting ? 'Deleting...' : 'Delete forever'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
