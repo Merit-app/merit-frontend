@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { useMeritStore, useHydrationStore } from '@/lib/store';
-import { authApi, orgOnboardingApi, orgBillingApi } from '@/lib/api';
+import { authApi, orgOnboardingApi, orgBillingApi, orgsApi } from '@/lib/api';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { OrgOnboardingModal } from '@/components/org/onboarding-modal';
 import {
@@ -54,6 +54,7 @@ export default function OrgDashboardLayout({ children }: { children: React.React
   // they can move between student and org dashboards with no second login.
   const isTokenValid = isAuthed && accessToken != null && expiresAt != null && expiresAt * 1000 > Date.now();
 
+  const setAdminOrgs = useMeritStore((s) => s.setAdminOrgs);
   const currentOrg = adminOrgs.find((o) => o.id === currentOrgId) ?? adminOrgs[0];
 
   // ── Auth guard ──────────────────────────────────────────────────────────────
@@ -63,6 +64,26 @@ export default function OrgDashboardLayout({ children }: { children: React.React
       router.push('/org/login');
     }
   }, [hydrated, isAuthed, isTokenValid, adminOrgs.length]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Re-verify membership with the server on load ────────────────────────────
+  // The persisted adminOrgs can be stale (e.g. a membership was revoked). Re-fetch
+  // the source of truth so a removed member isn't shown a ghost dashboard.
+  useEffect(() => {
+    if (!hydrated || !isAuthed || !isTokenValid) return;
+    orgsApi.adminMine()
+      .then((res: any) => {
+        const fresh = (res?.data ?? []).map((o: any) => ({
+          id: o.id,
+          name: o.name,
+          slug: o.slug ?? o.id,
+          logoUrl: o.logo_url ?? undefined,
+          role: (o.role as 'owner' | 'admin' | 'coordinator') ?? 'coordinator',
+        }));
+        setAdminOrgs(fresh);
+        if (!fresh.length) router.push('/org/login');
+      })
+      .catch(() => { /* non-fatal — keep cached view */ });
+  }, [hydrated, isAuthed, isTokenValid]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Onboarding check — robust version ──────────────────────────────────────
   useEffect(() => {
