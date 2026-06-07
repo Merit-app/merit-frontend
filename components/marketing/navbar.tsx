@@ -121,10 +121,10 @@ export function MarketingNavbar() {
               Sign in
             </Link>
             <Link
-              href="/org"
+              href="/org/create"
               className="bg-white text-black text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 rounded-full hover:bg-gray-200 transition-colors whitespace-nowrap"
             >
-              Learn more
+              Create your organization
             </Link>
           </div>
         )}

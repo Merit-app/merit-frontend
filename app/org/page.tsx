@@ -95,13 +95,19 @@ export default function OrgLandingPage() {
         <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
           Manage volunteers, run events, send announcements, and generate grant reports — all from one dashboard.
         </p>
-        <div className="flex items-center justify-center gap-4">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
-            href="/org/login"
+            href="/org/create"
             className="bg-white text-gray-900 font-semibold px-8 py-4 rounded-xl text-lg hover:bg-gray-100 transition-colors flex items-center gap-2"
           >
-            Sign in to your organization
+            Create your organization
             <ArrowRight className="w-5 h-5" />
+          </Link>
+          <Link
+            href="/org/login"
+            className="text-gray-300 font-medium px-8 py-4 rounded-xl text-lg border border-gray-700 hover:bg-gray-900 transition-colors"
+          >
+            Sign in
           </Link>
         </div>
         <p className="text-gray-600 text-sm mt-4">

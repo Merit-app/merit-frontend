@@ -450,6 +450,20 @@ export const orgAuthApi = {
     request<{ data: { user: any; orgs: any[]; defaultOrgId: string; accessToken: string; refreshToken: string; expiresAt: number } }>(
       'POST', '/auth/login/org', { email, password }, true,
     ),
+  // Org-first signup: create a Merit account + org in one step (no student step).
+  create: (body: {
+    email: string; password: string;
+    name: string; category: string; city: string;
+    province?: string; country?: string; websiteUrl?: string;
+    description?: string; contactPhone?: string; isRecruiting?: boolean;
+    adminEmails?: string[];
+  }) => request<{
+    data: {
+      user: any; org: { id: string; name: string; slug: string; role: string };
+      orgs: any[]; defaultOrgId: string; invited: string[];
+      accessToken: string | null; refreshToken: string | null; expiresAt: number | null;
+    };
+  }>('POST', '/auth/org/create', body, true),
 };
 
 export const orgEventsApi = {
