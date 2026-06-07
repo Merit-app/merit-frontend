@@ -163,7 +163,7 @@ export default function OrgLoginPage() {
             </Link>
           </p>
           <p className="text-gray-600">
-            <Link href="/forgot-password" className="hover:text-gray-400">
+            <Link href="/org/forgot-password" className="hover:text-gray-400">
               Forgot password?
             </Link>
           </p>
