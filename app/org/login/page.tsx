@@ -5,12 +5,15 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { Loader2, Eye, EyeOff, User, ArrowRight } from 'lucide-react';
-import { useOrgStore } from '@/lib/store';
-import { orgAuthApi, ApiError } from '@/lib/api';
+import { useMeritStore } from '@/lib/store';
+import { orgAuthApi, mapUser, ApiError } from '@/lib/api';
 
 export default function OrgLoginPage() {
   const router = useRouter();
-  const orgLogin = useOrgStore((s) => s.orgLogin);
+  const login = useMeritStore((s) => s.login);
+  const setAdminOrgs = useMeritStore((s) => s.setAdminOrgs);
+  const setCurrentOrgId = useMeritStore((s) => s.setCurrentOrgId);
+  const setIsOrgAdmin = useMeritStore((s) => s.setIsOrgAdmin);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -35,25 +38,20 @@ export default function OrgLoginPage() {
         role: o.role as 'owner' | 'admin' | 'coordinator',
       }));
 
-      // Defensive: never let a null/partial user object throw (it would be
-      // misreported as "could not reach the server"). Fall back to typed email.
-      const u = rawUser ?? {};
-      orgLogin({
-        user: {
-          id: u.id ?? '',
-          name: u.name ?? email.split('@')[0],
-          email: u.email ?? email,
-          plan: u.plan ?? 'free',
-        },
-        orgs: mappedOrgs,
-        defaultOrgId: defaultOrgId ?? mappedOrgs[0]?.id ?? '',
+      // One unified Merit session — same store the student side uses.
+      const u = rawUser ?? { id: '', name: email.split('@')[0], email, plan: 'free' };
+      login(mapUser(u), {
         accessToken,
         refreshToken,
         expiresAt: expiresAt ?? Math.floor(Date.now() / 1000) + 3600,
       });
+      setAdminOrgs(mappedOrgs);
+      setIsOrgAdmin(mappedOrgs.length > 0);
+      const landingOrg = defaultOrgId ?? mappedOrgs[0]?.id ?? '';
+      setCurrentOrgId(landingOrg);
 
       toast.success('Welcome back!');
-      router.push(`/org/${defaultOrgId ?? mappedOrgs[0]?.id}/dashboard`);
+      router.push(`/org/${landingOrg}/dashboard`);
     } catch (err) {
       if (err instanceof ApiError) {
         if (err.status === 401) {

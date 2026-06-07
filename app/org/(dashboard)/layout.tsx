@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
-import { useOrgStore, useHydrationStore } from '@/lib/store';
+import { useMeritStore, useHydrationStore } from '@/lib/store';
 import { authApi, orgOnboardingApi, orgBillingApi } from '@/lib/api';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { OrgOnboardingModal } from '@/components/org/onboarding-modal';
@@ -37,37 +37,36 @@ export default function OrgDashboardLayout({ children }: { children: React.React
   const router = useRouter();
   const pathname = usePathname();
   const hydrated = useHydrationStore((s) => s.hydrated);
-  const orgUser = useOrgStore((s) => s.orgUser);
-  const orgIsAuthed = useOrgStore((s) => s.orgIsAuthed);
-  const orgAccessToken = useOrgStore((s) => s.orgAccessToken);
-  const orgExpiresAt = useOrgStore((s) => s.orgExpiresAt);
-  const adminOrgs = useOrgStore((s) => s.adminOrgs);
-  const currentOrgId = useOrgStore((s) => s.currentOrgId);
-  const setCurrentOrgId = useOrgStore((s) => s.setCurrentOrgId);
-  const orgLogout = useOrgStore((s) => s.orgLogout);
+  const user = useMeritStore((s) => s.user);
+  const isAuthed = useMeritStore((s) => s.isAuthed);
+  const accessToken = useMeritStore((s) => s.accessToken);
+  const expiresAt = useMeritStore((s) => s.expiresAt);
+  const adminOrgs = useMeritStore((s) => s.adminOrgs);
+  const currentOrgId = useMeritStore((s) => s.currentOrgId);
+  const setCurrentOrgId = useMeritStore((s) => s.setCurrentOrgId);
 
   const [showOrgPicker, setShowOrgPicker] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardingChecked, setOnboardingChecked] = useState(false);
 
-  // The org token is persisted to localStorage (unlike student token).
-  // A token is valid if it exists and hasn't expired.
-  const isOrgTokenValid = orgIsAuthed && orgAccessToken != null && orgExpiresAt != null && orgExpiresAt * 1000 > Date.now();
+  // One unified Merit session. Token lives in memory (not persisted) — on a hard
+  // refresh the user re-authenticates, same as the student side. Within a session
+  // they can move between student and org dashboards with no second login.
+  const isTokenValid = isAuthed && accessToken != null && expiresAt != null && expiresAt * 1000 > Date.now();
 
   const currentOrg = adminOrgs.find((o) => o.id === currentOrgId) ?? adminOrgs[0];
 
   // ── Auth guard ──────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!hydrated) return;
-    if (!orgIsAuthed || !isOrgTokenValid || !adminOrgs.length) {
-      orgLogout();
+    if (!isAuthed || !isTokenValid || !adminOrgs.length) {
       router.push('/org/login');
     }
-  }, [hydrated, orgIsAuthed, isOrgTokenValid, adminOrgs.length]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [hydrated, isAuthed, isTokenValid, adminOrgs.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Onboarding check — robust version ──────────────────────────────────────
   useEffect(() => {
-    if (!currentOrg?.id || onboardingChecked || !orgIsAuthed) return;
+    if (!currentOrg?.id || onboardingChecked || !isAuthed) return;
 
     const check = async () => {
       try {
@@ -85,7 +84,7 @@ export default function OrgDashboardLayout({ children }: { children: React.React
     };
 
     check();
-  }, [currentOrg?.id, onboardingChecked, orgIsAuthed]);
+  }, [currentOrg?.id, onboardingChecked, isAuthed]);
 
   // Reset check when org changes
   useEffect(() => {
@@ -97,21 +96,22 @@ export default function OrgDashboardLayout({ children }: { children: React.React
   const { data: billingRes } = useQuery({
     queryKey: ['org-billing-plan', currentOrg?.id],
     queryFn: () => orgBillingApi.get(currentOrg!.id),
-    enabled: !!currentOrg?.id && orgIsAuthed,
+    enabled: !!currentOrg?.id && isAuthed,
     staleTime: 5 * 60 * 1000,
     retry: false,
   });
   const orgPlan = (billingRes as any)?.data?.plan ?? 'basic';
   const isBasicPlan = orgPlan === 'basic';
 
+  const logout = useMeritStore.getState().logout;
   const handleLogout = async () => {
     try { await authApi.logout(); } catch { /* non-fatal */ }
-    orgLogout();
+    logout();
     router.push('/org/login');
   };
 
   if (!hydrated) return null;
-  if (!orgIsAuthed || !isOrgTokenValid || !adminOrgs.length) return null;
+  if (!isAuthed || !isTokenValid || !adminOrgs.length) return null;
   if (!currentOrg) return null;
 
   const orgBase = `/org/${currentOrg.id}`;
@@ -257,13 +257,13 @@ export default function OrgDashboardLayout({ children }: { children: React.React
           {/* User row */}
           <div className="flex items-center gap-3 px-3 py-2.5 mt-1 border-t border-gray-800">
             <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-xs font-bold text-white shrink-0">
-              {orgUser?.name?.[0] ?? '?'}
+              {user?.firstName?.[0] ?? '?'}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-white text-xs font-medium truncate">
-                {orgUser?.name}
+                {user?.firstName} {user?.lastName}
               </p>
-              <p className="text-gray-600 text-[10px] truncate">{orgUser?.email}</p>
+              <p className="text-gray-600 text-[10px] truncate">{user?.email}</p>
             </div>
           </div>
         </div>

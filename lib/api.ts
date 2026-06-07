@@ -27,50 +27,14 @@ function getStore() {
 function getAccessToken(): string | null { return getStore().getState().accessToken ?? null; }
 function getRefreshToken(): string | null { return getStore().getState().refreshToken ?? null; }
 
-// ── Org-specific store accessors ──────────────────────────────────────────────
-function getOrgStore() {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { useOrgStore } = require('./store');
-  return useOrgStore;
-}
-function getOrgAccessToken(): string | null { return getOrgStore().getState().orgAccessToken ?? null; }
-function getOrgRefreshToken(): string | null { return getOrgStore().getState().orgRefreshToken ?? null; }
+// ── Unified session ───────────────────────────────────────────────────────────
+// Org and student now share ONE Merit account/session. These aliases keep the
+// org API definitions unchanged while routing them through the single store.
+function getOrgAccessToken(): string | null { return getAccessToken(); }
 
-/** Like request() but reads from useOrgStore. Used for all org-admin API calls. */
+/** Org-admin API calls — now use the same unified Merit session as request(). */
 async function orgRequest<T>(method: string, path: string, body?: unknown, isPublic = false): Promise<T> {
-  const token = isPublic ? null : getOrgAccessToken();
-  let res = await makeRequest(method, path, body, token);
-
-  if (res.status === 401 && !isPublic) {
-    const refreshToken = getOrgRefreshToken();
-    if (refreshToken) {
-      try {
-        const refreshRes = await makeRequest('POST', '/auth/refresh', { refreshToken }, null);
-        if (refreshRes.ok) {
-          const d = await refreshRes.json();
-          const s = d?.data;
-          if (s?.accessToken) {
-            getOrgStore().getState().setOrgTokens(s.accessToken, s.refreshToken, s.expiresAt);
-            res = await makeRequest(method, path, body, s.accessToken);
-          }
-        } else {
-          getOrgStore().getState().orgLogout();
-          throw new ApiError(401, 'session_expired', 'Your session has expired. Please sign in again.');
-        }
-      } catch (e) {
-        if (e instanceof ApiError) throw e;
-        getOrgStore().getState().orgLogout();
-        throw new ApiError(401, 'session_expired', 'Session error. Please sign in again.');
-      }
-    }
-  }
-
-  if (!res.ok) {
-    let payload: any = {};
-    try { payload = await res.json(); } catch { /* ignore */ }
-    throw new ApiError(res.status, payload?.code, payload?.message ?? res.statusText);
-  }
-  return res.json() as Promise<T>;
+  return request<T>(method, path, body, isPublic);
 }
 
 async function makeRequest(method: string, path: string, body?: unknown, token?: string | null): Promise<Response> {

@@ -8,7 +8,6 @@ import {
   orgsApi, orgProfileApi, orgInvitesApi, orgBillingApi,
   authApi, usersApi, mapUser, ApiError,
 } from '@/lib/api';
-import { useOrgStore } from '@/lib/store';
 import { toast } from 'sonner';
 import {
   Building2, Users, CreditCard, Lock, Loader2,
@@ -33,12 +32,10 @@ const INPUT_CLASS =
 function OrgSettingsInner() {
   const { orgId } = useParams<{ orgId: string }>();
   const searchParams = useSearchParams();
-  // Use the org store for role — accurate and independent of student auth
-  const orgUser = useOrgStore((s) => s.orgUser);
   const currentUser = useMeritStore((s) => s.user);
-  const orgAdminOrgs = useOrgStore((s) => s.adminOrgs);
-  // Role from org store (set at org login) — fallback if the API call fails
-  const storeRole = orgAdminOrgs.find((o) => o.id === orgId)?.role;
+  const adminOrgs = useMeritStore((s) => s.adminOrgs);
+  // Role from the Merit store (set at login) — fallback if the API call fails
+  const storeRole = adminOrgs.find((o) => o.id === orgId)?.role;
 
   const [activeTab, setActiveTab] = useState<Tab>(() => {
     const t = searchParams.get('tab') as Tab | null;
@@ -132,7 +129,7 @@ function OrgSettingsInner() {
           <OrganizationTab orgId={orgId} org={org} canEdit={canEdit} isOwner={userRole === 'owner'} />
         )}
         {activeTab === 'team' && (
-          <TeamTab orgId={orgId} admins={admins} userRole={userRole} currentUserId={orgUser?.id ?? currentUser?.id} />
+          <TeamTab orgId={orgId} admins={admins} userRole={userRole} currentUserId={currentUser?.id} />
         )}
         {activeTab === 'account' && <AccountTab />}
         {activeTab === 'password' && <PasswordTab />}
@@ -339,7 +336,7 @@ function OrganizationTab({ orgId, org, canEdit, isOwner }: { orgId: string; org:
 // ── DANGER ZONE (delete org — owner only) ─────────────────────────────────────
 function DangerZone({ orgId, orgName }: { orgId: string; orgName: string }) {
   const router = useRouter();
-  const orgLogout = useOrgStore((s) => s.orgLogout);
+  const clearOrgState = useMeritStore((s) => s.clearOrgState);
   const [open, setOpen] = useState(false);
   const [confirmText, setConfirmText] = useState('');
   const [deleting, setDeleting] = useState(false);
@@ -352,7 +349,8 @@ function DangerZone({ orgId, orgName }: { orgId: string; orgName: string }) {
     try {
       await orgsApi.deleteOrg(orgId);
       toast.success('Organization deleted');
-      orgLogout();
+      // Drop this org from the session's org list and return to the org home.
+      clearOrgState();
       router.push('/org/login');
     } catch (err) {
       toast.error(err instanceof ApiError ? err.message : 'Failed to delete organization');
