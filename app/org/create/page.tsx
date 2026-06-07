@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Loader2, Eye, EyeOff, Plus, X, ChevronDown } from 'lucide-react';
 import { useMeritStore } from '@/lib/store';
-import { orgAuthApi, mapUser, ApiError } from '@/lib/api';
+import { orgAuthApi, orgsApi, orgInvitesApi, authApi, mapUser, ApiError } from '@/lib/api';
 
 const CATEGORIES = [
   'Community & Social', 'Food & Hunger', 'Education & Tutoring',
@@ -19,14 +19,24 @@ const input =
   'w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-3 text-sm placeholder-gray-600 focus:outline-none focus:border-white transition-colors';
 const label = 'block text-sm font-medium text-gray-300 mb-1.5';
 
+type AuthMode = 'new' | 'existing';
+
 export default function OrgCreatePage() {
   const router = useRouter();
   const login = useMeritStore((s) => s.login);
+  const user = useMeritStore((s) => s.user);
+  const isAuthed = useMeritStore((s) => s.isAuthed);
+  const accessToken = useMeritStore((s) => s.accessToken);
+  const expiresAt = useMeritStore((s) => s.expiresAt);
   const setAdminOrgs = useMeritStore((s) => s.setAdminOrgs);
   const setCurrentOrgId = useMeritStore((s) => s.setCurrentOrgId);
   const setIsOrgAdmin = useMeritStore((s) => s.setIsOrgAdmin);
+  const logoutStore = useMeritStore((s) => s.logout);
 
-  // account
+  const loggedIn = isAuthed && accessToken != null && expiresAt != null && expiresAt * 1000 > Date.now();
+
+  // auth
+  const [mode, setMode] = useState<AuthMode>('new');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -47,11 +57,16 @@ export default function OrgCreatePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const pwTooShort = password.length > 0 && password.length < 8;
-  const mismatch = confirm.length > 0 && password !== confirm;
-  const canSubmit =
-    /\S+@\S+\.\S+/.test(email) && password.length >= 8 && password === confirm &&
-    name.trim().length >= 2 && city.trim().length >= 2 && !loading;
+  const pwTooShort = mode === 'new' && password.length > 0 && password.length < 8;
+  const mismatch = mode === 'new' && confirm.length > 0 && password !== confirm;
+
+  const orgValid = name.trim().length >= 2 && city.trim().length >= 2;
+  const authValid =
+    loggedIn ||
+    (mode === 'new'
+      ? /\S+@\S+\.\S+/.test(email) && password.length >= 8 && password === confirm
+      : /\S+@\S+\.\S+/.test(email) && password.length > 0);
+  const canSubmit = orgValid && authValid && !loading;
 
   const addAdmin = () => {
     const e = adminInput.trim().toLowerCase();
@@ -61,38 +76,73 @@ export default function OrgCreatePage() {
     }
   };
 
+  const orgPayload = {
+    name: name.trim(),
+    category,
+    city: city.trim(),
+    websiteUrl: website.trim() || undefined,
+    description: description.trim() || undefined,
+    contactPhone: phone.trim() || undefined,
+  };
+
   const handleSubmit = async (ev: React.FormEvent) => {
     ev.preventDefault();
     if (!canSubmit) return;
     setLoading(true);
     setError(null);
     try {
-      const res = await orgAuthApi.create({
-        email: email.trim(),
-        password,
-        name: name.trim(),
-        category,
-        city: city.trim(),
-        websiteUrl: website.trim() || undefined,
-        description: description.trim() || undefined,
-        contactPhone: phone.trim() || undefined,
-        adminEmails: adminEmails.length ? adminEmails : undefined,
-      });
-      const d = res.data;
-      login(mapUser(d.user ?? { id: '', name, email, plan: 'free' }), {
-        accessToken: d.accessToken ?? '',
-        refreshToken: d.refreshToken ?? '',
-        expiresAt: d.expiresAt ?? Math.floor(Date.now() / 1000) + 3600,
-      });
-      setAdminOrgs([{ id: d.org.id, name: d.org.name, slug: d.org.slug, role: 'owner' }]);
+      // ── Brand-new account: one-shot endpoint handles account + org + invites ──
+      if (!loggedIn && mode === 'new') {
+        const res = await orgAuthApi.create({ ...orgPayload, email: email.trim(), password, adminEmails: adminEmails.length ? adminEmails : undefined });
+        const d = res.data;
+        login(mapUser(d.user ?? { id: '', name, email, plan: 'free' }), {
+          accessToken: d.accessToken ?? '',
+          refreshToken: d.refreshToken ?? '',
+          expiresAt: d.expiresAt ?? Math.floor(Date.now() / 1000) + 3600,
+        });
+        setAdminOrgs([{ id: d.org.id, name: d.org.name, slug: d.org.slug, role: 'owner' }]);
+        setIsOrgAdmin(true);
+        setCurrentOrgId(d.org.id);
+        toast.success(d.invited?.length ? `Organization created — invited ${d.invited.length} admin(s)` : 'Organization created!');
+        router.push(`/org/${d.org.id}/dashboard`);
+        return;
+      }
+
+      // ── Existing account: sign in first if needed ──
+      if (!loggedIn && mode === 'existing') {
+        const r = await authApi.login(email.trim(), password);
+        const s = r.data.session;
+        login(mapUser(r.data.user), { accessToken: s.accessToken, refreshToken: s.refreshToken, expiresAt: s.expiresAt });
+      }
+
+      // ── Create the org under the (now) logged-in account ──
+      const created = await orgsApi.createOrg({ ...orgPayload, contactEmail: user?.email });
+      const orgId = created.data.org.id;
+
+      // invite admins (best-effort)
+      let invited = 0;
+      for (const ae of adminEmails) {
+        try { await orgInvitesApi.create(orgId, ae, 'admin'); invited++; } catch { /* skip */ }
+      }
+
+      // refresh org list from server so the new org shows + role is accurate
+      try {
+        const mine = await orgsApi.adminMine();
+        setAdminOrgs((mine.data ?? []).map((o: any) => ({
+          id: o.id, name: o.name, slug: o.slug ?? o.id, logoUrl: o.logo_url ?? undefined,
+          role: (o.role as 'owner' | 'admin' | 'coordinator') ?? 'owner',
+        })));
+      } catch { /* keep going */ }
       setIsOrgAdmin(true);
-      setCurrentOrgId(d.org.id);
-      if (d.invited?.length) toast.success(`Organization created — invited ${d.invited.length} admin(s)`);
-      else toast.success('Organization created!');
-      router.push(`/org/${d.org.id}/dashboard`);
+      setCurrentOrgId(orgId);
+
+      toast.success(invited ? `Organization created — invited ${invited} admin(s)` : 'Organization created!');
+      router.push(`/org/${orgId}/dashboard`);
     } catch (err) {
       if (err instanceof ApiError && err.status === 409) {
-        setError('An account with this email already exists. Sign in, then create your org from the dashboard.');
+        setError('An account with this email already exists. Switch to "Use an existing account" and sign in.');
+      } else if (err instanceof ApiError && err.status === 401) {
+        setError('Incorrect email or password.');
       } else {
         setError(err instanceof ApiError ? err.message : 'Could not reach the server. Try again.');
       }
@@ -117,26 +167,56 @@ export default function OrgCreatePage() {
         {/* Account */}
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-4">
           <h2 className="text-white font-semibold text-sm">Your account</h2>
-          <p className="text-gray-500 text-xs -mt-2">This is your Merit login — works for the org and (optionally) the student side.</p>
-          <div>
-            <label className={label}>Email</label>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@organization.org" className={input} required />
-          </div>
-          <div>
-            <label className={label}>Password</label>
-            <div className="relative">
-              <input type={showPw ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 8 characters" className={`${input} pr-10`} required />
-              <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300">
-                {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+
+          {loggedIn ? (
+            <div className="flex items-center justify-between gap-3 bg-gray-800/60 border border-gray-700 rounded-xl px-4 py-3">
+              <div className="min-w-0">
+                <p className="text-gray-300 text-xs">Creating as</p>
+                <p className="text-white text-sm font-medium truncate">{user?.email}</p>
+              </div>
+              <button type="button" onClick={() => logoutStore()} className="text-xs text-gray-400 hover:text-white shrink-0">
+                Use a different account
               </button>
             </div>
-            {pwTooShort && <p className="text-xs text-red-400 mt-1">Must be at least 8 characters</p>}
-          </div>
-          <div>
-            <label className={label}>Confirm password</label>
-            <input type={showPw ? 'text' : 'password'} value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder="Re-enter password" className={input} required />
-            {mismatch && <p className="text-xs text-red-400 mt-1">Passwords don&apos;t match</p>}
-          </div>
+          ) : (
+            <>
+              {/* mode toggle */}
+              <div className="flex gap-1 p-1 bg-gray-800 rounded-xl">
+                {([['new', 'Create new account'], ['existing', 'Use existing account']] as const).map(([m, lbl]) => (
+                  <button key={m} type="button" onClick={() => { setMode(m); setError(null); }}
+                    className={`flex-1 py-2 rounded-lg text-xs font-medium transition-colors ${mode === m ? 'bg-white text-gray-900' : 'text-gray-400 hover:text-white'}`}>
+                    {lbl}
+                  </button>
+                ))}
+              </div>
+
+              <div>
+                <label className={label}>Email</label>
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@organization.org" className={input} required />
+              </div>
+              <div>
+                <label className={label}>Password</label>
+                <div className="relative">
+                  <input type={showPw ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)}
+                    placeholder={mode === 'new' ? 'At least 8 characters' : 'Your password'} className={`${input} pr-10`} required />
+                  <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300">
+                    {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+                {pwTooShort && <p className="text-xs text-red-400 mt-1">Must be at least 8 characters</p>}
+              </div>
+              {mode === 'new' && (
+                <div>
+                  <label className={label}>Confirm password</label>
+                  <input type={showPw ? 'text' : 'password'} value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder="Re-enter password" className={input} required />
+                  {mismatch && <p className="text-xs text-red-400 mt-1">Passwords don&apos;t match</p>}
+                </div>
+              )}
+              {mode === 'new' && (
+                <p className="text-gray-500 text-xs">This Merit login works for the org and (optionally) the student side.</p>
+              )}
+            </>
+          )}
         </div>
 
         {/* Organization */}
@@ -159,7 +239,6 @@ export default function OrgCreatePage() {
             </div>
           </div>
 
-          {/* Optional — set up later */}
           <button type="button" onClick={() => setShowMore(!showMore)} className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white transition-colors">
             <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showMore ? 'rotate-180' : ''}`} />
             {showMore ? 'Hide optional details' : 'Add more details (optional — set up later)'}
@@ -184,17 +263,14 @@ export default function OrgCreatePage() {
           )}
         </div>
 
-        {/* Admins — optional */}
+        {/* Admins */}
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-3">
           <h2 className="text-white font-semibold text-sm">Invite admins <span className="text-gray-500 font-normal">(optional)</span></h2>
           <p className="text-gray-500 text-xs -mt-1">They&apos;ll get an email invite. New users are prompted to create a Merit account.</p>
           <div className="flex gap-2">
-            <input
-              type="email" value={adminInput}
-              onChange={(e) => setAdminInput(e.target.value)}
+            <input type="email" value={adminInput} onChange={(e) => setAdminInput(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addAdmin(); } }}
-              placeholder="admin@organization.org" className={`${input} flex-1`}
-            />
+              placeholder="admin@organization.org" className={`${input} flex-1`} />
             <button type="button" onClick={addAdmin} className="px-3 rounded-xl bg-gray-800 text-white hover:bg-gray-700 transition-colors">
               <Plus className="w-4 h-4" />
             </button>
@@ -219,10 +295,12 @@ export default function OrgCreatePage() {
           {loading ? 'Creating…' : 'Create organization'}
         </button>
 
-        <p className="text-center text-sm text-gray-500">
-          Already have an account?{' '}
-          <Link href="/org/login" className="text-gray-300 hover:text-white">Sign in</Link>
-        </p>
+        {!loggedIn && (
+          <p className="text-center text-sm text-gray-500">
+            Just want to sign in?{' '}
+            <Link href="/org/login" className="text-gray-300 hover:text-white">Org login</Link>
+          </p>
+        )}
       </form>
     </div>
   );
