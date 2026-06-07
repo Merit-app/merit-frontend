@@ -48,7 +48,11 @@ function LoginForm() {
         refreshToken: session.refreshToken,
         expiresAt: session.expiresAt,
       });
-      router.replace('/dashboard');
+      // Honor a relative ?redirect= (e.g. invite-accept flow). Only allow paths
+      // that start with a single "/" to avoid open-redirect to external sites.
+      const redirect = params.get('redirect');
+      const dest = redirect && /^\/(?!\/)/.test(redirect) ? redirect : '/dashboard';
+      router.replace(dest);
     } catch (err) {
       if (err instanceof ApiError) {
         if (err.status === 401) {

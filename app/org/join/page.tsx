@@ -15,9 +15,14 @@ function JoinForm() {
   const router = useRouter();
   const token = searchParams.get('token');
 
-  const user = useMeritStore((s) => s.user);
   const isAuthed = useMeritStore((s) => s.isAuthed);
-  const setCurrentOrgId = useMeritStore((s) => s.setCurrentOrgId);
+  const accessToken = useMeritStore((s) => s.accessToken);
+  const expiresAt = useMeritStore((s) => s.expiresAt);
+
+  // isAuthed persists to localStorage but the access token does NOT — so a fresh
+  // tab (e.g. from an email link) can have isAuthed=true with no usable token.
+  // Gate on a live, unexpired token instead, or the accept POST 401s.
+  const hasValidToken = isAuthed && accessToken != null && expiresAt != null && expiresAt * 1000 > Date.now();
 
   const [invite, setInvite] = useState<any>(null);
   const [status, setStatus] = useState<Status>('loading');
@@ -38,17 +43,18 @@ function JoinForm() {
 
   const handleAccept = async () => {
     if (!token) return;
-    if (!isAuthed) {
-      router.push(`/login?redirect=/org/join?token=${token}`);
+    if (!hasValidToken) {
+      router.push(`/login?redirect=${encodeURIComponent(`/org/join?token=${token}`)}`);
       return;
     }
     setIsAccepting(true);
     try {
-      const res = await orgInvitesApi.accept(token);
-      const { orgId } = res.data;
-      toast.success(`You now have access to ${invite?.organizations?.name}!`);
-      setCurrentOrgId(orgId);
-      router.push(`/org/${orgId}/dashboard`);
+      await orgInvitesApi.accept(token);
+      setStatus('accepted');
+      toast.success(`You now have access to ${invite?.organizations?.name}! Sign in to your org dashboard.`);
+      // The org dashboard uses a separate org session — send them to org login to
+      // establish it (their student login here doesn't populate the org store).
+      router.push('/org/login');
     } catch (err) {
       const msg = err instanceof ApiError ? err.message : 'Failed to accept invite';
       toast.error(msg);
@@ -130,7 +136,7 @@ function JoinForm() {
               </p>
             </div>
 
-            {isAuthed ? (
+            {hasValidToken ? (
               <button
                 onClick={handleAccept}
                 disabled={isAccepting}
@@ -143,13 +149,13 @@ function JoinForm() {
               <div className="w-full space-y-3">
                 <p className="text-gray-500 text-sm">Sign in or create an account to accept</p>
                 <Link
-                  href={`/login?redirect=/org/join?token=${token}`}
+                  href={`/login?redirect=${encodeURIComponent(`/org/join?token=${token}`)}`}
                   className="block w-full bg-white text-gray-900 font-semibold py-3 rounded-xl text-sm text-center hover:bg-gray-100 transition-colors"
                 >
                   Sign in to Merit
                 </Link>
                 <Link
-                  href={`/signup?redirect=/org/join?token=${token}`}
+                  href={`/signup?redirect=${encodeURIComponent(`/org/join?token=${token}`)}`}
                   className="block w-full bg-gray-800 text-white font-medium py-3 rounded-xl text-sm text-center hover:bg-gray-700 transition-colors"
                 >
                   Create account
