@@ -50,11 +50,48 @@
   --background: #FAFAF9;   /* ink-50 — warm off-white */
   --foreground: #1C1917;   /* ink-900 */
   --shadow-elevated: 0 4px 12px -2px rgb(0 0 0 / 0.04), 0 2px 4px -1px rgb(0 0 0 / 0.03);
+
+  /* shadcn/ui tokens — mapped to the Merit ink/blue palette so components like
+     Select/Popover/Dialog render with solid (non-transparent) surfaces. */
+  --card: #FFFFFF;
+  --card-foreground: #1C1917;
+  --popover: #FFFFFF;
+  --popover-foreground: #1C1917;
+  --primary: #2563EB;            /* merit-blue-600 */
+  --primary-foreground: #FFFFFF;
+  --secondary: #F5F5F4;          /* ink-100 */
+  --secondary-foreground: #1C1917;
+  --muted: #F5F5F4;              /* ink-100 */
+  --muted-foreground: #78716C;   /* ink-500 */
+  --accent: #F5F5F4;             /* ink-100 */
+  --accent-foreground: #1C1917;
+  --destructive: #DC2626;
+  --destructive-foreground: #FFFFFF;
+  --border: #E7E5E4;            /* ink-200 */
+  --input: #E7E5E4;             /* ink-200 */
+  --ring: #2563EB;              /* merit-blue-600 */
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
