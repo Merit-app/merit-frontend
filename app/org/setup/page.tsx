@@ -55,8 +55,9 @@ function SetupForm() {
 
       const { user: rawUser, org, accessToken, refreshToken, expiresAt } = res.data;
 
+      const u = rawUser ?? {};
       orgLogin({
-        user: { id: rawUser.id, name: rawUser.name, email: rawUser.email, plan: rawUser.plan ?? 'free' },
+        user: { id: u.id ?? '', name: u.name ?? form.name, email: u.email ?? form.email, plan: u.plan ?? 'free' },
         orgs: [{
           id: org.id,
           name: org.name,

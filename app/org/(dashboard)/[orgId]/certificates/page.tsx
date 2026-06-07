@@ -28,7 +28,8 @@ export default function CertificatesPage() {
     queryFn: () => orgVolunteersApi.list(orgId),
     enabled: isPro,
   });
-  const volunteers: any[] = (res as any)?.data ?? [];
+  const rawVols = (res as any)?.data?.volunteers ?? (res as any)?.data;
+  const volunteers: any[] = Array.isArray(rawVols) ? rawVols : [];
 
   if (orgPlan && !isPro) {
     return (

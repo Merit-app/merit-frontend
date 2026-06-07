@@ -22,7 +22,10 @@ export default function VolunteersPage() {
     queryKey: ['org-volunteers', orgId],
     queryFn: () => orgVolunteersApi.list(orgId),
   });
-  const volunteers: any[] = (volunteersRes as any)?.data ?? [];
+  // API shape is { data: { volunteers: [...] } } — read the nested array, and
+  // guard with Array.isArray so a non-array can never crash .filter().
+  const rawVolunteers = (volunteersRes as any)?.data?.volunteers ?? (volunteersRes as any)?.data;
+  const volunteers: any[] = Array.isArray(rawVolunteers) ? rawVolunteers : [];
 
   const verifySession = useMutation({
     mutationFn: (sessionId: string) => orgVolunteersApi.verify(orgId, sessionId),

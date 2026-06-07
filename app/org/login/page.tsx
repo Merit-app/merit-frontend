@@ -35,8 +35,16 @@ export default function OrgLoginPage() {
         role: o.role as 'owner' | 'admin' | 'coordinator',
       }));
 
+      // Defensive: never let a null/partial user object throw (it would be
+      // misreported as "could not reach the server"). Fall back to typed email.
+      const u = rawUser ?? {};
       orgLogin({
-        user: { id: rawUser.id, name: rawUser.name, email: rawUser.email, plan: rawUser.plan ?? 'free' },
+        user: {
+          id: u.id ?? '',
+          name: u.name ?? email.split('@')[0],
+          email: u.email ?? email,
+          plan: u.plan ?? 'free',
+        },
         orgs: mappedOrgs,
         defaultOrgId: defaultOrgId ?? mappedOrgs[0]?.id ?? '',
         accessToken,
