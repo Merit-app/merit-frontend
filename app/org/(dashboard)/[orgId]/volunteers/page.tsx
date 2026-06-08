@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { orgVolunteersApi } from '@/lib/api';
 import { toast } from 'sonner';
-import { Search, Download, CheckCircle2, ChevronDown, ChevronRight, ExternalLink } from 'lucide-react';
+import { Search, Download, CheckCircle2, ChevronDown, ChevronRight, ExternalLink, Mail, Phone, GraduationCap } from 'lucide-react';
 
 function fmtDate(iso: string) {
   try { return new Date(iso).toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' }); }
@@ -133,7 +133,39 @@ export default function VolunteersPage() {
               </button>
 
               {expanded === v.student.id && (
-                <div className="border-t border-gray-800 divide-y divide-gray-800/50">
+                <div className="border-t border-gray-800">
+                  {/* Contact info */}
+                  <div className="px-4 py-3 bg-gray-900/30 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs">
+                    {v.student.email ? (
+                      <a href={`mailto:${v.student.email}`} className="flex items-center gap-1.5 text-gray-300 hover:text-white transition-colors">
+                        <Mail className="w-3.5 h-3.5 text-gray-500" />
+                        {v.student.email}
+                      </a>
+                    ) : (
+                      <span className="flex items-center gap-1.5 text-gray-600"><Mail className="w-3.5 h-3.5" />No email</span>
+                    )}
+                    {v.student.phone ? (
+                      <a href={`tel:${v.student.phone}`} className="flex items-center gap-1.5 text-gray-300 hover:text-white transition-colors">
+                        <Phone className="w-3.5 h-3.5 text-gray-500" />
+                        {v.student.phone}
+                      </a>
+                    ) : (
+                      <span className="flex items-center gap-1.5 text-gray-600"><Phone className="w-3.5 h-3.5" />No phone</span>
+                    )}
+                    {(v.student.school || v.student.grade) && (
+                      <span className="flex items-center gap-1.5 text-gray-400">
+                        <GraduationCap className="w-3.5 h-3.5 text-gray-500" />
+                        {v.student.school}{v.student.grade ? ` · Grade ${v.student.grade}` : ''}
+                      </span>
+                    )}
+                  </div>
+
+                  {v.isInterested && (v.sessions ?? []).length === 0 ? (
+                    <p className="px-4 py-3 text-xs text-gray-500 border-t border-gray-800/50">
+                      Registered interest — no hours logged yet.
+                    </p>
+                  ) : (
+                  <div className="divide-y divide-gray-800/50 border-t border-gray-800/50">
                   {(v.sessions ?? []).map((s: any) => (
                     <div key={s.id} className="flex items-center gap-3 px-4 py-3 bg-gray-900/50">
                       <span className="text-gray-600 text-xs w-24 shrink-0">{fmtDate(s.date)}</span>
@@ -163,6 +195,8 @@ export default function VolunteersPage() {
                       )}
                     </div>
                   ))}
+                  </div>
+                  )}
                 </div>
               )}
             </div>
