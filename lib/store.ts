@@ -133,17 +133,21 @@ export const useMeritStore = create<MeritStore>()(
       storage: createJSONStorage(() => localStorage),
       // skipHydration prevents SSR/client mismatch — rehydrate in a useEffect
       skipHydration: true,
-      // Security: neither access token nor refresh token is persisted to localStorage.
-      // Both are kept in memory only. On page refresh the user will be redirected to
-      // /login to re-authenticate. This eliminates the XSS-based token-theft vector.
+      // Session persistence: the refresh token is persisted to localStorage so the
+      // session survives page reloads, idle periods, and navigation between the
+      // student and org dashboards. On boot, StoreHydrator exchanges the persisted
+      // refresh token for a fresh short-lived access token; thereafter request()
+      // auto-refreshes on any 401. This is the standard SPA pattern.
       //
-      // Long-term improvement: migrate to httpOnly cookie-based session storage in the
-      // backend so the refresh token survives page reloads without being JS-accessible.
+      // Tradeoff: a persisted refresh token is reachable by XSS. The short-lived
+      // access token limits the blast radius. Long-term improvement: migrate to
+      // httpOnly cookie-based sessions so the refresh token is not JS-accessible.
       partialize: (state) => ({
         isAuthed: state.isAuthed,
         user: state.user,
-        // accessToken: intentionally NOT persisted (high-value, short-lived)
-        // refreshToken: intentionally NOT persisted (XSS risk — do not add back)
+        accessToken: state.accessToken,
+        refreshToken: state.refreshToken,
+        expiresAt: state.expiresAt,
         sessions: state.sessions,
         organizations: state.organizations,
         followedOrgIds: state.followedOrgIds,

@@ -9,29 +9,29 @@ import Link from 'next/link';
  */
 export function MarketingNav() {
   return (
-    <nav className="border-b border-ink-200 bg-white">
+    <nav className="border-b border-border bg-card">
       <div className="max-w-6xl mx-auto px-4 sm:px-8 h-14 flex items-center justify-between gap-4">
         {/* Wordmark */}
         <Link
           href="/"
-          className="text-[18px] font-bold text-ink-900 tracking-tight shrink-0"
+          className="text-[18px] font-bold text-foreground tracking-tight shrink-0"
         >
           merit<span className="text-merit-blue-600">.</span>
         </Link>
 
         {/* Middle nav — hidden on mobile */}
-        <div className="hidden md:flex items-center gap-5 text-[13px] font-medium text-ink-600">
-          <Link href="/about"    className="hover:text-ink-900 transition-colors">About</Link>
-          <Link href="/pricing"  className="hover:text-ink-900 transition-colors">Pricing</Link>
-          <Link href="/faq"      className="hover:text-ink-900 transition-colors">FAQ</Link>
-          <Link href="/contact"  className="hover:text-ink-900 transition-colors">Contact</Link>
+        <div className="hidden md:flex items-center gap-5 text-[13px] font-medium text-muted-foreground">
+          <Link href="/about"    className="hover:text-foreground transition-colors">About</Link>
+          <Link href="/pricing"  className="hover:text-foreground transition-colors">Pricing</Link>
+          <Link href="/faq"      className="hover:text-foreground transition-colors">FAQ</Link>
+          <Link href="/contact"  className="hover:text-foreground transition-colors">Contact</Link>
         </div>
 
         {/* Auth links — always visible */}
         <div className="flex items-center gap-3 shrink-0">
           <Link
             href="/login"
-            className="text-[13px] font-medium text-ink-600 hover:text-ink-900 transition-colors"
+            className="text-[13px] font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             Sign in
           </Link>

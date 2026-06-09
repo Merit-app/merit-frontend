@@ -73,8 +73,8 @@ export default function IntegrationsPage() {
   return (
     <div className="max-w-2xl">
       <div className="mb-6">
-        <h2 className="text-h1 text-ink-900">Integrations</h2>
-        <p className="text-small text-ink-500 mt-1">
+        <h2 className="text-h1 text-foreground">Integrations</h2>
+        <p className="text-small text-muted-foreground mt-1">
           Connect Merit to the tools your school already uses.
         </p>
       </div>
@@ -83,7 +83,7 @@ export default function IntegrationsPage() {
         {INTEGRATIONS.map((integration) => (
           <div
             key={integration.name}
-            className="bg-white rounded-xl border border-ink-200 p-5 flex items-center gap-4"
+            className="bg-card rounded-xl border border-border p-5 flex items-center gap-4"
           >
             {/* Logo */}
             <span
@@ -96,18 +96,18 @@ export default function IntegrationsPage() {
             {/* Info */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-0.5">
-                <p className="text-[13px] font-medium text-ink-900">{integration.name}</p>
-                <span className="text-[11px] font-medium text-ink-400 bg-ink-100 px-2 py-0.5 rounded-full">
+                <p className="text-[13px] font-medium text-foreground">{integration.name}</p>
+                <span className="text-[11px] font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
                   Coming soon
                 </span>
               </div>
-              <p className="text-small text-ink-500">{integration.description}</p>
+              <p className="text-small text-muted-foreground">{integration.description}</p>
             </div>
 
             {/* CTA */}
             <button
               onClick={() => handleConnect(integration.name)}
-              className="shrink-0 flex items-center gap-1.5 text-[13px] font-medium text-ink-400 border border-ink-200 px-3 py-1.5 rounded-lg cursor-not-allowed"
+              className="shrink-0 flex items-center gap-1.5 text-[13px] font-medium text-muted-foreground border border-border px-3 py-1.5 rounded-lg cursor-not-allowed"
               aria-disabled="true"
             >
               <Lock size={12} />
@@ -117,7 +117,7 @@ export default function IntegrationsPage() {
         ))}
       </div>
 
-      <p className="text-small text-ink-400 mt-6 text-center">
+      <p className="text-small text-muted-foreground mt-6 text-center">
         Missing an integration? Email us at{' '}
         <a href="mailto:hello@merit.app" className="text-merit-blue-600 hover:underline">
           hello@merit.app

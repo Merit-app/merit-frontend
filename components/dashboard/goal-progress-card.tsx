@@ -41,9 +41,9 @@ function GoalSetupCard() {
   }
 
   return (
-    <div className="bg-white rounded-xl border border-ink-200 p-6 mb-6">
-      <h3 className="text-h3 text-ink-900 mb-1">Set your service goal</h3>
-      <p className="text-small text-ink-500 mb-5">
+    <div className="bg-card rounded-xl border border-border p-6 mb-6">
+      <h3 className="text-h3 text-foreground mb-1">Set your service goal</h3>
+      <p className="text-small text-muted-foreground mb-5">
         Choose a program to start tracking your progress.
       </p>
 
@@ -53,10 +53,10 @@ function GoalSetupCard() {
             key={p.program}
             disabled={saving}
             onClick={() => { setShowCustom(false); saveGoal(p.program, p.hours); }}
-            className="flex flex-col items-start rounded-lg border border-ink-200 px-4 py-3 text-left hover:border-merit-blue-300 hover:bg-merit-blue-50 transition-colors disabled:opacity-50"
+            className="flex flex-col items-start rounded-lg border border-border px-4 py-3 text-left hover:border-merit-blue-300 hover:bg-merit-blue-50 transition-colors disabled:opacity-50"
           >
-            <span className="text-[13px] font-semibold text-ink-900">{p.label}</span>
-            <span className="text-[12px] text-ink-500">{p.sub}</span>
+            <span className="text-[13px] font-semibold text-foreground">{p.label}</span>
+            <span className="text-[12px] text-muted-foreground">{p.sub}</span>
           </button>
         ))}
       </div>
@@ -77,9 +77,9 @@ function GoalSetupCard() {
             placeholder="e.g. 100"
             value={customHours}
             onChange={(e) => setCustomHours(e.target.value)}
-            className="flex h-10 w-28 rounded-lg border border-ink-200 bg-white px-3 text-[14px] text-ink-900 focus:outline-none focus:border-merit-blue-400 transition-colors"
+            className="flex h-10 w-28 rounded-lg border border-border bg-card px-3 text-[14px] text-foreground focus:outline-none focus:border-merit-blue-400 transition-colors"
           />
-          <span className="text-[13px] text-ink-500">hrs</span>
+          <span className="text-[13px] text-muted-foreground">hrs</span>
           <Button
             size="sm"
             disabled={!customHours || parseInt(customHours) < 1 || saving}
@@ -90,7 +90,7 @@ function GoalSetupCard() {
           </Button>
           <button
             onClick={() => { setShowCustom(false); setCustomHours(''); }}
-            className="text-[13px] text-ink-400 hover:text-ink-600 transition-colors"
+            className="text-[13px] text-muted-foreground hover:text-muted-foreground transition-colors"
           >
             Cancel
           </button>
@@ -158,25 +158,25 @@ function GoalProgressInner({ totalHours, goal, pct, remaining }: InnerProps) {
     : 'Service goal';
 
   return (
-    <div className="bg-white rounded-xl border border-ink-200 p-6 mb-6">
+    <div className="bg-card rounded-xl border border-border p-6 mb-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-h3 text-ink-900">{programLabel}</h3>
-        <span className="text-[12px] font-medium text-ink-500 bg-ink-100 px-2.5 py-1 rounded-full">
+        <h3 className="text-h3 text-foreground">{programLabel}</h3>
+        <span className="text-[12px] font-medium text-muted-foreground bg-muted px-2.5 py-1 rounded-full">
           {goal} hrs
         </span>
       </div>
 
       {/* Big number */}
       <div className="flex items-baseline gap-1.5 mb-4">
-        <span className="text-[32px] font-medium text-ink-900 leading-none tabular-nums">
+        <span className="text-[32px] font-medium text-foreground leading-none tabular-nums">
           {displayHours}
         </span>
-        <span className="text-[16px] text-ink-500">/ {goal} hrs</span>
+        <span className="text-[16px] text-muted-foreground">/ {goal} hrs</span>
       </div>
 
       {/* Progress bar */}
-      <div className="h-1.5 bg-ink-100 rounded-full overflow-hidden mb-4">
+      <div className="h-1.5 bg-muted rounded-full overflow-hidden mb-4">
         <div
           className="h-full bg-merit-blue-600 rounded-full transition-none"
           style={{ width: `${displayPct}%` }}
@@ -185,7 +185,7 @@ function GoalProgressInner({ totalHours, goal, pct, remaining }: InnerProps) {
 
       {/* Footer */}
       <div className="flex items-center justify-between">
-        <span className="text-small text-ink-500">
+        <span className="text-small text-muted-foreground">
           {user.nhsGoalStartDate
             ? `Started ${formatLongDate(user.nhsGoalStartDate)}`
             : `${remaining > 0 ? `${remaining % 1 === 0 ? remaining : remaining.toFixed(1)} hrs remaining` : 'Goal complete 🎉'}`}

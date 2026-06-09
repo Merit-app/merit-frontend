@@ -91,7 +91,7 @@ export function ClaimModal({ orgId, orgName, orgWebsiteUrl, onClose }: ClaimModa
   };
 
   const inputClass =
-    'w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gray-900 transition-colors';
+    'w-full border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-border transition-colors';
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -100,20 +100,20 @@ export function ClaimModal({ orgId, orgName, orgWebsiteUrl, onClose }: ClaimModa
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.97, y: 8 }}
         transition={SPRING}
-        className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden"
+        className="bg-card rounded-2xl w-full max-w-md shadow-2xl overflow-hidden"
       >
         {/* Header */}
-        <div className="flex items-start justify-between p-6 border-b border-gray-100">
+        <div className="flex items-start justify-between p-6 border-b border-border">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
-              <Building2 className="w-5 h-5 text-gray-700" />
+            <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center">
+              <Building2 className="w-5 h-5 text-foreground" />
             </div>
             <div>
-              <h2 className="font-bold text-gray-900">Claim this page</h2>
-              <p className="text-sm text-gray-500">{orgName}</p>
+              <h2 className="font-bold text-foreground">Claim this page</h2>
+              <p className="text-sm text-muted-foreground">{orgName}</p>
             </div>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+          <button onClick={onClose} className="text-muted-foreground hover:text-muted-foreground transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -130,7 +130,7 @@ export function ClaimModal({ orgId, orgName, orgWebsiteUrl, onClose }: ClaimModa
                 onSubmit={handleSubmit}
                 className="space-y-4"
               >
-                <p className="text-sm text-gray-600 leading-relaxed">
+                <p className="text-sm text-muted-foreground leading-relaxed">
                   Tell us your role at {orgName}. If your work email matches the org&apos;s website
                   domain, you&apos;ll get instant access. Otherwise we&apos;ll review within 24–48 hours.
                 </p>
@@ -143,7 +143,7 @@ export function ClaimModal({ orgId, orgName, orgWebsiteUrl, onClose }: ClaimModa
                 )}
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                  <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">
                     Your role
                   </label>
                   <select
@@ -159,7 +159,7 @@ export function ClaimModal({ orgId, orgName, orgWebsiteUrl, onClose }: ClaimModa
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                  <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">
                     Work email
                   </label>
                   <input
@@ -173,7 +173,7 @@ export function ClaimModal({ orgId, orgName, orgWebsiteUrl, onClose }: ClaimModa
                 </div>
 
                 {!isAuthed && (
-                  <p className="text-xs text-gray-400 text-center">
+                  <p className="text-xs text-muted-foreground text-center">
                     You&apos;ll need a Merit account to complete setup. We&apos;ll link to it after approval.
                   </p>
                 )}
@@ -181,7 +181,7 @@ export function ClaimModal({ orgId, orgName, orgWebsiteUrl, onClose }: ClaimModa
                 <button
                   type="submit"
                   disabled={isLoading || !form.workEmail}
-                  className="w-full bg-gray-900 text-white font-semibold py-3 rounded-xl text-sm hover:bg-gray-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+                  className="w-full bg-card text-white font-semibold py-3 rounded-xl text-sm hover:bg-muted disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
                 >
                   {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
                   {isLoading ? 'Submitting...' : 'Submit claim →'}
@@ -201,15 +201,15 @@ export function ClaimModal({ orgId, orgName, orgWebsiteUrl, onClose }: ClaimModa
                   <Clock className="w-8 h-8 text-amber-600" />
                 </div>
                 <div>
-                  <p className="font-bold text-gray-900 text-lg">Claim submitted</p>
-                  <p className="text-gray-500 text-sm mt-2 leading-relaxed">
+                  <p className="font-bold text-foreground text-lg">Claim submitted</p>
+                  <p className="text-muted-foreground text-sm mt-2 leading-relaxed">
                     We&apos;ll review your request within 24–48 hours and email{' '}
                     <span className="font-medium">{form.workEmail}</span> when approved.
                   </p>
                 </div>
                 <button
                   onClick={onClose}
-                  className="text-sm text-gray-500 hover:text-gray-700 underline"
+                  className="text-sm text-muted-foreground hover:text-foreground underline"
                 >
                   Close
                 </button>
@@ -232,12 +232,12 @@ export function ClaimModal({ orgId, orgName, orgWebsiteUrl, onClose }: ClaimModa
                   <CheckCircle2 className="w-8 h-8 text-green-600" />
                 </motion.div>
                 <div>
-                  <p className="font-bold text-gray-900 text-lg">Instantly approved!</p>
-                  <p className="text-gray-500 text-sm mt-2">
+                  <p className="font-bold text-foreground text-lg">Instantly approved!</p>
+                  <p className="text-muted-foreground text-sm mt-2">
                     Domain matched. Setting up your dashboard...
                   </p>
                 </div>
-                <Loader2 className="w-5 h-5 text-gray-400 animate-spin mx-auto" />
+                <Loader2 className="w-5 h-5 text-muted-foreground animate-spin mx-auto" />
               </motion.div>
             )}
           </AnimatePresence>

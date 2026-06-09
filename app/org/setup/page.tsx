@@ -9,8 +9,8 @@ import { useMeritStore } from '@/lib/store';
 import { orgSignupApi, mapUser, ApiError } from '@/lib/api';
 
 const inputClass =
-  'w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-3 text-sm placeholder-gray-600 focus:outline-none focus:border-white transition-colors';
-const labelClass = 'block text-sm font-medium text-gray-300 mb-1.5';
+  'w-full bg-muted border border-border text-foreground rounded-xl px-4 py-3 text-sm placeholder-gray-600 focus:outline-none focus:border-ring transition-colors';
+const labelClass = 'block text-sm font-medium text-muted-foreground mb-1.5';
 
 function SetupForm() {
   const router = useRouter();
@@ -95,11 +95,11 @@ function SetupForm() {
 
   if (!orgId) {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center p-6">
-        <div className="text-center text-white space-y-4">
-          <Building2 className="w-12 h-12 text-gray-600 mx-auto" />
-          <p className="text-gray-400">No organization selected.</p>
-          <Link href="/org" className="text-white underline text-sm">Go to Merit for Organizations →</Link>
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
+        <div className="text-center text-foreground space-y-4">
+          <Building2 className="w-12 h-12 text-muted-foreground mx-auto" />
+          <p className="text-muted-foreground">No organization selected.</p>
+          <Link href="/org" className="text-foreground underline text-sm">Go to Merit for Organizations →</Link>
         </div>
       </div>
     );
@@ -107,42 +107,42 @@ function SetupForm() {
 
   if (step === 'done') {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
         <div className="text-center space-y-4">
           <div className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mx-auto">
-            <CheckCircle2 className="w-8 h-8 text-green-400" />
+            <CheckCircle2 className="w-8 h-8 text-success" />
           </div>
-          <p className="text-xl font-bold text-white">Welcome to Merit!</p>
-          <p className="text-gray-400 text-sm">Taking you to your dashboard...</p>
-          <Loader2 className="w-5 h-5 text-gray-600 animate-spin mx-auto" />
+          <p className="text-xl font-bold text-foreground">Welcome to Merit!</p>
+          <p className="text-muted-foreground text-sm">Taking you to your dashboard...</p>
+          <Loader2 className="w-5 h-5 text-muted-foreground animate-spin mx-auto" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center p-6">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">
       <div className="mb-8 text-center">
-        <a href="/org" className="text-2xl font-bold text-white">merit.</a>
-        <p className="text-gray-500 text-sm mt-1">Set up your organization account</p>
+        <a href="/org" className="text-2xl font-bold text-foreground">merit.</a>
+        <p className="text-muted-foreground text-sm mt-1">Set up your organization account</p>
       </div>
 
-      <div className="w-full max-w-sm bg-gray-900 border border-gray-800 rounded-2xl p-8 space-y-6">
+      <div className="w-full max-w-sm bg-card border border-border rounded-2xl p-8 space-y-6">
         {orgName && (
-          <div className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/10">
-            <div className="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center text-white font-bold shrink-0">
+          <div className="flex items-center gap-3 p-3 bg-card/5 rounded-xl border border-white/10">
+            <div className="w-9 h-9 rounded-lg bg-card/10 flex items-center justify-center text-foreground font-bold shrink-0">
               {orgName[0]}
             </div>
             <div>
-              <p className="text-white text-sm font-medium">{orgName}</p>
-              <p className="text-gray-500 text-xs">Setting up admin access</p>
+              <p className="text-foreground text-sm font-medium">{orgName}</p>
+              <p className="text-muted-foreground text-xs">Setting up admin access</p>
             </div>
           </div>
         )}
 
         <div>
-          <h1 className="text-xl font-bold text-white">Create your account</h1>
-          <p className="text-gray-400 text-sm mt-1">This will be your login for the org dashboard.</p>
+          <h1 className="text-xl font-bold text-foreground">Create your account</h1>
+          <p className="text-muted-foreground text-sm mt-1">This will be your login for the org dashboard.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -186,7 +186,7 @@ function SetupForm() {
                 type="button"
                 onClick={() => setShowPw(!showPw)}
                 tabIndex={-1}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
               >
                 {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -210,13 +210,13 @@ function SetupForm() {
                 type="button"
                 onClick={() => setShowConfirmPw(!showConfirmPw)}
                 tabIndex={-1}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
               >
                 {showConfirmPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
             {form.confirmPassword && form.password !== form.confirmPassword && (
-              <p className="text-red-400 text-xs mt-1">Passwords do not match</p>
+              <p className="text-danger text-xs mt-1">Passwords do not match</p>
             )}
           </div>
 
@@ -242,17 +242,17 @@ function SetupForm() {
               !form.password ||
               form.password !== form.confirmPassword
             }
-            className="w-full bg-white text-gray-900 font-semibold py-3 rounded-xl text-sm hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 mt-2"
+            className="w-full bg-foreground text-background font-semibold py-3 rounded-xl text-sm hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 mt-2"
           >
             {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
             {isLoading ? 'Creating account...' : 'Create account →'}
           </button>
         </form>
 
-        <div className="pt-2 border-t border-gray-800 text-center">
-          <p className="text-gray-500 text-sm">
+        <div className="pt-2 border-t border-border text-center">
+          <p className="text-muted-foreground text-sm">
             Already have an account?{' '}
-            <Link href="/org/login" className="text-gray-300 hover:text-white">
+            <Link href="/org/login" className="text-muted-foreground hover:text-foreground">
               Sign in instead
             </Link>
           </p>

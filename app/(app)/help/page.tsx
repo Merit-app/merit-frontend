@@ -35,40 +35,40 @@ export default function HelpPage() {
   return (
     <div className="px-4 py-4 md:px-8 md:py-6 max-w-2xl">
       <div className="mb-8">
-        <h1 className="text-h1 text-ink-900">Help</h1>
-        <p className="text-small text-ink-500 mt-1">Answers to common questions about Merit.</p>
+        <h1 className="text-h1 text-foreground">Help</h1>
+        <p className="text-small text-muted-foreground mt-1">Answers to common questions about Merit.</p>
       </div>
 
       {/* FAQ */}
       <div className="space-y-4 mb-10">
         {FAQS.map(({ q, a }) => (
-          <div key={q} className="bg-white rounded-xl border border-ink-200 p-5">
-            <p className="text-[13px] font-semibold text-ink-900 mb-2">{q}</p>
-            <p className="text-small text-ink-500 leading-relaxed">{a}</p>
+          <div key={q} className="bg-card rounded-xl border border-border p-5">
+            <p className="text-[13px] font-semibold text-foreground mb-2">{q}</p>
+            <p className="text-small text-muted-foreground leading-relaxed">{a}</p>
           </div>
         ))}
       </div>
 
       {/* Contact */}
-      <div className="bg-white rounded-xl border border-ink-200 p-5">
-        <p className="text-[13px] font-semibold text-ink-900 mb-4">Still need help?</p>
+      <div className="bg-card rounded-xl border border-border p-5">
+        <p className="text-[13px] font-semibold text-foreground mb-4">Still need help?</p>
         <div className="space-y-3">
           <a
             href="mailto:hello@merit.app"
-            className="flex items-center gap-3 text-[13px] text-ink-700 hover:text-merit-blue-600 transition-colors"
+            className="flex items-center gap-3 text-[13px] text-foreground hover:text-merit-blue-600 transition-colors"
           >
-            <Mail size={15} className="text-ink-400 shrink-0" />
+            <Mail size={15} className="text-muted-foreground shrink-0" />
             hello@merit.app
           </a>
-          <div className="flex items-center gap-3 text-[13px] text-ink-500">
-            <MessageCircle size={15} className="text-ink-400 shrink-0" />
+          <div className="flex items-center gap-3 text-[13px] text-muted-foreground">
+            <MessageCircle size={15} className="text-muted-foreground shrink-0" />
             Live chat coming soon
           </div>
           <Link
             href="/export"
-            className="flex items-center gap-3 text-[13px] text-ink-700 hover:text-merit-blue-600 transition-colors"
+            className="flex items-center gap-3 text-[13px] text-foreground hover:text-merit-blue-600 transition-colors"
           >
-            <FileText size={15} className="text-ink-400 shrink-0" />
+            <FileText size={15} className="text-muted-foreground shrink-0" />
             Export your record
           </Link>
         </div>

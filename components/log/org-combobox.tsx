@@ -97,15 +97,15 @@ export function OrgCombobox({ value, onChange }: Props) {
 
   if (value) {
     return (
-      <div className="flex items-center gap-2 h-10 px-3 rounded-lg border border-ink-200 bg-white">
-        <span className="flex-1 text-[14px] text-ink-900 truncate">{value.name}</span>
+      <div className="flex items-center gap-2 h-10 px-3 rounded-lg border border-border bg-card">
+        <span className="flex-1 text-[14px] text-foreground truncate">{value.name}</span>
         {justVerified && (
           <Check size={14} className="text-success shrink-0 animate-in fade-in duration-150" />
         )}
         <button
           type="button"
           onClick={() => onChange(null)}
-          className="text-ink-400 hover:text-ink-700 transition-colors"
+          className="text-muted-foreground hover:text-foreground transition-colors"
           aria-label="Clear organization"
         >
           <X size={14} />
@@ -120,18 +120,18 @@ export function OrgCombobox({ value, onChange }: Props) {
         type="button"
         onClick={() => setOpen(!open)}
         className={cn(
-          'flex w-full items-center justify-between h-10 px-3 rounded-lg border bg-white text-left text-[14px] transition-colors',
-          open ? 'border-merit-blue-600' : 'border-ink-200 hover:border-ink-300',
+          'flex w-full items-center justify-between h-10 px-3 rounded-lg border bg-card text-left text-[14px] transition-colors',
+          open ? 'border-merit-blue-600' : 'border-border hover:border-border',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merit-blue-600'
         )}
       >
-        <span className="text-ink-400">Search organizations...</span>
-        <ChevronsUpDown size={14} className="text-ink-400 shrink-0" />
+        <span className="text-muted-foreground">Search organizations...</span>
+        <ChevronsUpDown size={14} className="text-muted-foreground shrink-0" />
       </button>
 
       {open && (
         <div
-          className="absolute z-50 top-full left-0 right-0 mt-1 bg-white border border-ink-200 rounded-xl overflow-hidden"
+          className="absolute z-50 top-full left-0 right-0 mt-1 bg-card border border-border rounded-xl overflow-hidden"
           style={{ boxShadow: '0 4px 12px -2px rgb(0 0 0 / 0.08)' }}
         >
           {!creatingNew ? (
@@ -142,26 +142,26 @@ export function OrgCombobox({ value, onChange }: Props) {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Type to search..."
-                  className="flex-1 text-[13px] text-ink-900 placeholder:text-ink-400 outline-none"
+                  className="flex-1 text-[13px] text-foreground placeholder:text-muted-foreground outline-none"
                 />
-                {searching && <Loader2 size={13} className="text-ink-400 animate-spin shrink-0" />}
+                {searching && <Loader2 size={13} className="text-muted-foreground animate-spin shrink-0" />}
               </div>
-              <div className="border-t border-ink-100" />
+              <div className="border-t border-border" />
               <div className="max-h-52 overflow-y-auto py-1">
                 {!searching && query && results.length === 0 && (
-                  <p className="px-3 py-2 text-[13px] text-ink-500">No results for "{query}"</p>
+                  <p className="px-3 py-2 text-[13px] text-muted-foreground">No results for "{query}"</p>
                 )}
                 {!query && (
-                  <p className="px-3 py-2 text-[13px] text-ink-500">Start typing to search…</p>
+                  <p className="px-3 py-2 text-[13px] text-muted-foreground">Start typing to search…</p>
                 )}
                 {results.map((org) => (
                   <button
                     key={org.id}
                     type="button"
                     onClick={() => selectOrg(org)}
-                    className="flex w-full items-center justify-between px-3 py-2 text-left hover:bg-ink-50 transition-colors"
+                    className="flex w-full items-center justify-between px-3 py-2 text-left hover:bg-background transition-colors"
                   >
-                    <span className="text-[13px] text-ink-900">{org.name}</span>
+                    <span className="text-[13px] text-foreground">{org.name}</span>
                     {org.registrationStatus !== 'unregistered' && (
                       <span className="text-[11px] font-medium text-merit-blue-600 bg-merit-blue-50 px-2 py-0.5 rounded-full shrink-0 ml-2">
                         {org.registrationStatus === 'institutional' ? 'Partner' : 'Registered'}
@@ -170,7 +170,7 @@ export function OrgCombobox({ value, onChange }: Props) {
                   </button>
                 ))}
               </div>
-              <div className="border-t border-ink-100">
+              <div className="border-t border-border">
                 <button
                   type="button"
                   onClick={() => { setCreatingNew(true); setNewOrgName(query); }}
@@ -183,18 +183,18 @@ export function OrgCombobox({ value, onChange }: Props) {
             </>
           ) : (
             <div className="p-4 space-y-3">
-              <p className="text-[13px] font-medium text-ink-900">New organization</p>
+              <p className="text-[13px] font-medium text-foreground">New organization</p>
               <input
                 autoFocus
                 value={newOrgName}
                 onChange={(e) => setNewOrgName(e.target.value)}
                 placeholder="Organization name"
-                className="w-full h-9 px-3 rounded-lg border border-ink-200 text-[13px] text-ink-900 placeholder:text-ink-400 focus:border-merit-blue-600 focus:outline-none"
+                className="w-full h-9 px-3 rounded-lg border border-border text-[13px] text-foreground placeholder:text-muted-foreground focus:border-merit-blue-600 focus:outline-none"
               />
               <select
                 value={newOrgCategory}
                 onChange={(e) => setNewOrgCategory(e.target.value)}
-                className="w-full h-9 px-3 rounded-lg border border-ink-200 text-[13px] text-ink-900 focus:border-merit-blue-600 focus:outline-none bg-white"
+                className="w-full h-9 px-3 rounded-lg border border-border text-[13px] text-foreground focus:border-merit-blue-600 focus:outline-none bg-card"
               >
                 {CATEGORY_OPTIONS.map((c) => <option key={c}>{c}</option>)}
               </select>
@@ -210,7 +210,7 @@ export function OrgCombobox({ value, onChange }: Props) {
                 <button
                   type="button"
                   onClick={() => setCreatingNew(false)}
-                  className="h-9 px-3 border border-ink-200 text-[13px] text-ink-700 rounded-lg hover:bg-ink-50 transition-colors"
+                  className="h-9 px-3 border border-border text-[13px] text-foreground rounded-lg hover:bg-background transition-colors"
                 >
                   Cancel
                 </button>

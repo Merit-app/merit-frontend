@@ -65,7 +65,7 @@ export function VolunteerInterestButton({ orgId, orgName, orgSlug }: Props) {
       className={`flex items-center gap-2 h-8 px-3 rounded-lg text-[12px] font-medium transition-all disabled:opacity-50 shadow-sm ${
         registered
           ? 'bg-green-50 text-green-700 border border-green-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200'
-          : 'bg-gray-900 text-white hover:bg-gray-700 border border-gray-700'
+          : 'bg-card text-white hover:bg-muted border border-border'
       }`}
     >
       {loading ? (

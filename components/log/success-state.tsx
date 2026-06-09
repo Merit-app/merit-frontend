@@ -48,10 +48,10 @@ export function SuccessState({ supervisorName, onLogAnother }: Props) {
         </motion.div>
       </motion.div>
 
-      <h2 className="text-h1 text-ink-900 mb-2">
+      <h2 className="text-h1 text-foreground mb-2">
         Sent to {supervisorName || 'your supervisor'}
       </h2>
-      <p className="text-small text-ink-500 mb-8">
+      <p className="text-small text-muted-foreground mb-8">
         They'll get a text in the next few seconds.
       </p>
 
@@ -66,14 +66,14 @@ export function SuccessState({ supervisorName, onLogAnother }: Props) {
         <Button
           variant="outline"
           onClick={() => router.push('/dashboard')}
-          className="border-ink-200 text-ink-700 hover:bg-ink-50 font-medium"
+          className="border-border text-foreground hover:bg-background font-medium"
         >
           Back to dashboard
         </Button>
       </div>
 
       {/* Live status indicator */}
-      <div className="flex items-center gap-2 text-[13px] text-ink-500">
+      <div className="flex items-center gap-2 text-[13px] text-muted-foreground">
         <span
           className={[
             'h-2 w-2 rounded-full shrink-0 transition-colors duration-500',

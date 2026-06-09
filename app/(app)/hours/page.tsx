@@ -144,24 +144,24 @@ export default function HoursPage() {
   }
 
   function SortIcon({ col }: { col: SortKey }) {
-    if (sortKey !== col) return <ChevronDown size={12} className="text-ink-300 ml-0.5" />;
+    if (sortKey !== col) return <ChevronDown size={12} className="text-muted-foreground ml-0.5" />;
     return sortDir === 'asc'
-      ? <ChevronUp size={12} className="text-ink-600 ml-0.5" />
-      : <ChevronDown size={12} className="text-ink-600 ml-0.5" />;
+      ? <ChevronUp size={12} className="text-muted-foreground ml-0.5" />
+      : <ChevronDown size={12} className="text-muted-foreground ml-0.5" />;
   }
 
   return (
     <div className="px-4 py-4 md:px-8 md:py-6">
       {/* Top bar */}
       <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-1 bg-ink-100 p-1 rounded-lg">
+        <div className="flex items-center gap-1 bg-muted p-1 rounded-lg">
           {FILTER_TABS.map(({ key, label }) => (
             <button
               key={key}
               onClick={() => setFilter(key)}
               className={cn(
                 'px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors',
-                filter === key ? 'bg-white text-ink-900 shadow-sm' : 'text-ink-500 hover:text-ink-700'
+                filter === key ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
               )}
             >
               {label}
@@ -171,7 +171,7 @@ export default function HoursPage() {
 
         <div className="flex items-center gap-3">
           <div className="relative">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-400 pointer-events-none" />
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -191,11 +191,11 @@ export default function HoursPage() {
 
       {/* Bulk action bar */}
       {someSelected && (
-        <div className="mb-4 flex items-center gap-3 rounded-lg bg-ink-900 px-4 py-2.5">
-          <span className="text-[13px] text-white">{selected.size} selected</span>
+        <div className="mb-4 flex items-center gap-3 rounded-lg bg-foreground px-4 py-2.5">
+          <span className="text-[13px] text-background font-medium">{selected.size} selected</span>
           <button
             onClick={() => setSelected(new Set())}
-            className="text-[13px] text-ink-400 hover:text-white transition-colors"
+            className="text-[13px] text-background/70 hover:text-background transition-colors"
           >
             Deselect all
           </button>
@@ -203,7 +203,7 @@ export default function HoursPage() {
           <button
             onClick={handleBulkDelete}
             disabled={bulkDeleting}
-            className="flex items-center gap-1.5 text-[13px] font-medium text-white bg-danger hover:bg-danger/90 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+            className="flex items-center gap-1.5 text-[13px] font-medium text-white bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
           >
             <Trash2 size={13} />
             {bulkDeleting ? 'Deleting...' : `Delete ${selected.size}`}
@@ -214,9 +214,9 @@ export default function HoursPage() {
       {/* Table */}
       {filtered.length === 0 ? (
         <div className="flex flex-col items-center py-20 text-center">
-          <Clock size={32} className="text-ink-300 mb-3" />
-          <p className="text-[15px] font-semibold text-ink-900 mb-1">No sessions found.</p>
-          <p className="text-small text-ink-500 mb-4">
+          <Clock size={32} className="text-muted-foreground mb-3" />
+          <p className="text-[15px] font-semibold text-foreground mb-1">No sessions found.</p>
+          <p className="text-small text-muted-foreground mb-4">
             {query || filter !== 'all'
               ? 'Try adjusting your search or filter.'
               : 'Your verified sessions will appear here once logged.'}
@@ -230,16 +230,16 @@ export default function HoursPage() {
           </Link>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-ink-200 overflow-x-auto">
+        <div className="bg-card rounded-xl border border-border overflow-x-auto">
           <div className="min-w-[820px]">
             {/* Header */}
-            <div className="grid grid-cols-[32px_120px_1fr_1fr_80px_140px_100px_40px] gap-3 px-4 py-2.5 border-b border-ink-200 bg-ink-50 items-center">
+            <div className="grid grid-cols-[32px_120px_1fr_1fr_80px_140px_100px_40px] gap-3 px-4 py-2.5 border-b border-border bg-background items-center">
               <input
                 type="checkbox"
                 checked={allSelected}
                 onChange={toggleSelectAll}
                 aria-label="Select all sessions"
-                className="h-4 w-4 rounded border-ink-300 accent-merit-blue-600 cursor-pointer"
+                className="h-4 w-4 rounded border-border accent-merit-blue-600 cursor-pointer"
               />
               {(
                 [
@@ -258,8 +258,8 @@ export default function HoursPage() {
                   onClick={() => key && toggleSort(key)}
                   disabled={noSort}
                   className={cn(
-                    'flex items-center text-[11px] font-semibold uppercase tracking-wide text-ink-500 text-left',
-                    !noSort && 'hover:text-ink-700 cursor-pointer',
+                    'flex items-center text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-left',
+                    !noSort && 'hover:text-foreground cursor-pointer',
                     noSort && 'cursor-default'
                   )}
                 >
@@ -287,10 +287,10 @@ export default function HoursPage() {
                   }}
                   className={cn(
                     'grid grid-cols-[32px_120px_1fr_1fr_80px_140px_100px_40px] gap-3 px-4 py-3.5',
-                    'border-b border-ink-100 last:border-0 items-center',
+                    'border-b border-border last:border-0 items-center',
                     'transition-colors duration-100 cursor-pointer focus-visible:outline-none',
                     'focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-merit-blue-400',
-                    isSelected ? 'bg-merit-blue-50' : 'hover:bg-ink-50'
+                    isSelected ? 'bg-merit-blue-50' : 'hover:bg-background'
                   )}
                 >
                   <input
@@ -299,15 +299,15 @@ export default function HoursPage() {
                     onChange={(e) => toggleSelectRow(session.id, e)}
                     onClick={(e) => e.stopPropagation()}
                     aria-label={`Select session at ${session.org}`}
-                    className="h-4 w-4 rounded border-ink-300 accent-merit-blue-600 cursor-pointer"
+                    className="h-4 w-4 rounded border-border accent-merit-blue-600 cursor-pointer"
                   />
-                  <span className="text-[13px] text-ink-500 tabular-nums">{formatSessionDate(session.date)}</span>
-                  <span className="text-[13px] font-medium text-ink-900 truncate">{session.org}</span>
-                  <span className="text-[12px] text-ink-500 truncate">{session.activity}</span>
-                  <span className="text-[13px] font-medium text-ink-900 tabular-nums">{hoursStr} hrs</span>
+                  <span className="text-[13px] text-muted-foreground tabular-nums">{formatSessionDate(session.date)}</span>
+                  <span className="text-[13px] font-medium text-foreground truncate">{session.org}</span>
+                  <span className="text-[12px] text-muted-foreground truncate">{session.activity}</span>
+                  <span className="text-[13px] font-medium text-foreground tabular-nums">{hoursStr} hrs</span>
                   <TierBadge tier={session.tier} />
-                  <StatusBadge status={session.status} />
-                  <span className="text-ink-300 text-[18px] leading-none select-none">›</span>
+                  <StatusBadge status={session.status} selfReported={session.selfReported} />
+                  <span className="text-muted-foreground text-[18px] leading-none select-none">›</span>
                 </div>
               );
             })}

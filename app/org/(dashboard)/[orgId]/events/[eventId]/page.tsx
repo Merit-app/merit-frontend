@@ -52,11 +52,11 @@ export default function EventDetailPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-6 h-6 text-gray-600 animate-spin" />
+        <Loader2 className="w-6 h-6 text-muted-foreground animate-spin" />
       </div>
     );
   }
-  if (!event) return <p className="text-gray-500">Event not found.</p>;
+  if (!event) return <p className="text-muted-foreground">Event not found.</p>;
 
   const startDate = new Date(event.start_time);
   const endDate = new Date(event.end_time);
@@ -71,58 +71,58 @@ export default function EventDetailPage() {
 
   return (
     <div className="space-y-6 max-w-3xl">
-      <Link href={`/org/${orgId}/events`} className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm">
+      <Link href={`/org/${orgId}/events`} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm">
         <ArrowLeft className="w-4 h-4" />
         Back to events
       </Link>
 
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+      <div className="bg-card border border-border rounded-2xl p-6">
         <div className="flex items-start justify-between gap-4 mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-white">{event.title}</h1>
+            <h1 className="text-2xl font-bold text-foreground">{event.title}</h1>
             {event.description && (
-              <p className="text-gray-400 text-sm mt-2">{event.description}</p>
+              <p className="text-muted-foreground text-sm mt-2">{event.description}</p>
             )}
           </div>
           <span className={`text-xs px-3 py-1.5 rounded-full font-medium shrink-0 ${
-            event.status === 'published'  ? 'bg-green-500/10 text-green-400'  :
-            event.status === 'completed'  ? 'bg-gray-700 text-gray-400'       :
-            event.status === 'cancelled'  ? 'bg-red-500/10 text-red-400'      :
-                                            'bg-amber-500/10 text-amber-400'
+            event.status === 'published'  ? 'bg-green-500/10 text-success'  :
+            event.status === 'completed'  ? 'bg-muted text-muted-foreground'       :
+            event.status === 'cancelled'  ? 'bg-red-500/10 text-danger'      :
+                                            'bg-amber-500/10 text-warning'
           }`}>
             {event.status}
           </span>
         </div>
 
         <div className="grid grid-cols-2 gap-3 text-sm">
-          <div className="flex items-center gap-2 text-gray-400">
+          <div className="flex items-center gap-2 text-muted-foreground">
             <Calendar className="w-4 h-4 shrink-0" />
             {startDate.toLocaleDateString('en-CA', { weekday: 'long', month: 'long', day: 'numeric' })}
           </div>
-          <div className="flex items-center gap-2 text-gray-400">
+          <div className="flex items-center gap-2 text-muted-foreground">
             <Clock className="w-4 h-4 shrink-0" />
             {startDate.toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit' })}
             {' – '}
             {endDate.toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit' })}
           </div>
           {event.location && (
-            <div className="flex items-center gap-2 text-gray-400">
+            <div className="flex items-center gap-2 text-muted-foreground">
               <MapPin className="w-4 h-4 shrink-0" />
               {event.location}
             </div>
           )}
-          <div className="flex items-center gap-2 text-gray-400">
+          <div className="flex items-center gap-2 text-muted-foreground">
             <Users className="w-4 h-4 shrink-0" />
             {allActive.length} signed up{event.max_volunteers ? ` / ${event.max_volunteers}` : ''}
           </div>
         </div>
 
-        <div className="flex gap-3 mt-5 pt-5 border-t border-gray-800">
+        <div className="flex gap-3 mt-5 pt-5 border-t border-border">
           {event.status === 'draft' && (
             <button
               onClick={() => publishEvent.mutate()}
               disabled={publishEvent.isPending}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white text-gray-900 text-sm font-semibold hover:bg-gray-100 disabled:opacity-50 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-foreground text-background text-sm font-semibold hover:bg-muted disabled:opacity-50 transition-colors"
             >
               {publishEvent.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
               Publish + notify volunteers
@@ -136,7 +136,7 @@ export default function EventDetailPage() {
                 }
               }}
               disabled={completeEvent.isPending}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-green-500/10 text-green-400 border border-green-500/20 text-sm font-semibold hover:bg-green-500/20 disabled:opacity-50 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-green-500/10 text-success border border-green-500/20 text-sm font-semibold hover:bg-green-500/20 disabled:opacity-50 transition-colors"
             >
               {completeEvent.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
               Complete event + log hours
@@ -146,37 +146,37 @@ export default function EventDetailPage() {
       </div>
 
       {/* Volunteer list */}
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
-        <div className="p-4 border-b border-gray-800 flex items-center justify-between">
-          <h3 className="font-semibold text-white">Volunteers ({allActive.length})</h3>
+      <div className="bg-card border border-border rounded-2xl overflow-hidden">
+        <div className="p-4 border-b border-border flex items-center justify-between">
+          <h3 className="font-semibold text-foreground">Volunteers ({allActive.length})</h3>
           {isToday && event.status === 'published' && (
-            <span className="text-xs text-amber-400 font-medium bg-amber-500/10 px-2.5 py-1 rounded-full">
+            <span className="text-xs text-warning font-medium bg-amber-500/10 px-2.5 py-1 rounded-full">
               Day-of check-in active
             </span>
           )}
         </div>
 
         {allActive.length === 0 ? (
-          <div className="p-8 text-center text-gray-500 text-sm">No volunteers signed up yet</div>
+          <div className="p-8 text-center text-muted-foreground text-sm">No volunteers signed up yet</div>
         ) : (
-          <div className="divide-y divide-gray-800">
+          <div className="divide-y divide-border">
             {allActive.map((signup: any) => {
               const u = signup.users;
               const isCheckedIn = signup.status === 'checked_in';
               const showCheckIn = (isToday || !isUpcoming) && event.status === 'published';
               return (
                 <div key={signup.id} className="flex items-center gap-4 px-5 py-3">
-                  <div className="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center font-bold text-gray-400 text-sm shrink-0">
+                  <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center font-bold text-muted-foreground text-sm shrink-0">
                     {u?.name?.[0] ?? '?'}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-white text-sm font-medium">{u?.name ?? 'Unknown'}</p>
-                    <p className="text-gray-500 text-xs">
+                    <p className="text-foreground text-sm font-medium">{u?.name ?? 'Unknown'}</p>
+                    <p className="text-muted-foreground text-xs">
                       {u?.school ?? ''}{u?.grade ? ` · Grade ${u.grade}` : ''}
                     </p>
                   </div>
                   {isCheckedIn ? (
-                    <span className="flex items-center gap-1.5 text-xs text-green-400 font-medium bg-green-500/10 px-2.5 py-1 rounded-full shrink-0">
+                    <span className="flex items-center gap-1.5 text-xs text-success font-medium bg-green-500/10 px-2.5 py-1 rounded-full shrink-0">
                       <CheckCircle2 className="w-3 h-3" />
                       Checked in
                     </span>
@@ -184,7 +184,7 @@ export default function EventDetailPage() {
                     <button
                       onClick={() => checkIn.mutate(u?.id)}
                       disabled={checkIn.isPending}
-                      className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-white text-gray-900 font-medium hover:bg-gray-100 disabled:opacity-50 transition-colors shrink-0"
+                      className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-foreground text-background font-medium hover:bg-muted disabled:opacity-50 transition-colors shrink-0"
                     >
                       <UserCheck className="w-3.5 h-3.5" />
                       Check in
@@ -197,17 +197,17 @@ export default function EventDetailPage() {
         )}
 
         {waitlisted.length > 0 && (
-          <div className="border-t border-gray-800">
-            <p className="text-xs text-gray-500 font-medium uppercase tracking-wider px-5 py-3">
+          <div className="border-t border-border">
+            <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider px-5 py-3">
               Waitlist ({waitlisted.length})
             </p>
             {waitlisted.map((signup: any) => (
               <div key={signup.id} className="flex items-center gap-4 px-5 py-3 opacity-60">
-                <div className="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center font-bold text-gray-400 text-sm shrink-0">
+                <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center font-bold text-muted-foreground text-sm shrink-0">
                   {signup.users?.name?.[0] ?? '?'}
                 </div>
-                <p className="text-gray-400 text-sm">{signup.users?.name}</p>
-                <span className="ml-auto text-xs text-gray-600">Waitlisted</span>
+                <p className="text-muted-foreground text-sm">{signup.users?.name}</p>
+                <span className="ml-auto text-xs text-muted-foreground">Waitlisted</span>
               </div>
             ))}
           </div>

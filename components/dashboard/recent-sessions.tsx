@@ -14,13 +14,18 @@ const STATUS_STYLES: Record<string, { label: string; className: string }> = {
   disputed: { label: 'Disputed', className: 'text-danger bg-danger-bg'  },
 };
 
+const SELF_TRACKED_STYLE = {
+  label: 'Self-tracked',
+  className: 'text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-500/10',
+};
+
 function RecentSessionsSkeleton() {
   return (
-    <div className="bg-white rounded-xl border border-ink-200 p-6 mb-6">
+    <div className="bg-card rounded-xl border border-border p-6 mb-6">
       <div className="flex items-center justify-between mb-5">
         <Skeleton className="h-4 w-32" />
       </div>
-      <div className="divide-y divide-ink-100">
+      <div className="divide-y divide-border">
         {[0, 1, 2, 3, 4].map((i) => (
           <div key={i} className="flex items-center gap-4 py-3">
             <Skeleton className="h-3 w-10 shrink-0" />
@@ -50,14 +55,14 @@ export function RecentSessions() {
 
   if (recent.length === 0) {
     return (
-      <div className="bg-white rounded-xl border border-ink-200 p-6 mb-6">
+      <div className="bg-card rounded-xl border border-border p-6 mb-6">
         <div className="flex items-center justify-between mb-5">
-          <h3 className="text-h3 text-ink-900">Recent sessions</h3>
+          <h3 className="text-h3 text-foreground">Recent sessions</h3>
         </div>
         <div className="flex flex-col items-center py-10 text-center">
-          <Clock size={32} className="text-ink-300 mb-3" />
-          <p className="text-[15px] font-semibold text-ink-900 mb-1">Nothing logged yet.</p>
-          <p className="text-small text-ink-500 mb-4">Your first session is the hardest.</p>
+          <Clock size={32} className="text-muted-foreground mb-3" />
+          <p className="text-[15px] font-semibold text-foreground mb-1">Nothing logged yet.</p>
+          <p className="text-small text-muted-foreground mb-4">Your first session is the hardest.</p>
           <Link
             href="/log"
             className="flex items-center gap-1.5 bg-merit-blue-600 hover:bg-merit-blue-700 text-white text-[13px] font-medium px-4 py-2 rounded-lg transition-colors"
@@ -71,9 +76,9 @@ export function RecentSessions() {
   }
 
   return (
-    <div className="bg-white rounded-xl border border-ink-200 p-6 mb-6">
+    <div className="bg-card rounded-xl border border-border p-6 mb-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-h3 text-ink-900">Recent sessions</h3>
+        <h3 className="text-h3 text-foreground">Recent sessions</h3>
         <Link
           href="/hours"
           className="text-[13px] font-medium text-merit-blue-600 hover:text-merit-blue-700 transition-colors"
@@ -82,28 +87,30 @@ export function RecentSessions() {
         </Link>
       </div>
 
-      <div className="divide-y divide-ink-100">
+      <div className="divide-y divide-border">
         {recent.map((session) => {
-          const status = STATUS_STYLES[session.status] ?? STATUS_STYLES.pending;
+          const status = session.selfReported
+            ? SELF_TRACKED_STYLE
+            : STATUS_STYLES[session.status] ?? STATUS_STYLES.pending;
           return (
             <button
               key={session.id}
               onClick={() => router.push(`/hours?session=${session.id}`)}
-              className="w-full flex items-center gap-4 py-3 hover:bg-ink-50 -mx-2 px-2 rounded-lg transition-colors duration-100 text-left cursor-pointer"
+              className="w-full flex items-center gap-4 py-3 hover:bg-background -mx-2 px-2 rounded-lg transition-colors duration-100 text-left cursor-pointer"
             >
               {/* Date - relative time */}
-              <span className="text-small text-ink-500 w-20 shrink-0 tabular-nums">
+              <span className="text-small text-muted-foreground w-20 shrink-0 tabular-nums">
                 {formatRelativeTime(session.date + 'T12:00:00')}
               </span>
 
               {/* Org + activity */}
               <div className="flex-1 min-w-0">
-                <p className="text-[13px] font-medium text-ink-900 truncate">{session.org}</p>
-                <p className="text-[12px] text-ink-500 truncate mt-0.5">{session.activity}</p>
+                <p className="text-[13px] font-medium text-foreground truncate">{session.org}</p>
+                <p className="text-[12px] text-muted-foreground truncate mt-0.5">{session.activity}</p>
               </div>
 
               {/* Hours */}
-              <span className="text-[13px] font-medium text-ink-700 tabular-nums shrink-0">
+              <span className="text-[13px] font-medium text-foreground tabular-nums shrink-0">
                 {session.hours % 1 === 0 ? session.hours : session.hours.toFixed(1)} hrs
               </span>
 

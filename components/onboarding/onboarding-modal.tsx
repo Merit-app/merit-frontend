@@ -30,7 +30,7 @@ function getSlides(firstName: string) {
           <div className="w-16 h-16 rounded-2xl bg-merit-blue-100 flex items-center justify-center">
             <Sparkles className="text-merit-blue-600" size={32} />
           </div>
-          <p className="text-xs text-ink-400 font-medium tracking-wide uppercase">merit.</p>
+          <p className="text-xs text-muted-foreground font-medium tracking-wide uppercase">merit.</p>
         </div>
       ),
     },
@@ -45,9 +45,9 @@ function getSlides(firstName: string) {
             { label: 'Hours', val: '3' },
             { label: 'Supervisor', val: 'Jane Smith' },
           ].map((f) => (
-            <div key={f.label} className="bg-white rounded-lg px-3 py-2 border border-ink-200 flex justify-between text-xs">
-              <span className="text-ink-400">{f.label}</span>
-              <span className="text-ink-700 font-medium">{f.val}</span>
+            <div key={f.label} className="bg-card rounded-lg px-3 py-2 border border-border flex justify-between text-xs">
+              <span className="text-muted-foreground">{f.label}</span>
+              <span className="text-foreground font-medium">{f.val}</span>
             </div>
           ))}
           <div className="bg-merit-blue-600 rounded-lg px-3 py-2 flex items-center justify-center gap-1.5 text-white text-xs font-medium">
@@ -64,7 +64,7 @@ function getSlides(firstName: string) {
       visual: (
         <div className="flex flex-col gap-2 w-64">
           <div className="bg-ink-700 rounded-2xl rounded-bl-sm px-4 py-2.5 text-xs text-ink-100 self-start max-w-[80%]">
-            <span className="font-medium text-ink-300 block mb-0.5 text-[10px]">Merit</span>
+            <span className="font-medium text-muted-foreground block mb-0.5 text-[10px]">Merit</span>
             Hi Jane! Kai logged 3 hrs at Vancouver Food Bank on Jun 14.{' '}
             <span className="text-merit-blue-300 font-semibold">Reply YES to confirm.</span>
           </div>
@@ -72,8 +72,8 @@ function getSlides(firstName: string) {
             YES
           </div>
           <div className="flex items-center gap-1.5 self-start">
-            <MessageSquare size={12} className="text-ink-400" />
-            <span className="text-[10px] text-ink-400">Verified via SMS</span>
+            <MessageSquare size={12} className="text-muted-foreground" />
+            <span className="text-[10px] text-muted-foreground">Verified via SMS</span>
           </div>
         </div>
       ),
@@ -103,7 +103,7 @@ function getSlides(firstName: string) {
               {b.label}
             </div>
           ))}
-          <div className="rounded-xl border px-3 py-2 text-center text-xs font-medium bg-gray-50 border-gray-200 text-gray-400 opacity-60 grayscale">
+          <div className="rounded-xl border px-3 py-2 text-center text-xs font-medium bg-muted border-border text-muted-foreground opacity-60 grayscale">
             <BadgeCheck className="mx-auto mb-0.5" size={16} />
             ???
           </div>
@@ -118,7 +118,7 @@ function getSlides(firstName: string) {
           <div className="w-16 h-16 rounded-full bg-merit-blue-100 flex items-center justify-center">
             <ArrowRight className="text-merit-blue-600" size={28} />
           </div>
-          <p className="text-xs text-ink-400">You're all set</p>
+          <p className="text-xs text-muted-foreground">You're all set</p>
         </div>
       ),
     },
@@ -164,16 +164,16 @@ export function OnboardingModal() {
 
   return (
     /* Backdrop */
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/60 backdrop-blur-sm px-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/60 backdrop-blur-sm px-4">
       {/* Card */}
-      <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden">
+      <div className="relative w-full max-w-md bg-card rounded-3xl shadow-2xl overflow-hidden">
 
         {/* Top bar */}
         <div className="flex items-center justify-between px-6 pt-5 pb-2">
           <OnboardingProgress total={TOTAL_SLIDES} current={step} />
           <button
             onClick={handleSkip}
-            className="text-ink-400 hover:text-ink-600 transition-colors p-1 rounded-lg hover:bg-ink-100"
+            className="text-muted-foreground hover:text-muted-foreground transition-colors p-1 rounded-lg hover:bg-muted"
             aria-label="Skip onboarding"
           >
             <X size={18} />
@@ -209,7 +209,7 @@ export function OnboardingModal() {
           {step > 0 && !isLast && (
             <button
               onClick={back}
-              className="text-sm text-ink-400 hover:text-ink-600 transition-colors py-1"
+              className="text-sm text-muted-foreground hover:text-muted-foreground transition-colors py-1"
             >
               Back
             </button>
@@ -218,7 +218,7 @@ export function OnboardingModal() {
           {(step === 0 || isLast) && (
             <button
               onClick={handleSkip}
-              className="text-sm text-ink-400 hover:text-ink-600 transition-colors py-1"
+              className="text-sm text-muted-foreground hover:text-muted-foreground transition-colors py-1"
             >
               {isLast ? "I'll do it later" : 'Skip'}
             </button>

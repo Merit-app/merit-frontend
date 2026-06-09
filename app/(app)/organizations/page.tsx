@@ -82,7 +82,7 @@ function MyOrgCard({ org, sessions }: { org: ReturnType<typeof useMeritStore.get
   return (
     <Link
       href={`/organizations/${org.slug}`}
-      className="min-w-[200px] rounded-xl border border-border bg-white p-4 flex flex-col gap-2 flex-shrink-0 hover:shadow-md transition-shadow duration-150"
+      className="min-w-[200px] rounded-xl border border-border bg-card p-4 flex flex-col gap-2 flex-shrink-0 hover:shadow-md transition-shadow duration-150"
     >
       {/* Avatar circle — deterministic color */}
       <div className={`w-10 h-10 rounded-full flex items-center justify-center text-[13px] font-bold shrink-0 ${color.bg} ${color.text}`}>
@@ -90,15 +90,15 @@ function MyOrgCard({ org, sessions }: { org: ReturnType<typeof useMeritStore.get
       </div>
 
       {/* Name */}
-      <p className="text-[13px] font-semibold text-ink-900 leading-snug line-clamp-2">{org.name}</p>
+      <p className="text-[13px] font-semibold text-foreground leading-snug line-clamp-2">{org.name}</p>
 
       {/* Stats */}
       <div className="mt-auto space-y-0.5">
-        <p className="text-[12px] text-ink-500">
-          <span className="font-semibold text-ink-700">{hoursStr} hrs</span> logged
+        <p className="text-[12px] text-muted-foreground">
+          <span className="font-semibold text-foreground">{hoursStr} hrs</span> logged
         </p>
         {lastRelative && (
-          <p className="text-[11px] text-ink-400">Last visited {lastRelative}</p>
+          <p className="text-[11px] text-muted-foreground">Last visited {lastRelative}</p>
         )}
       </div>
 
@@ -238,22 +238,22 @@ export default function OrganizationsPage() {
       {/* SECTION 1 — Your Organizations */}
       <section>
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-[16px] font-semibold text-ink-900">Your Organizations</h2>
+          <h2 className="text-[16px] font-semibold text-foreground">Your Organizations</h2>
           {organizations.length > 0 && (
-            <span className="text-[12px] text-ink-400">{organizations.length} {organizations.length === 1 ? 'org' : 'orgs'}</span>
+            <span className="text-[12px] text-muted-foreground">{organizations.length} {organizations.length === 1 ? 'org' : 'orgs'}</span>
           )}
         </div>
 
         {!hydrated ? (
           <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none">
             {[0, 1, 2].map((i) => (
-              <div key={i} className="flex-shrink-0 w-48 h-36 bg-white rounded-xl border border-ink-200 animate-pulse" />
+              <div key={i} className="flex-shrink-0 w-48 h-36 bg-card rounded-xl border border-border animate-pulse" />
             ))}
           </div>
         ) : organizations.length === 0 ? (
-          <div className="bg-white rounded-xl border border-ink-100 px-5 py-6 text-center">
-            <Building2 size={24} className="text-ink-300 mx-auto mb-2" />
-            <p className="text-[13px] text-ink-500">
+          <div className="bg-card rounded-xl border border-border px-5 py-6 text-center">
+            <Building2 size={24} className="text-muted-foreground mx-auto mb-2" />
+            <p className="text-[13px] text-muted-foreground">
               Your organizations will appear here once you log your first session.
             </p>
             <Link href="/log" className="mt-3 inline-block text-[13px] font-medium text-merit-blue-600 hover:text-merit-blue-700 transition-colors">
@@ -271,7 +271,7 @@ export default function OrganizationsPage() {
 
       {/* SECTION 2 — Discover */}
       <section>
-        <h2 className="text-[16px] font-semibold text-ink-900 mb-4">Discover</h2>
+        <h2 className="text-[16px] font-semibold text-foreground mb-4">Discover</h2>
 
         {/* Action cards — create or claim */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
@@ -280,12 +280,12 @@ export default function OrganizationsPage() {
             className="rounded-xl border-2 border-dashed border-border hover:border-ink-400 transition-colors p-4 cursor-pointer group text-left"
           >
             <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-lg bg-ink-100 flex items-center justify-center shrink-0 group-hover:bg-ink-200 transition-colors">
-                <Plus className="w-4 h-4 text-ink-600" />
+              <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0 group-hover:bg-muted transition-colors">
+                <Plus className="w-4 h-4 text-muted-foreground" />
               </div>
               <div>
-                <p className="font-semibold text-[13px] text-ink-900">Add your organization</p>
-                <p className="text-[12px] text-ink-500 mt-0.5">
+                <p className="font-semibold text-[13px] text-foreground">Add your organization</p>
+                <p className="text-[12px] text-muted-foreground mt-0.5">
                   Don't see your org? Add it so students can log hours here.
                 </p>
               </div>
@@ -300,12 +300,12 @@ export default function OrganizationsPage() {
             className="rounded-xl border-2 border-dashed border-border hover:border-ink-400 transition-colors p-4 cursor-pointer group text-left"
           >
             <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-lg bg-ink-100 flex items-center justify-center shrink-0 group-hover:bg-ink-200 transition-colors">
-                <ShieldCheck className="w-4 h-4 text-ink-600" />
+              <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0 group-hover:bg-muted transition-colors">
+                <ShieldCheck className="w-4 h-4 text-muted-foreground" />
               </div>
               <div>
-                <p className="font-semibold text-[13px] text-ink-900">Manage your org's page</p>
-                <p className="text-[12px] text-ink-500 mt-0.5">
+                <p className="font-semibold text-[13px] text-foreground">Manage your org's page</p>
+                <p className="text-[12px] text-muted-foreground mt-0.5">
                   Already in Merit? Find it below and click Claim.
                 </p>
               </div>
@@ -315,7 +315,7 @@ export default function OrganizationsPage() {
 
         {/* Search */}
         <div className="relative mb-4" id="discover-grid">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-400 pointer-events-none" />
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -333,8 +333,8 @@ export default function OrganizationsPage() {
               className={cn(
                 'flex-shrink-0 px-3 py-1.5 rounded-full text-[12px] font-medium transition-colors',
                 category === cat
-                  ? 'bg-ink-900 text-white'
-                  : 'bg-ink-100 text-ink-600 hover:bg-ink-200'
+                  ? 'bg-foreground text-background'
+                  : 'bg-muted text-muted-foreground hover:bg-muted'
               )}
             >
               {cat}
@@ -346,21 +346,21 @@ export default function OrganizationsPage() {
         {discoverLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="bg-white rounded-xl border border-ink-200 overflow-hidden animate-pulse">
-                <div className="h-20 bg-ink-100" />
+              <div key={i} className="bg-card rounded-xl border border-border overflow-hidden animate-pulse">
+                <div className="h-20 bg-muted" />
                 <div className="p-4 space-y-2">
-                  <div className="h-3 bg-ink-100 rounded w-3/4" />
-                  <div className="h-2.5 bg-ink-100 rounded w-1/2" />
-                  <div className="h-2.5 bg-ink-100 rounded w-2/3" />
+                  <div className="h-3 bg-muted rounded w-3/4" />
+                  <div className="h-2.5 bg-muted rounded w-1/2" />
+                  <div className="h-2.5 bg-muted rounded w-2/3" />
                 </div>
               </div>
             ))}
           </div>
         ) : discoverOrgs.length === 0 ? (
           <div className="flex flex-col items-center py-16 text-center">
-            <Building2 size={32} className="text-ink-300 mb-3" />
-            <p className="text-[15px] font-semibold text-ink-900 mb-1">No organizations found</p>
-            <p className="text-small text-ink-500">
+            <Building2 size={32} className="text-muted-foreground mb-3" />
+            <p className="text-[15px] font-semibold text-foreground mb-1">No organizations found</p>
+            <p className="text-small text-muted-foreground">
               {query ? 'Try a different search term.' : 'Check back later as more organizations join Merit.'}
             </p>
           </div>
@@ -382,7 +382,7 @@ export default function OrganizationsPage() {
                 <button
                   onClick={handleLoadMore}
                   disabled={loadingMore}
-                  className="px-6 py-2.5 rounded-lg border border-ink-200 text-[13px] font-medium text-ink-700 hover:bg-ink-50 transition-colors disabled:opacity-50"
+                  className="px-6 py-2.5 rounded-lg border border-border text-[13px] font-medium text-foreground hover:bg-background transition-colors disabled:opacity-50"
                 >
                   {loadingMore ? 'Loading...' : 'Load more'}
                 </button>

@@ -20,9 +20,9 @@ export function CookieBanner() {
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-0 inset-x-0 z-50 bg-ink-900/95 backdrop-blur-sm border-t border-ink-700">
+    <div className="fixed bottom-0 inset-x-0 z-50 bg-foreground/95 backdrop-blur-sm border-t border-ink-700">
       <div className="max-w-5xl mx-auto px-4 py-3 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-6">
-        <p className="flex-1 text-[13px] text-ink-300 leading-snug">
+        <p className="flex-1 text-[13px] text-muted-foreground leading-snug">
           We use cookies to improve your experience. By using Merit you agree to our{' '}
           <Link
             href="/privacy"

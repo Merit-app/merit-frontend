@@ -32,29 +32,26 @@ export function SmsPreview({ supervisorName, studentName, hours, org, date, acti
 
   return (
     <div className="flex flex-col h-full">
-      <p className="text-h3 text-ink-900 mb-4">SMS preview</p>
+      <p className="text-h3 text-foreground mb-4">SMS preview</p>
 
       {/* Phone frame */}
-      <div className="flex-1 bg-white rounded-xl border border-ink-200 p-5">
+      <div className="flex-1 bg-card rounded-xl border border-border p-5">
         {/* From header */}
-        <p className="text-[11px] font-mono text-ink-400 mb-4">
+        <p className="text-[11px] font-mono text-muted-foreground mb-4">
           From: Merit (+1 587 555 0199)
         </p>
 
         {/* Message bubble */}
-        <div
-          className="rounded-2xl rounded-tl-sm px-4 py-3 max-w-[85%] text-[13px] leading-relaxed text-ink-900"
-          style={{ background: '#F5F5F4' }}
-        >
+        <div className="rounded-2xl rounded-tl-sm bg-muted px-4 py-3 max-w-[85%] text-[13px] leading-relaxed text-foreground">
           {messageText}
         </div>
 
         {/* What happens next */}
-        <div className="mt-6 border-t border-ink-100 pt-4">
+        <div className="mt-6 border-t border-border pt-4">
           <button
             type="button"
             onClick={() => setExplainerOpen(!explainerOpen)}
-            className="flex items-center gap-1.5 text-[12px] font-medium text-ink-500 hover:text-ink-700 transition-colors"
+            className="flex items-center gap-1.5 text-[12px] font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             What happens next?
             {explainerOpen ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
@@ -67,7 +64,7 @@ export function SmsPreview({ supervisorName, studentName, hours, org, date, acti
                   <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-merit-blue-100 text-[10px] font-semibold text-merit-blue-700 mt-0.5">
                     {n}
                   </span>
-                  <span className="text-[12px] text-ink-600">{text}</span>
+                  <span className="text-[12px] text-muted-foreground">{text}</span>
                 </li>
               ))}
             </ol>

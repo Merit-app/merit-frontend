@@ -39,7 +39,7 @@ export function OnboardingSlide({ heading, subtext, visual, direction }: SlidePr
     >
       {/* Visual */}
       <div className={cn(
-        'w-full rounded-2xl bg-ink-100 flex items-center justify-center',
+        'w-full rounded-2xl bg-muted flex items-center justify-center',
         'h-40 sm:h-48',
       )}>
         {visual}
@@ -47,8 +47,8 @@ export function OnboardingSlide({ heading, subtext, visual, direction }: SlidePr
 
       {/* Copy */}
       <div className="space-y-2 max-w-sm">
-        <h2 className="text-xl font-semibold text-ink-900 leading-snug">{heading}</h2>
-        <p className="text-sm text-ink-500 leading-relaxed">{subtext}</p>
+        <h2 className="text-xl font-semibold text-foreground leading-snug">{heading}</h2>
+        <p className="text-sm text-muted-foreground leading-relaxed">{subtext}</p>
       </div>
     </motion.div>
   );

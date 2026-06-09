@@ -34,9 +34,9 @@ interface Props {
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="flex items-start justify-between gap-4 py-3 border-b border-ink-100 last:border-0">
-      <span className="text-[12px] font-medium text-ink-500 shrink-0 w-36">{label}</span>
-      <span className="text-[13px] text-ink-900 text-right">{value}</span>
+    <div className="flex items-start justify-between gap-4 py-3 border-b border-border last:border-0">
+      <span className="text-[12px] font-medium text-muted-foreground shrink-0 w-36">{label}</span>
+      <span className="text-[13px] text-foreground text-right">{value}</span>
     </div>
   );
 }
@@ -104,15 +104,15 @@ function EditForm({
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
         {/* Read-only info */}
-        <div className="flex items-center gap-3 rounded-lg bg-ink-50 px-4 py-3 text-[13px]">
-          <span className="text-ink-500 w-24 shrink-0">Date</span>
-          <span className="text-ink-700">{formatLongDate(session.date)}</span>
-          <span className="text-ink-500 ml-auto">{session.hours % 1 === 0 ? session.hours : session.hours.toFixed(1)} hrs</span>
+        <div className="flex items-center gap-3 rounded-lg bg-background px-4 py-3 text-[13px]">
+          <span className="text-muted-foreground w-24 shrink-0">Date</span>
+          <span className="text-foreground">{formatLongDate(session.date)}</span>
+          <span className="text-muted-foreground ml-auto">{session.hours % 1 === 0 ? session.hours : session.hours.toFixed(1)} hrs</span>
         </div>
 
         {/* Activity */}
         <div className="space-y-1.5">
-          <Label className="text-[13px] font-medium text-ink-900">Activity description</Label>
+          <Label className="text-[13px] font-medium text-foreground">Activity description</Label>
           <Textarea
             {...register('activity')}
             rows={3}
@@ -124,7 +124,7 @@ function EditForm({
 
         {/* Supervisor name */}
         <div className="space-y-1.5">
-          <Label className="text-[13px] font-medium text-ink-900">Supervisor name</Label>
+          <Label className="text-[13px] font-medium text-foreground">Supervisor name</Label>
           <Input
             {...register('supervisorName')}
             className={cn(errors.supervisorName && 'border-danger')}
@@ -134,13 +134,13 @@ function EditForm({
 
         {/* Supervisor phone */}
         <div className="space-y-1.5">
-          <Label className="text-[13px] font-medium text-ink-900">Supervisor phone</Label>
+          <Label className="text-[13px] font-medium text-foreground">Supervisor phone</Label>
           <Input type="tel" placeholder="+16045550100" {...register('supervisorPhone')} />
         </div>
 
         {/* Supervisor email */}
         <div className="space-y-1.5">
-          <Label className="text-[13px] font-medium text-ink-900">Supervisor email</Label>
+          <Label className="text-[13px] font-medium text-foreground">Supervisor email</Label>
           <Input
             type="email"
             placeholder="supervisor@org.ca"
@@ -151,7 +151,7 @@ function EditForm({
         </div>
       </div>
 
-      <div className="px-6 py-4 border-t border-ink-200 flex items-center gap-3">
+      <div className="px-6 py-4 border-t border-border flex items-center gap-3">
         <Button
           type="submit"
           disabled={saving || !isDirty}
@@ -163,7 +163,7 @@ function EditForm({
           type="button"
           variant="ghost"
           onClick={onCancel}
-          className="text-ink-600 text-[13px]"
+          className="text-muted-foreground text-[13px]"
         >
           Cancel
         </Button>
@@ -233,18 +233,18 @@ export function SessionDetailSheet({ session, open, onClose }: Props) {
     <Sheet open={open} onOpenChange={(v) => !v && handleClose()}>
       <SheetContent side="right" className="w-full sm:max-w-[480px] flex flex-col p-0">
         {/* Header */}
-        <SheetHeader className="px-6 pt-6 pb-4 border-b border-ink-200">
+        <SheetHeader className="px-6 pt-6 pb-4 border-b border-border">
           <div className="flex items-start justify-between">
             <div className="flex-1 min-w-0 pr-4">
-              <SheetTitle className="text-h2 text-ink-900 truncate">{s.org}</SheetTitle>
-              <SheetDescription className="text-small text-ink-500">
+              <SheetTitle className="text-h2 text-foreground truncate">{s.org}</SheetTitle>
+              <SheetDescription className="text-small text-muted-foreground">
                 {formatLongDate(s.date)}
               </SheetDescription>
             </div>
             {mode === 'view' && s.status !== 'verified' && (
               <button
                 onClick={() => setMode('edit')}
-                className="flex items-center gap-1.5 text-[13px] font-medium text-ink-600 hover:text-ink-900 border border-ink-200 hover:border-ink-300 px-3 py-1.5 rounded-lg transition-colors shrink-0"
+                className="flex items-center gap-1.5 text-[13px] font-medium text-muted-foreground hover:text-foreground border border-border hover:border-border px-3 py-1.5 rounded-lg transition-colors shrink-0"
               >
                 <Pencil size={13} />
                 Edit
@@ -256,7 +256,7 @@ export function SessionDetailSheet({ session, open, onClose }: Props) {
                   <button
                     onClick={() => setMode('view')}
                     aria-label="Cancel editing"
-                    className="text-ink-400 hover:text-ink-600 transition-colors"
+                    className="text-muted-foreground hover:text-muted-foreground transition-colors"
                   >
                     <X size={18} />
                   </button>
@@ -296,7 +296,7 @@ export function SessionDetailSheet({ session, open, onClose }: Props) {
             </div>
 
             {/* Footer actions */}
-            <div className="px-6 py-4 border-t border-ink-200 flex items-center justify-between gap-3">
+            <div className="px-6 py-4 border-t border-border flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 {s.status === 'pending' && (
                   <Button
@@ -304,7 +304,7 @@ export function SessionDetailSheet({ session, open, onClose }: Props) {
                     size="sm"
                     onClick={handleResend}
                     disabled={resending}
-                    className="border-ink-200 text-ink-700 hover:bg-ink-50 font-medium text-[13px]"
+                    className="border-border text-foreground hover:bg-background font-medium text-[13px]"
                   >
                     <RefreshCw size={13} className={`mr-1.5 ${resending ? 'animate-spin' : ''}`} />
                     {resending ? 'Sending...' : 'Resend verification'}
@@ -321,7 +321,7 @@ export function SessionDetailSheet({ session, open, onClose }: Props) {
                       toast.error('Could not copy link.');
                     });
                   }}
-                  className="border-ink-200 text-ink-700 hover:bg-ink-50 font-medium text-[13px]"
+                  className="border-border text-foreground hover:bg-background font-medium text-[13px]"
                   aria-label="Copy session link"
                 >
                   <Link2 size={13} className="mr-1.5" />

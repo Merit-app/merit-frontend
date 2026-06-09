@@ -32,11 +32,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const loaded = useRef(false);
 
   const accessToken = useMeritStore((s) => s.accessToken);
+  const refreshToken = useMeritStore((s) => s.refreshToken);
 
-  // Token validity: must be authenticated, have an in-memory access token, and not expired.
-  // refreshToken is no longer persisted to localStorage — once the page is refreshed and
-  // accessToken is gone from memory, the user must re-authenticate.
-  const isTokenValid = isAuthed && accessToken != null && expiresAt != null && expiresAt * 1000 > Date.now();
+  // Session validity: a persisted refresh token keeps the session alive. An expired
+  // (or briefly missing) access token is NOT a reason to log out — request() and the
+  // StoreHydrator boot-refresh transparently mint a new access token from the refresh
+  // token. We only treat the session as dead when there is no recoverable credential.
+  const isTokenValid =
+    isAuthed &&
+    (refreshToken != null ||
+      (accessToken != null && expiresAt != null && expiresAt * 1000 > Date.now()));
 
   useEffect(() => {
     // Wait until the persist store has rehydrated from localStorage
@@ -124,7 +129,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   if (user?.isMinor && user?.consentAccepted === false) return null;
 
   return (
-    <div className="flex h-screen bg-ink-50 overflow-hidden">
+    <div className="flex h-screen bg-background overflow-hidden">
       <OnboardingModal />
       <Sidebar />
       <CommandPalette />

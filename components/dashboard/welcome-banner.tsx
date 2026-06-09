@@ -27,14 +27,14 @@ export function WelcomeBanner() {
   };
 
   return (
-    <div className="bg-white rounded-xl border border-ink-200 p-6 mb-6">
+    <div className="bg-card rounded-xl border border-border p-6 mb-6">
       <div className="flex items-start gap-3 mb-5">
         <div className="w-11 h-11 rounded-2xl bg-merit-blue-50 flex items-center justify-center text-merit-blue-600">
           <Sparkles size={22} />
         </div>
         <div>
-          <p className="text-[18px] font-semibold text-ink-900 mb-1">Get started with Merit</p>
-          <p className="text-[13px] text-ink-500 leading-relaxed">
+          <p className="text-[18px] font-semibold text-foreground mb-1">Get started with Merit</p>
+          <p className="text-[13px] text-muted-foreground leading-relaxed">
             Follow the checklist below to build your first verified hours record.
           </p>
         </div>
@@ -48,12 +48,12 @@ export function WelcomeBanner() {
         ].map((item) => (
           <div
             key={item.label}
-            className="flex items-center gap-3 rounded-2xl border border-ink-200 bg-ink-50 px-4 py-3"
+            className="flex items-center gap-3 rounded-2xl border border-border bg-background px-4 py-3"
           >
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-ink-900">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-card text-foreground">
               {item.done ? <CheckCircle2 size={16} className="text-success" /> : <item.icon size={16} />}
             </div>
-            <p className={item.done ? 'text-ink-900' : 'text-ink-500'}>{item.label}</p>
+            <p className={item.done ? 'text-foreground' : 'text-muted-foreground'}>{item.label}</p>
           </div>
         ))}
       </div>
@@ -67,7 +67,7 @@ export function WelcomeBanner() {
         </Link>
         <Link
           href="/export"
-          className="inline-flex items-center justify-center gap-2 rounded-lg border border-ink-200 bg-white px-4 py-2 text-[13px] font-semibold text-ink-700 hover:bg-ink-50 transition-colors"
+          className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-[13px] font-semibold text-foreground hover:bg-background transition-colors"
         >
           Export your PDF
         </Link>

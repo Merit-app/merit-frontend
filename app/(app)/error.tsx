@@ -23,7 +23,7 @@ export default function AppError({
       </div>
 
       <div className="space-y-2">
-        <h2 className="text-xl font-semibold text-gray-900">Something went wrong</h2>
+        <h2 className="text-xl font-semibold text-foreground">Something went wrong</h2>
         <p className="text-muted-foreground text-sm max-w-md">
           An unexpected error occurred. We&apos;ve been notified and are looking into it.
         </p>
@@ -37,14 +37,14 @@ export default function AppError({
       <div className="flex gap-3">
         <button
           onClick={reset}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-sm font-medium text-foreground hover:bg-muted transition-colors"
         >
           <RefreshCw className="w-4 h-4" />
           Try again
         </button>
         <Link
           href="/dashboard"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-gray-700 transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-card text-white text-sm font-medium hover:bg-muted transition-colors"
         >
           <Home className="w-4 h-4" />
           Go to dashboard

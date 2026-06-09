@@ -72,39 +72,39 @@ export default function OrgLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center p-6">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">
       <div className="mb-8 text-center">
-        <a href="/org" className="text-2xl font-bold text-white">merit.</a>
-        <p className="text-gray-500 text-sm mt-1">Organization dashboard</p>
+        <a href="/org" className="text-2xl font-bold text-foreground">merit.</a>
+        <p className="text-muted-foreground text-sm mt-1">Organization dashboard</p>
       </div>
 
-      <div className="w-full max-w-sm bg-gray-900 border border-gray-800 rounded-2xl p-8">
+      <div className="w-full max-w-sm bg-card border border-border rounded-2xl p-8">
         {/* Cross-promotion to student login */}
         <Link
           href="/login"
-          className="group flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors mb-6 border border-white/10"
+          className="group flex items-center gap-3 p-3 rounded-xl bg-card/5 hover:bg-card/10 transition-colors mb-6 border border-white/10"
         >
-          <div className="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
-            <User className="w-4 h-4 text-gray-400" />
+          <div className="w-9 h-9 rounded-lg bg-card/10 flex items-center justify-center shrink-0">
+            <User className="w-4 h-4 text-muted-foreground" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-white">Tracking your own volunteer hours?</p>
-            <p className="text-xs text-gray-500">Student sign in</p>
+            <p className="text-sm font-semibold text-foreground">Tracking your own volunteer hours?</p>
+            <p className="text-xs text-muted-foreground">Student sign in</p>
           </div>
-          <ArrowRight className="w-4 h-4 text-gray-500 group-hover:text-white group-hover:translate-x-0.5 transition-all shrink-0" />
+          <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground group-hover:translate-x-0.5 transition-all shrink-0" />
         </Link>
 
-        <h1 className="text-xl font-bold text-white mb-6">Sign in to your organization</h1>
+        <h1 className="text-xl font-bold text-foreground mb-6">Sign in to your organization</h1>
 
         {serverError && (
           <div className="mb-4 rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3">
-            <p className="text-sm text-red-400">{serverError}</p>
+            <p className="text-sm text-danger">{serverError}</p>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-1.5">Work email</label>
+            <label className="block text-sm font-medium text-muted-foreground mb-1.5">Work email</label>
             <input
               type="email"
               value={email}
@@ -112,12 +112,12 @@ export default function OrgLoginPage() {
               placeholder="you@organization.org"
               autoFocus
               required
-              className="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-3 text-sm placeholder-gray-600 focus:outline-none focus:border-white transition-colors"
+              className="w-full bg-muted border border-border text-foreground rounded-xl px-4 py-3 text-sm placeholder-gray-600 focus:outline-none focus:border-ring transition-colors"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-1.5">Password</label>
+            <label className="block text-sm font-medium text-muted-foreground mb-1.5">Password</label>
             <div className="relative">
               <input
                 type={showPw ? 'text' : 'password'}
@@ -125,12 +125,12 @@ export default function OrgLoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
-                className="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-3 pr-10 text-sm focus:outline-none focus:border-white transition-colors"
+                className="w-full bg-muted border border-border text-foreground rounded-xl px-4 py-3 pr-10 text-sm focus:outline-none focus:border-ring transition-colors"
               />
               <button
                 type="button"
                 onClick={() => setShowPw(!showPw)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
                 tabIndex={-1}
               >
                 {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -141,27 +141,27 @@ export default function OrgLoginPage() {
           <button
             type="submit"
             disabled={isLoading || !email || !password}
-            className="w-full bg-white text-gray-900 font-semibold py-3 rounded-xl text-sm hover:bg-gray-100 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+            className="w-full bg-foreground text-background font-semibold py-3 rounded-xl text-sm hover:bg-muted disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
           >
             {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
             {isLoading ? 'Signing in...' : 'Sign in →'}
           </button>
         </form>
 
-        <div className="mt-6 pt-6 border-t border-gray-800 space-y-2 text-sm text-center">
-          <p className="text-gray-500">
+        <div className="mt-6 pt-6 border-t border-border space-y-2 text-sm text-center">
+          <p className="text-muted-foreground">
             Don&apos;t have access?{' '}
-            <Link href="/org/join" className="text-gray-300 hover:text-white">
+            <Link href="/org/join" className="text-muted-foreground hover:text-foreground">
               Accept an invitation
             </Link>
           </p>
-          <p className="text-gray-600">
-            <Link href="/login" className="hover:text-gray-400">
+          <p className="text-muted-foreground">
+            <Link href="/login" className="hover:text-muted-foreground">
               Student sign in →
             </Link>
           </p>
-          <p className="text-gray-600">
-            <Link href="/org/forgot-password" className="hover:text-gray-400">
+          <p className="text-muted-foreground">
+            <Link href="/org/forgot-password" className="hover:text-muted-foreground">
               Forgot password?
             </Link>
           </p>

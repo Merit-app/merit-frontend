@@ -37,7 +37,7 @@ export function SidebarAvatar() {
   return (
     <Link
       href={href}
-      className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-ink-100 transition-colors cursor-pointer group"
+      className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted transition-colors cursor-pointer group"
     >
       {/* Avatar */}
       <div className={cn(
@@ -53,10 +53,10 @@ export function SidebarAvatar() {
 
       {/* Name + plan */}
       <div className="flex flex-col min-w-0">
-        <span className="text-[13px] font-medium text-ink-900 truncate leading-snug group-hover:text-ink-700 transition-colors">
+        <span className="text-[13px] font-medium text-foreground truncate leading-snug group-hover:text-foreground transition-colors">
           {fullName}
         </span>
-        <span className="text-[11px] text-ink-500 capitalize leading-snug">
+        <span className="text-[11px] text-muted-foreground capitalize leading-snug">
           {user.plan} plan
         </span>
       </div>

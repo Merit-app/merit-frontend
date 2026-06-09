@@ -38,7 +38,7 @@ export function MobileNav() {
   return (
     <>
       <nav
-        className="flex md:hidden fixed bottom-0 left-0 right-0 z-30 h-14 items-stretch bg-white"
+        className="flex md:hidden fixed bottom-0 left-0 right-0 z-30 h-14 items-stretch bg-card"
         style={{ borderTop: '0.5px solid var(--color-ink-200)' }}
       >
         {/* Dashboard */}
@@ -77,12 +77,12 @@ export function MobileNav() {
         >
           <MoreHorizontal
             size={20}
-            className={moreActive ? 'text-merit-blue-600' : 'text-ink-400'}
+            className={moreActive ? 'text-merit-blue-600' : 'text-muted-foreground'}
           />
           <span
             className={cn(
               'text-[11px] font-medium',
-              moreActive ? 'text-merit-blue-600' : 'text-ink-400'
+              moreActive ? 'text-merit-blue-600' : 'text-muted-foreground'
             )}
           >
             More
@@ -94,7 +94,7 @@ export function MobileNav() {
       <Sheet open={moreOpen} onOpenChange={setMoreOpen}>
         <SheetContent side="bottom" className="rounded-t-2xl px-0 pb-safe">
           {/* User info */}
-          <div className="flex items-center gap-3 px-5 pb-4 pt-5 border-b border-ink-100">
+          <div className="flex items-center gap-3 px-5 pb-4 pt-5 border-b border-border">
             <span
               className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold"
               style={{ background: '#DBEAFE', color: '#1D4ED8' }}
@@ -102,10 +102,10 @@ export function MobileNav() {
               {user.firstName[0]}{user.lastName[0]}
             </span>
             <div className="min-w-0">
-              <p className="text-[13px] font-semibold text-ink-900 leading-none truncate">
+              <p className="text-[13px] font-semibold text-foreground leading-none truncate">
                 {user.firstName} {user.lastName}
               </p>
-              <p className="text-[11px] text-ink-500 mt-0.5 capitalize">{user.plan} plan</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5 capitalize">{user.plan} plan</p>
             </div>
           </div>
 
@@ -120,10 +120,10 @@ export function MobileNav() {
                   'flex items-center gap-3 px-5 py-3 text-[14px] font-medium transition-colors',
                   pathname.startsWith(href)
                     ? 'text-merit-blue-600'
-                    : 'text-ink-700 hover:text-ink-900'
+                    : 'text-foreground hover:text-foreground'
                 )}
               >
-                <Icon size={18} className={pathname.startsWith(href) ? 'text-merit-blue-600' : 'text-ink-400'} />
+                <Icon size={18} className={pathname.startsWith(href) ? 'text-merit-blue-600' : 'text-muted-foreground'} />
                 {label}
               </Link>
             ))}
@@ -150,8 +150,8 @@ function NavItem({
       href={href}
       className="flex flex-1 flex-col items-center justify-center gap-1 focus-visible:outline-none"
     >
-      <Icon size={20} className={active ? 'text-merit-blue-600' : 'text-ink-400'} />
-      <span className={cn('text-[11px] font-medium', active ? 'text-merit-blue-600' : 'text-ink-400')}>
+      <Icon size={20} className={active ? 'text-merit-blue-600' : 'text-muted-foreground'} />
+      <span className={cn('text-[11px] font-medium', active ? 'text-merit-blue-600' : 'text-muted-foreground')}>
         {label}
       </span>
     </Link>

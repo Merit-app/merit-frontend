@@ -40,11 +40,11 @@ export default function RootLayout({
         <link rel="preconnect" href="https://api.meritco.app" />
         <link rel="dns-prefetch" href="https://api.meritco.app" />
       </head>
-      <body className="min-h-full bg-ink-50 text-ink-900">
+      <body className="min-h-full bg-background text-foreground">
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
-          enableSystem={false}
+          enableSystem
           storageKey="merit-theme"
         >
           <WebAppJsonLd />
@@ -65,11 +65,11 @@ export default function RootLayout({
             position="bottom-right"
             toastOptions={{
               style: {
-                background: '#ffffff',
-                border: '1px solid #E7E5E4',
+                background: 'var(--popover)',
+                border: '1px solid var(--border)',
                 borderRadius: '12px',
                 fontSize: '14px',
-                color: '#1C1917',
+                color: 'var(--popover-foreground)',
               },
               duration: 4000,
             }}

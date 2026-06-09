@@ -25,7 +25,7 @@ export const queryKeys = {
   notifications: ['notifications'] as const,
 
   // Leaderboard
-  leaderboard: (type: string, period: string, scope?: string) =>
-    ['leaderboard', type, period, scope ?? ''] as const,
+  leaderboard: (type: string, period: string, scope?: string, cityScope?: string) =>
+    ['leaderboard', type, period, scope ?? '', cityScope ?? ''] as const,
   leaderboardUser: (username: string) => ['leaderboard', 'u', username] as const,
 } as const;

@@ -118,7 +118,7 @@ export function ClaimOrgModal({ open, onClose, orgId, orgName }: Props) {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-2">
               {/* Role */}
               <div className="space-y-1.5">
-                <Label className="text-[13px] font-medium text-ink-900">
+                <Label className="text-[13px] font-medium text-foreground">
                   Your role at {orgName}
                 </Label>
                 <Select onValueChange={(val) => setValue('role', val as FormData['role'])}>
@@ -140,7 +140,7 @@ export function ClaimOrgModal({ open, onClose, orgId, orgName }: Props) {
 
               {/* Work email */}
               <div className="space-y-1.5">
-                <Label className="text-[13px] font-medium text-ink-900">Work email</Label>
+                <Label className="text-[13px] font-medium text-foreground">Work email</Label>
                 <Input
                   {...register('workEmail')}
                   type="email"
@@ -150,7 +150,7 @@ export function ClaimOrgModal({ open, onClose, orgId, orgName }: Props) {
                 {errors.workEmail && (
                   <p className="text-[12px] text-red-500">{errors.workEmail.message}</p>
                 )}
-                <p className="text-[11px] text-ink-500">
+                <p className="text-[11px] text-muted-foreground">
                   Use your work email. If your domain matches the organization's website,
                   you'll be approved instantly.
                 </p>
@@ -176,7 +176,7 @@ export function ClaimOrgModal({ open, onClose, orgId, orgName }: Props) {
             </div>
             <div>
               <h3 className="font-semibold text-lg">You're now an admin!</h3>
-              <p className="text-ink-500 text-sm mt-1">
+              <p className="text-muted-foreground text-sm mt-1">
                 Your email matched {orgName}'s domain. You've been automatically approved.
               </p>
             </div>
@@ -196,7 +196,7 @@ export function ClaimOrgModal({ open, onClose, orgId, orgName }: Props) {
             </div>
             <div>
               <h3 className="font-semibold text-lg">Claim submitted</h3>
-              <p className="text-ink-500 text-sm mt-1">
+              <p className="text-muted-foreground text-sm mt-1">
                 We couldn't automatically verify your email domain.
                 Your claim is under manual review — we'll email you within 2 business days.
               </p>

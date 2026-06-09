@@ -27,7 +27,7 @@ function RegistrationPill({ status }: { status: Organization['registrationStatus
     );
   }
   return (
-    <span className="text-[11px] font-medium text-ink-500 bg-ink-100 px-2 py-0.5 rounded-full">
+    <span className="text-[11px] font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
       Unregistered
     </span>
   );
@@ -47,25 +47,25 @@ export function OrgCard({ org, sessions }: Props) {
   return (
     <Link
       href={`/organizations/${org.slug}`}
-      className="group flex flex-col bg-white rounded-xl border border-ink-200 p-5 hover:border-ink-300 transition-all duration-100 hover:-translate-y-px"
+      className="group flex flex-col bg-card rounded-xl border border-border p-5 hover:border-border transition-all duration-100 hover:-translate-y-px"
     >
       {/* Name + category */}
       <div className="flex items-start justify-between gap-2 mb-3">
-        <h3 className="text-h3 text-ink-900 group-hover:text-merit-blue-600 transition-colors leading-snug">
+        <h3 className="text-h3 text-foreground group-hover:text-merit-blue-600 transition-colors leading-snug">
           {org.name}
         </h3>
       </div>
 
       <div className="flex items-center gap-2 mb-3">
-        <span className="text-[11px] font-medium text-ink-500 bg-ink-100 px-2 py-0.5 rounded-full">
+        <span className="text-[11px] font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
           {org.category}
         </span>
         <RegistrationPill status={org.registrationStatus} />
       </div>
 
       {/* Stats */}
-      <div className="mt-auto pt-3 border-t border-ink-100 flex items-center justify-between text-[12px] text-ink-500">
-        <span><span className="font-medium text-ink-900">{hoursStr} hrs</span> logged</span>
+      <div className="mt-auto pt-3 border-t border-border flex items-center justify-between text-[12px] text-muted-foreground">
+        <span><span className="font-medium text-foreground">{hoursStr} hrs</span> logged</span>
         <span>{orgSessions.length} {orgSessions.length === 1 ? 'session' : 'sessions'}</span>
         {lastVisit && (
           <span>

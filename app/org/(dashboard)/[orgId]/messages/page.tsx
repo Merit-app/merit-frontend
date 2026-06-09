@@ -88,15 +88,15 @@ export default function MessagesPage() {
   return (
     <div className="max-w-2xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">Messages</h1>
-        <p className="text-gray-400 text-sm mt-1">Send SMS announcements to your volunteers</p>
+        <h1 className="text-2xl font-bold text-foreground">Messages</h1>
+        <p className="text-muted-foreground text-sm mt-1">Send SMS announcements to your volunteers</p>
       </div>
 
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-4">
-        <h3 className="font-semibold text-white">Send announcement</h3>
+      <div className="bg-card border border-border rounded-2xl p-5 space-y-4">
+        <h3 className="font-semibold text-foreground">Send announcement</h3>
 
         <div>
-          <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Send to</label>
+          <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Send to</label>
           <div className="flex gap-2 flex-wrap">
             {FILTERS.map((opt) => (
               <button
@@ -104,8 +104,8 @@ export default function MessagesPage() {
                 onClick={() => setFilter(opt.value)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                   filter === opt.value
-                    ? 'bg-white text-gray-900'
-                    : 'bg-gray-800 text-gray-400 hover:text-white'
+                    ? 'bg-foreground text-background'
+                    : 'bg-muted text-muted-foreground hover:text-foreground'
                 }`}
               >
                 {opt.label}
@@ -118,7 +118,7 @@ export default function MessagesPage() {
           <select
             value={selectedEvent}
             onChange={(e) => setSelectedEvent(e.target.value)}
-            className="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gray-500"
+            className="w-full bg-muted border border-border text-foreground rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-border"
           >
             <option value="">Select event...</option>
             {events.map((e: any) => (
@@ -134,18 +134,18 @@ export default function MessagesPage() {
             placeholder="Type your announcement..."
             rows={4}
             maxLength={300}
-            className="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-3 text-sm resize-none placeholder-gray-600 focus:outline-none focus:border-gray-500 transition-colors"
+            className="w-full bg-muted border border-border text-foreground rounded-xl px-4 py-3 text-sm resize-none placeholder-gray-600 focus:outline-none focus:border-border transition-colors"
           />
           <div className="flex justify-between mt-1">
-            <p className="text-xs text-gray-600">Sent via SMS to volunteers&apos; phones</p>
-            <p className="text-xs text-gray-600">{message.length}/300</p>
+            <p className="text-xs text-muted-foreground">Sent via SMS to volunteers&apos; phones</p>
+            <p className="text-xs text-muted-foreground">{message.length}/300</p>
           </div>
         </div>
 
         <button
           onClick={handleSend}
           disabled={isSending || !message.trim()}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-white text-gray-900 font-semibold text-sm hover:bg-gray-100 disabled:opacity-50 transition-colors"
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-foreground text-background font-semibold text-sm hover:bg-muted disabled:opacity-50 transition-colors"
         >
           {isSending ? (
             <><Loader2 className="w-4 h-4 animate-spin" />Sending...</>
@@ -157,11 +157,11 @@ export default function MessagesPage() {
 
       {history.length > 0 && (
         <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">History</h3>
+          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">History</h3>
           {history.map((msg: any) => (
-            <div key={msg.id} className="bg-gray-900 border border-gray-800 rounded-2xl p-4 space-y-2">
-              <p className="text-white text-sm">{msg.message}</p>
-              <div className="flex items-center justify-between text-xs text-gray-500">
+            <div key={msg.id} className="bg-card border border-border rounded-2xl p-4 space-y-2">
+              <p className="text-foreground text-sm">{msg.message}</p>
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <span>
                   Sent to {msg.recipient_count} volunteer{msg.recipient_count !== 1 ? 's' : ''}
                 </span>

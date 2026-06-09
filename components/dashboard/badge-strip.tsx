@@ -41,9 +41,9 @@ export function BadgeStrip() {
   return (
     <div className="mb-5">
       <div className="flex items-center justify-between mb-2">
-        <p className="text-[13px] font-semibold text-ink-700">
+        <p className="text-[13px] font-semibold text-foreground">
           Badges
-          <span className="ml-1.5 text-[11px] font-medium text-ink-400">{badges.length} earned</span>
+          <span className="ml-1.5 text-[11px] font-medium text-muted-foreground">{badges.length} earned</span>
         </p>
         <Link
           href="/badges"
@@ -64,7 +64,7 @@ export function BadgeStrip() {
         {badges.length > 8 && (
           <Link
             href="/badges"
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-ink-200 bg-ink-50 text-[12px] font-medium text-ink-500 hover:text-ink-700 transition-colors"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border bg-background text-[12px] font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             +{badges.length - 8} more
           </Link>

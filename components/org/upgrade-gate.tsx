@@ -16,20 +16,20 @@ export function UpgradeGate({ orgId, feature, description, plan = 'pro' }: Upgra
 
   return (
     <div className="flex flex-col items-center justify-center py-24 text-center max-w-sm mx-auto space-y-5">
-      <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
-        <Lock className="w-6 h-6 text-gray-500" />
+      <div className="w-14 h-14 rounded-2xl bg-card/5 border border-white/10 flex items-center justify-center">
+        <Lock className="w-6 h-6 text-muted-foreground" />
       </div>
       <div>
-        <p className="text-white font-bold text-lg">{feature}</p>
-        <p className="text-gray-400 text-sm mt-2 leading-relaxed">{description}</p>
+        <p className="text-foreground font-bold text-lg">{feature}</p>
+        <p className="text-muted-foreground text-sm mt-2 leading-relaxed">{description}</p>
       </div>
       <Link
         href={`/org/${orgId}/settings?tab=billing`}
-        className="bg-white text-gray-900 font-semibold px-6 py-3 rounded-xl text-sm hover:bg-gray-200 transition-colors"
+        className="bg-foreground text-background font-semibold px-6 py-3 rounded-xl text-sm hover:bg-muted transition-colors"
       >
         Upgrade to {planLabel} · ${price}/mo
       </Link>
-      <p className="text-gray-600 text-xs">14-day free trial. Cancel anytime.</p>
+      <p className="text-muted-foreground text-xs">14-day free trial. Cancel anytime.</p>
     </div>
   );
 }

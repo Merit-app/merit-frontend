@@ -88,14 +88,14 @@ export function UsernameEditor() {
   return (
     <div className="space-y-2">
       <div>
-        <Label className="text-[13px] font-medium text-ink-900">Username</Label>
+        <Label className="text-[13px] font-medium text-foreground">Username</Label>
         {currentUsername && (
-          <p className="text-[11px] text-ink-400 mt-0.5">
-            Username can only be changed once. Current: <span className="font-medium text-ink-600">@{currentUsername}</span>
+          <p className="text-[11px] text-muted-foreground mt-0.5">
+            Username can only be changed once. Current: <span className="font-medium text-muted-foreground">@{currentUsername}</span>
           </p>
         )}
         {!currentUsername && (
-          <p className="text-[11px] text-ink-400 mt-0.5">
+          <p className="text-[11px] text-muted-foreground mt-0.5">
             Choose your public username. You can only set this once.
           </p>
         )}
@@ -103,7 +103,7 @@ export function UsernameEditor() {
 
       <div className="flex gap-2 max-w-sm">
         <div className="relative flex-1">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-400 text-[13px] select-none pointer-events-none">@</span>
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-[13px] select-none pointer-events-none">@</span>
           <Input
             value={value}
             onChange={handleChange}
@@ -131,7 +131,7 @@ export function UsernameEditor() {
 
       {/* Status row */}
       {checkState === 'checking' && (
-        <p className="flex items-center gap-1.5 text-[12px] text-ink-500">
+        <p className="flex items-center gap-1.5 text-[12px] text-muted-foreground">
           <Loader2 size={12} className="animate-spin" /> Checking…
         </p>
       )}

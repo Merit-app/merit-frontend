@@ -33,7 +33,7 @@ export function UserMenu({ compact }: UserMenuProps) {
     <button
       className={cn(
         'flex w-full items-center gap-2 rounded-lg px-2 py-1.5',
-        'text-[12px] text-ink-500 hover:bg-ink-100 hover:text-ink-700 transition-colors duration-100',
+        'text-[12px] text-muted-foreground hover:bg-muted hover:text-foreground transition-colors duration-100',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merit-blue-600',
       )}
     >
@@ -44,7 +44,7 @@ export function UserMenu({ compact }: UserMenuProps) {
     <button
       className={cn(
         'flex w-full items-center gap-2.5 rounded-lg px-2 py-2',
-        'hover:bg-ink-100 transition-colors duration-100',
+        'hover:bg-muted transition-colors duration-100',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merit-blue-600',
       )}
     >
@@ -56,10 +56,10 @@ export function UserMenu({ compact }: UserMenuProps) {
         {`${user.firstName[0] ?? ''}${user.lastName[0] ?? ''}`.toUpperCase()}
       </span>
       <div className="flex-1 min-w-0 text-left">
-        <p className="text-[13px] font-medium text-ink-900 leading-none truncate">
+        <p className="text-[13px] font-medium text-foreground leading-none truncate">
           {user.firstName} {user.lastName}
         </p>
-        <p className="text-micro text-ink-500 mt-0.5 capitalize">{user.plan} plan</p>
+        <p className="text-micro text-muted-foreground mt-0.5 capitalize">{user.plan} plan</p>
       </div>
     </button>
   );
@@ -76,15 +76,15 @@ export function UserMenu({ compact }: UserMenuProps) {
         style={{ boxShadow: 'var(--shadow-elevated, 0 4px 12px -2px rgb(0 0 0 / 0.04), 0 2px 4px -1px rgb(0 0 0 / 0.03))' }}
       >
         <DropdownMenuItem onClick={() => router.push('/settings/profile')}>
-          <Settings size={14} className="mr-2 text-ink-500" />
+          <Settings size={14} className="mr-2 text-muted-foreground" />
           Settings
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => router.push('/settings/billing')}>
-          <CreditCard size={14} className="mr-2 text-ink-500" />
+          <CreditCard size={14} className="mr-2 text-muted-foreground" />
           Plan &amp; billing
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => toast.info('Theme options coming soon.')}>
-          <Palette size={14} className="mr-2 text-ink-500" />
+          <Palette size={14} className="mr-2 text-muted-foreground" />
           Theme
         </DropdownMenuItem>
         <DropdownMenuSeparator />

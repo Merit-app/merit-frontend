@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dialog';
 import { useMeritStore } from '@/lib/store';
 import { authApi, usersApi, ApiError } from '@/lib/api';
+import { ThemeSetting } from '@/components/theme-setting';
 
 export default function AccountPage() {
   const user = useMeritStore((s) => s.user);
@@ -88,18 +89,29 @@ export default function AccountPage() {
   return (
     <div className="max-w-2xl">
       <div className="mb-6">
-        <h2 className="text-h1 text-ink-900">Account</h2>
-        <p className="text-small text-ink-500 mt-1">Manage your session and account data.</p>
+        <h2 className="text-h1 text-foreground">Account</h2>
+        <p className="text-small text-muted-foreground mt-1">Manage your session and account data.</p>
+      </div>
+
+      {/* Appearance */}
+      <div className="bg-card rounded-xl border border-border p-5 mb-6">
+        <div className="flex items-center justify-between gap-6 flex-wrap">
+          <div>
+            <p className="text-[13px] font-medium text-foreground">Appearance</p>
+            <p className="text-small text-muted-foreground mt-0.5">Choose how Merit looks to you.</p>
+          </div>
+          <ThemeSetting />
+        </div>
       </div>
 
       {/* Signed-in as */}
-      <div className="bg-white rounded-xl border border-ink-200 p-5 mb-6">
-        <p className="text-[13px] font-medium text-ink-900 mb-0.5">Signed in as</p>
-        <p className="text-small text-ink-500">{user.firstName} {user.lastName} · {user.email}</p>
-        <Separator className="my-4 bg-ink-100" />
+      <div className="bg-card rounded-xl border border-border p-5 mb-6">
+        <p className="text-[13px] font-medium text-foreground mb-0.5">Signed in as</p>
+        <p className="text-small text-muted-foreground">{user.firstName} {user.lastName} · {user.email}</p>
+        <Separator className="my-4 bg-muted" />
         <button
           onClick={handleLogout}
-          className="flex items-center gap-2 text-[13px] font-medium text-ink-700 hover:text-ink-900 transition-colors"
+          className="flex items-center gap-2 text-[13px] font-medium text-foreground hover:text-foreground transition-colors"
         >
           <LogOut size={14} />
           Sign out
@@ -107,11 +119,11 @@ export default function AccountPage() {
       </div>
 
       {/* Data export */}
-      <div className="bg-white rounded-xl border border-ink-200 p-5 mb-6">
+      <div className="bg-card rounded-xl border border-border p-5 mb-6">
         <div className="flex items-center justify-between gap-6">
           <div>
-            <p className="text-[13px] font-medium text-ink-900">Export my data</p>
-            <p className="text-small text-ink-500 mt-0.5">
+            <p className="text-[13px] font-medium text-foreground">Export my data</p>
+            <p className="text-small text-muted-foreground mt-0.5">
               Download all your sessions, profile, and account data as a JSON file.
             </p>
           </div>
@@ -134,10 +146,10 @@ export default function AccountPage() {
         </div>
 
         {/* Clear sessions (local only) */}
-        <div className="px-5 py-4 border-t border-ink-100 flex items-center justify-between gap-6">
+        <div className="px-5 py-4 border-t border-border flex items-center justify-between gap-6">
           <div>
-            <p className="text-[13px] font-medium text-ink-900">Clear local session cache</p>
-            <p className="text-small text-ink-500 mt-0.5">
+            <p className="text-[13px] font-medium text-foreground">Clear local session cache</p>
+            <p className="text-small text-muted-foreground mt-0.5">
               Clears your local cache. Data is still safe on the server and will reload on next visit.
             </p>
           </div>
@@ -146,13 +158,13 @@ export default function AccountPage() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setConfirmClear(false)}
-                  className="text-[13px] text-ink-500 hover:text-ink-700 transition-colors"
+                  className="text-[13px] text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleClearSessions}
-                  className="flex items-center gap-1.5 text-[13px] font-medium text-white bg-danger hover:bg-danger/90 px-3 py-1.5 rounded-lg transition-colors"
+                  className="flex items-center gap-1.5 text-[13px] font-medium text-white bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-lg transition-colors"
                 >
                   <Trash2 size={13} />
                   Yes, clear
@@ -170,10 +182,10 @@ export default function AccountPage() {
         </div>
 
         {/* Delete account */}
-        <div className="px-5 py-4 border-t border-ink-100 flex items-center justify-between gap-6">
+        <div className="px-5 py-4 border-t border-border flex items-center justify-between gap-6">
           <div>
-            <p className="text-[13px] font-medium text-ink-900">Delete account</p>
-            <p className="text-small text-ink-500 mt-0.5">
+            <p className="text-[13px] font-medium text-foreground">Delete account</p>
+            <p className="text-small text-muted-foreground mt-0.5">
               Schedules your account for deletion in 30 days. You'll get a confirmation email.
             </p>
           </div>
@@ -190,11 +202,11 @@ export default function AccountPage() {
       <Dialog open={deleteOpen} onOpenChange={(v) => { if (!v) { setDeleteOpen(false); setDeleteConfirmText(''); } }}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-ink-900 flex items-center gap-2">
+            <DialogTitle className="text-foreground flex items-center gap-2">
               <AlertTriangle size={16} className="text-danger" />
               Delete your account
             </DialogTitle>
-            <DialogDescription className="text-ink-500">
+            <DialogDescription className="text-muted-foreground">
               This will schedule your account for permanent deletion in 30 days. All your sessions, organizations, and data will be removed.
             </DialogDescription>
           </DialogHeader>
@@ -216,7 +228,7 @@ export default function AccountPage() {
               <Button
                 onClick={handleDeleteAccount}
                 disabled={deleteConfirmText !== 'DELETE' || deleting}
-                className="bg-danger hover:bg-danger/90 text-white font-medium flex-1 disabled:opacity-50"
+                className="bg-red-600 hover:bg-red-700 text-white font-medium flex-1 disabled:opacity-50"
               >
                 <Trash2 size={14} className="mr-1.5" />
                 {deleting ? 'Deleting...' : 'Delete my account'}
@@ -224,7 +236,7 @@ export default function AccountPage() {
               <Button
                 variant="outline"
                 onClick={() => { setDeleteOpen(false); setDeleteConfirmText(''); }}
-                className="border-ink-200"
+                className="border-border"
               >
                 Cancel
               </Button>

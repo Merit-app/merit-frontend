@@ -26,7 +26,7 @@ function fmtDate(iso: string) {
 function Spinner() {
   return (
     <div className="flex items-center justify-center p-8">
-      <div className="animate-spin w-5 h-5 border-2 border-ink-300 border-t-ink-700 rounded-full" />
+      <div className="animate-spin w-5 h-5 border-2 border-border border-t-ink-700 rounded-full" />
     </div>
   );
 }
@@ -37,14 +37,14 @@ function DashSkeleton() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[0, 1, 2, 3].map((i) => (
           <div key={i} className="rounded-xl border p-5 space-y-3">
-            <div className="h-3 w-24 bg-ink-100 rounded animate-pulse" />
-            <div className="h-8 w-16 bg-ink-100 rounded animate-pulse" />
+            <div className="h-3 w-24 bg-muted rounded animate-pulse" />
+            <div className="h-8 w-16 bg-muted rounded animate-pulse" />
           </div>
         ))}
       </div>
       <div className="rounded-xl border p-5 space-y-3">
-        <div className="h-4 w-48 bg-ink-100 rounded animate-pulse" />
-        <div className="h-16 w-full bg-ink-100 rounded animate-pulse" />
+        <div className="h-4 w-48 bg-muted rounded animate-pulse" />
+        <div className="h-16 w-full bg-muted rounded animate-pulse" />
       </div>
     </div>
   );
@@ -192,11 +192,11 @@ export default function OrgDashboardPage() {
   if (!adminOrgs?.length) {
     return (
       <div className="px-4 py-6 md:px-8 flex flex-col items-center justify-center py-20 gap-4 text-center max-w-md mx-auto">
-        <div className="w-16 h-16 rounded-full bg-ink-100 flex items-center justify-center">
-          <Building2 className="w-8 h-8 text-ink-400" />
+        <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
+          <Building2 className="w-8 h-8 text-muted-foreground" />
         </div>
-        <h2 className="font-semibold text-xl text-ink-900">No organizations yet</h2>
-        <p className="text-ink-500 text-sm">
+        <h2 className="font-semibold text-xl text-foreground">No organizations yet</h2>
+        <p className="text-muted-foreground text-sm">
           Create a new organization or claim an existing one to access your admin dashboard.
         </p>
         <Button asChild>
@@ -222,7 +222,7 @@ export default function OrgDashboardPage() {
     <div className="px-4 py-4 md:px-8 md:py-6 max-w-5xl mx-auto space-y-6">
 
       {/* ── Org header card ────────────────────────────────────────────────── */}
-      <div className="rounded-xl border overflow-hidden bg-white">
+      <div className="rounded-xl border overflow-hidden bg-card">
         {/* Cover */}
         <div className="h-24 bg-gradient-to-r from-ink-800 to-ink-600 relative">
           {org?.cover_url && (
@@ -233,11 +233,11 @@ export default function OrgDashboardPage() {
         {/* Info bar */}
         <div className="px-5 pb-4 pt-3 flex items-start gap-4">
           {/* Logo */}
-          <div className="w-16 h-16 rounded-xl border-4 border-white bg-white shadow-sm flex items-center justify-center -mt-8 shrink-0 overflow-hidden relative">
+          <div className="w-16 h-16 rounded-xl border-4 border-white bg-card shadow-sm flex items-center justify-center -mt-8 shrink-0 overflow-hidden relative">
             {org?.logo_url ? (
               <Image src={org.logo_url} alt={org.name ?? ''} fill className="object-cover" sizes="64px" />
             ) : (
-              <span className="text-2xl font-bold text-ink-500">
+              <span className="text-2xl font-bold text-muted-foreground">
                 {org?.name?.[0] ?? '?'}
               </span>
             )}
@@ -246,8 +246,8 @@ export default function OrgDashboardPage() {
           <div className="flex-1 min-w-0 pt-1">
             <div className="flex items-start justify-between gap-4 flex-wrap">
               <div>
-                <h1 className="text-xl font-bold text-ink-900">{org?.name ?? '—'}</h1>
-                <p className="text-sm text-ink-500 mt-0.5">
+                <h1 className="text-xl font-bold text-foreground">{org?.name ?? '—'}</h1>
+                <p className="text-sm text-muted-foreground mt-0.5">
                   {org?.category ?? ''}
                   {org?.city ? ` · ${org.city}` : ''}
                 </p>
@@ -285,7 +285,7 @@ export default function OrgDashboardPage() {
                 key={o.id}
                 onClick={() => { setSelectedOrgId(o.id); setActiveTab('overview'); }}
                 className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
-                  orgId === o.id ? 'bg-ink-900 text-white' : 'bg-ink-100 text-ink-700 hover:bg-ink-200'
+                  orgId === o.id ? 'bg-foreground text-background' : 'bg-muted text-foreground hover:bg-muted'
                 }`}
               >
                 {o.name}
@@ -296,15 +296,15 @@ export default function OrgDashboardPage() {
       </div>
 
       {/* ── Tabs ───────────────────────────────────────────────────────────── */}
-      <div className="flex gap-1 border-b border-ink-200 overflow-x-auto">
+      <div className="flex gap-1 border-b border-border overflow-x-auto">
         {TABS.map(({ id, label, Icon }) => (
           <button
             key={id}
             onClick={() => setActiveTab(id)}
             className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors whitespace-nowrap ${
               activeTab === id
-                ? 'border-ink-900 text-ink-900'
-                : 'border-transparent text-ink-500 hover:text-ink-800'
+                ? 'border-ink-900 text-foreground'
+                : 'border-transparent text-muted-foreground hover:text-foreground'
             }`}
           >
             <Icon className="w-4 h-4" />
@@ -324,22 +324,22 @@ export default function OrgDashboardPage() {
               { label: 'Verified sessions', value: stats?.verifiedSessions ?? 0, Icon: CheckCircle2, color: 'text-emerald-600' },
               { label: 'Pending sessions', value: stats?.pendingSessions ?? 0, Icon: AlertCircle, color: 'text-amber-600' },
             ].map((stat) => (
-              <div key={stat.label} className="rounded-xl border bg-white p-5 space-y-3">
+              <div key={stat.label} className="rounded-xl border bg-card p-5 space-y-3">
                 <div className="flex items-center gap-2">
                   <stat.Icon className={`w-4 h-4 ${stat.color}`} />
-                  <span className="text-xs text-ink-500">{stat.label}</span>
+                  <span className="text-xs text-muted-foreground">{stat.label}</span>
                 </div>
-                <p className="text-3xl font-bold text-ink-900">{stat.value}</p>
+                <p className="text-3xl font-bold text-foreground">{stat.value}</p>
               </div>
             ))}
           </div>
 
           {/* Recent sessions with verify/dispute */}
-          <div className="rounded-xl border bg-white overflow-hidden">
-            <div className="flex items-center justify-between p-5 border-b border-ink-100">
+          <div className="rounded-xl border bg-card overflow-hidden">
+            <div className="flex items-center justify-between p-5 border-b border-border">
               <div>
-                <h3 className="font-semibold text-ink-900">Recent sessions</h3>
-                <p className="text-xs text-ink-500 mt-0.5">Verify or dispute student-logged hours</p>
+                <h3 className="font-semibold text-foreground">Recent sessions</h3>
+                <p className="text-xs text-muted-foreground mt-0.5">Verify or dispute student-logged hours</p>
               </div>
               <Button variant="ghost" size="sm" onClick={() => setActiveTab('volunteers')}>
                 View all →
@@ -349,7 +349,7 @@ export default function OrgDashboardPage() {
             {loadingDashboard ? (
               <Spinner />
             ) : recentSessions.length === 0 ? (
-              <div className="p-8 text-center text-ink-400 text-sm">
+              <div className="p-8 text-center text-muted-foreground text-sm">
                 No sessions yet. Share your org page so students can log hours here.
               </div>
             ) : (
@@ -360,14 +360,14 @@ export default function OrgDashboardPage() {
                       {session.users?.name?.[0] ?? '?'}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-ink-900 truncate">
+                      <p className="text-sm font-medium text-foreground truncate">
                         {session.users?.name ?? 'Student'}
                       </p>
-                      <p className="text-xs text-ink-400 truncate">
+                      <p className="text-xs text-muted-foreground truncate">
                         {session.activity} · {fmtDate(session.date)}
                       </p>
                     </div>
-                    <span className="text-sm font-bold text-ink-800 shrink-0">{session.hours}h</span>
+                    <span className="text-sm font-bold text-foreground shrink-0">{session.hours}h</span>
 
                     {session.status === 'pending' ? (
                       <div className="flex items-center gap-2 shrink-0">
@@ -405,7 +405,7 @@ export default function OrgDashboardPage() {
       {activeTab === 'volunteers' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <p className="text-sm text-ink-500">
+            <p className="text-sm text-muted-foreground">
               {volunteersData?.length ?? 0} students have volunteered here
             </p>
             <Button variant="outline" size="sm" onClick={handleExport}>
@@ -414,13 +414,13 @@ export default function OrgDashboardPage() {
           </div>
 
           {loadingVolunteers ? (
-            <div className="rounded-xl border bg-white"><Spinner /></div>
+            <div className="rounded-xl border bg-card"><Spinner /></div>
           ) : !volunteersData?.length ? (
-            <div className="rounded-xl border bg-white p-12 text-center text-ink-400 text-sm">
+            <div className="rounded-xl border bg-card p-12 text-center text-muted-foreground text-sm">
               No volunteers yet.
             </div>
           ) : (
-            <div className="rounded-xl border bg-white overflow-hidden divide-y divide-ink-50">
+            <div className="rounded-xl border bg-card overflow-hidden divide-y divide-ink-50">
               {volunteersData.map((v: any) => (
                 <div key={v.student.id} className="p-4">
                   {/* Student row */}
@@ -430,7 +430,7 @@ export default function OrgDashboardPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <p className="font-medium text-sm text-ink-900">{v.student.name}</p>
+                        <p className="font-medium text-sm text-foreground">{v.student.name}</p>
                         {v.student.username && (
                           <Link href={`/u/${v.student.username}`}
                             className="text-xs text-merit-blue-600 hover:underline">
@@ -438,14 +438,14 @@ export default function OrgDashboardPage() {
                           </Link>
                         )}
                       </div>
-                      <p className="text-xs text-ink-500">
+                      <p className="text-xs text-muted-foreground">
                         {v.student.school}
                         {v.student.grade ? ` · Grade ${v.student.grade}` : ''}
                       </p>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="font-bold text-sm text-ink-900">{v.verifiedHours}h verified</p>
-                      <p className="text-xs text-ink-400">
+                      <p className="font-bold text-sm text-foreground">{v.verifiedHours}h verified</p>
+                      <p className="text-xs text-muted-foreground">
                         {v.totalHours}h total · {v.sessions.length} sessions
                       </p>
                     </div>
@@ -455,12 +455,12 @@ export default function OrgDashboardPage() {
                   <div className="ml-13 space-y-1.5 pl-1">
                     {v.sessions.map((s: any) => (
                       <div key={s.id}
-                        className="flex items-center gap-3 text-sm bg-ink-50 rounded-lg px-3 py-2">
-                        <span className="text-ink-400 text-xs w-20 shrink-0">
+                        className="flex items-center gap-3 text-sm bg-background rounded-lg px-3 py-2">
+                        <span className="text-muted-foreground text-xs w-20 shrink-0">
                           {fmtDate(s.date)}
                         </span>
-                        <span className="flex-1 text-xs text-ink-700 truncate">{s.activity}</span>
-                        <span className="font-medium text-xs text-ink-800 shrink-0">{s.hours}h</span>
+                        <span className="flex-1 text-xs text-foreground truncate">{s.activity}</span>
+                        <span className="font-medium text-xs text-foreground shrink-0">{s.hours}h</span>
                         {s.status === 'pending' ? (
                           <div className="flex gap-1.5 shrink-0">
                             <button
@@ -497,12 +497,12 @@ export default function OrgDashboardPage() {
       {activeTab === 'team' && (
         <div className="space-y-6">
           {/* Invite */}
-          <div className="rounded-xl border bg-white p-5 space-y-4">
-            <h3 className="font-semibold text-ink-900 flex items-center gap-2">
+          <div className="rounded-xl border bg-card p-5 space-y-4">
+            <h3 className="font-semibold text-foreground flex items-center gap-2">
               <UserPlus className="w-4 h-4" />
               Add team member
             </h3>
-            <p className="text-sm text-ink-500">
+            <p className="text-sm text-muted-foreground">
               They need an existing Merit account. Enter their email address.
             </p>
             <div className="flex gap-3 flex-wrap">
@@ -517,25 +517,25 @@ export default function OrgDashboardPage() {
               <select
                 value={inviteRole}
                 onChange={(e) => setInviteRole(e.target.value as 'coordinator' | 'admin')}
-                className="border border-ink-200 rounded-lg px-3 text-sm bg-white text-ink-700 focus:outline-none focus:ring-2 focus:ring-merit-blue-600"
+                className="border border-border rounded-lg px-3 text-sm bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-merit-blue-600"
               >
                 <option value="coordinator">Coordinator</option>
                 <option value="admin">Admin</option>
               </select>
-              <Button onClick={handleInvite} disabled={isInviting} className="bg-ink-900 hover:bg-ink-700 text-white">
+              <Button onClick={handleInvite} disabled={isInviting} className="bg-merit-blue-600 hover:bg-merit-blue-700 text-white">
                 {isInviting ? 'Adding...' : 'Add'}
               </Button>
             </div>
-            <div className="text-xs text-ink-400 space-y-1">
-              <p><strong className="text-ink-600">Coordinator</strong> — view volunteers and verify sessions</p>
-              <p><strong className="text-ink-600">Admin</strong> — full access, can add/remove team members</p>
+            <div className="text-xs text-muted-foreground space-y-1">
+              <p><strong className="text-muted-foreground">Coordinator</strong> — view volunteers and verify sessions</p>
+              <p><strong className="text-muted-foreground">Admin</strong> — full access, can add/remove team members</p>
             </div>
           </div>
 
           {/* Current team */}
-          <div className="rounded-xl border bg-white overflow-hidden">
-            <div className="p-4 border-b border-ink-100 bg-ink-50">
-              <h3 className="font-semibold text-sm text-ink-700">Current team</h3>
+          <div className="rounded-xl border bg-card overflow-hidden">
+            <div className="p-4 border-b border-border bg-background">
+              <h3 className="font-semibold text-sm text-foreground">Current team</h3>
             </div>
             <div className="divide-y divide-ink-50">
               {admins.map((admin: any) => (
@@ -545,15 +545,15 @@ export default function OrgDashboardPage() {
                     {admin.users?.name?.[0] ?? '?'}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-ink-900">
+                    <p className="text-sm font-medium text-foreground">
                       {admin.users?.name}
                       {admin.users?.email === user?.email && (
-                        <span className="ml-2 text-xs text-ink-400">(you)</span>
+                        <span className="ml-2 text-xs text-muted-foreground">(you)</span>
                       )}
                     </p>
-                    <p className="text-xs text-ink-400">{admin.users?.email}</p>
+                    <p className="text-xs text-muted-foreground">{admin.users?.email}</p>
                   </div>
-                  <span className="text-xs px-2.5 py-1 rounded-full bg-ink-100 font-medium capitalize text-ink-700">
+                  <span className="text-xs px-2.5 py-1 rounded-full bg-muted font-medium capitalize text-foreground">
                     {admin.role}
                   </span>
                   {admin.users?.email !== user?.email && dashboard?.userRole !== 'coordinator' && (
@@ -576,9 +576,9 @@ export default function OrgDashboardPage() {
       {activeTab === 'settings' && (
         <div className="space-y-6 max-w-2xl">
           {/* Description */}
-          <div className="rounded-xl border bg-white p-5 space-y-4">
+          <div className="rounded-xl border bg-card p-5 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold text-ink-900">Description</h3>
+              <h3 className="font-semibold text-foreground">Description</h3>
               {!editingDesc ? (
                 <Button variant="ghost" size="sm" onClick={() => setEditingDesc(true)}>
                   <Edit3 className="w-4 h-4 mr-1.5" />Edit
@@ -599,21 +599,21 @@ export default function OrgDashboardPage() {
                   onChange={(e) => setDescription(e.target.value)}
                   rows={4}
                   maxLength={500}
-                  className="w-full rounded-lg border border-ink-200 p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-merit-blue-600"
+                  className="w-full rounded-lg border border-border p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-merit-blue-600"
                   placeholder="Describe what your organization does..."
                 />
-                <p className="text-xs text-ink-400 text-right">{description.length}/500</p>
+                <p className="text-xs text-muted-foreground text-right">{description.length}/500</p>
               </div>
             ) : (
-              <p className="text-sm text-ink-500">
+              <p className="text-sm text-muted-foreground">
                 {description || 'No description yet. Click Edit to add one.'}
               </p>
             )}
           </div>
 
           {/* Contact info */}
-          <div className="rounded-xl border bg-white p-5 space-y-4">
-            <h3 className="font-semibold text-ink-900">Contact info</h3>
+          <div className="rounded-xl border bg-card p-5 space-y-4">
+            <h3 className="font-semibold text-foreground">Contact info</h3>
             <div className="grid grid-cols-1 gap-3">
               {[
                 { Icon: Globe, label: 'Website', value: org?.website_url },
@@ -621,10 +621,10 @@ export default function OrgDashboardPage() {
                 { Icon: Phone, label: 'Phone', value: org?.contact_phone },
               ].map(({ Icon, label, value }) => (
                 <div key={label} className="flex items-center gap-3 text-sm">
-                  <Icon className="w-4 h-4 text-ink-400 shrink-0" />
-                  <span className="text-ink-500 w-28 shrink-0">{label}</span>
-                  <span className="truncate text-ink-800">
-                    {value || <span className="text-ink-300 italic">Not set</span>}
+                  <Icon className="w-4 h-4 text-muted-foreground shrink-0" />
+                  <span className="text-muted-foreground w-28 shrink-0">{label}</span>
+                  <span className="truncate text-foreground">
+                    {value || <span className="text-muted-foreground italic">Not set</span>}
                   </span>
                 </div>
               ))}
@@ -636,21 +636,21 @@ export default function OrgDashboardPage() {
           </div>
 
           {/* Recruiting toggle */}
-          <div className="rounded-xl border bg-white p-5">
+          <div className="rounded-xl border bg-card p-5">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-semibold text-sm text-ink-900">Actively recruiting</h3>
-                <p className="text-xs text-ink-500 mt-1">
+                <h3 className="font-semibold text-sm text-foreground">Actively recruiting</h3>
+                <p className="text-xs text-muted-foreground mt-1">
                   Shows a "Looking for volunteers" badge on your org page
                 </p>
               </div>
               <button
                 onClick={() => recruitingToggle.mutate(!org?.is_recruiting)}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  org?.is_recruiting ? 'bg-success' : 'bg-ink-200'
+                  org?.is_recruiting ? 'bg-success' : 'bg-muted'
                 }`}
               >
-                <span className={`inline-block h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${
+                <span className={`inline-block h-4 w-4 rounded-full bg-card shadow-sm transition-transform ${
                   org?.is_recruiting ? 'translate-x-6' : 'translate-x-1'
                 }`} />
               </button>

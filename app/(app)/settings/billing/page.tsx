@@ -87,14 +87,14 @@ function PlanCard({
       isCurrent && isHighlighted
         ? 'border-merit-blue-300 bg-merit-blue-50'
         : isCurrent
-        ? 'border-ink-300 bg-white'
+        ? 'border-border bg-card'
         : isHighlighted
-        ? 'border-merit-blue-200 bg-white'
-        : 'border-ink-200 bg-white',
+        ? 'border-merit-blue-200 bg-card'
+        : 'border-border bg-card',
     )}>
       {/* Header */}
       <div className="flex items-center justify-between mb-1">
-        <p className="text-h3 text-ink-900">{name}</p>
+        <p className="text-h3 text-foreground">{name}</p>
         <div className="flex items-center gap-1.5">
           {badge && !isCurrent && (
             <span className="text-[11px] font-medium text-merit-blue-700 bg-merit-blue-100 px-2 py-0.5 rounded-full">
@@ -111,26 +111,26 @@ function PlanCard({
 
       {/* Price */}
       {showFree ? (
-        <p className="text-display text-ink-900 mb-1">$0</p>
+        <p className="text-display text-foreground mb-1">$0</p>
       ) : cadence === 'monthly' ? (
         <div className="mb-1">
-          <span className="text-display text-ink-900">{monthlyPrice}</span>
-          <span className="text-[14px] text-ink-500">/mo</span>
+          <span className="text-display text-foreground">{monthlyPrice}</span>
+          <span className="text-[14px] text-muted-foreground">/mo</span>
         </div>
       ) : (
         <div className="mb-0.5">
-          <span className="text-display text-ink-900">{yearlyMonthly}</span>
-          <span className="text-[14px] text-ink-500">/mo</span>
+          <span className="text-display text-foreground">{yearlyMonthly}</span>
+          <span className="text-[14px] text-muted-foreground">/mo</span>
         </div>
       )}
       {!showFree && cadence === 'yearly' && (
-        <p className="text-[12px] text-ink-400 mb-1">{yearlyPrice}/yr — billed annually</p>
+        <p className="text-[12px] text-muted-foreground mb-1">{yearlyPrice}/yr — billed annually</p>
       )}
 
       {/* Features */}
       <ul className="space-y-2.5 mt-3 mb-5 flex-1">
         {features.map((f) => (
-          <li key={f} className="flex items-start gap-2 text-[13px] text-ink-700">
+          <li key={f} className="flex items-start gap-2 text-[13px] text-foreground">
             <Check
               size={14}
               className={cn(
@@ -155,7 +155,7 @@ function PlanCard({
         </Button>
       )}
       {isCurrent && !showFree && (
-        <p className="text-[12px] text-center text-ink-400 mt-auto pt-1">Your current plan</p>
+        <p className="text-[12px] text-center text-muted-foreground mt-auto pt-1">Your current plan</p>
       )}
     </div>
   );
@@ -234,16 +234,16 @@ export default function BillingPage() {
   return (
     <div className="max-w-3xl">
       <div className="mb-6">
-        <h2 className="text-h1 text-ink-900">Plan & billing</h2>
-        <p className="text-small text-ink-500 mt-1">Manage your subscription and payment details.</p>
+        <h2 className="text-h1 text-foreground">Plan & billing</h2>
+        <p className="text-small text-muted-foreground mt-1">Manage your subscription and payment details.</p>
       </div>
 
       {/* Current plan banner (paid users only) */}
       {isPaid && (
         <div className="rounded-xl border border-merit-blue-200 bg-merit-blue-50 p-5 mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <p className="text-[13px] font-medium text-ink-900 capitalize">{plan} plan</p>
-            <p className="text-small text-ink-500 mt-0.5">
+            <p className="text-[13px] font-medium text-foreground capitalize">{plan} plan</p>
+            <p className="text-small text-muted-foreground mt-0.5">
               {nextBillingDate ? `Next billing date: ${nextBillingDate}` : 'Active subscription'}
             </p>
           </div>
@@ -261,14 +261,14 @@ export default function BillingPage() {
 
       {/* Monthly / Yearly toggle */}
       <div className="flex items-center justify-center mb-6">
-        <div className="inline-flex items-center rounded-lg border border-ink-200 bg-ink-50 p-0.5 gap-0.5">
+        <div className="inline-flex items-center rounded-lg border border-border bg-background p-0.5 gap-0.5">
           <button
             onClick={() => setCadence('monthly')}
             className={cn(
               'px-4 py-1.5 rounded-md text-[13px] font-medium transition-colors',
               cadence === 'monthly'
-                ? 'bg-white text-ink-900 shadow-sm border border-ink-200'
-                : 'text-ink-500 hover:text-ink-700',
+                ? 'bg-card text-foreground shadow-sm border border-border'
+                : 'text-muted-foreground hover:text-foreground',
             )}
           >
             Monthly
@@ -278,8 +278,8 @@ export default function BillingPage() {
             className={cn(
               'px-4 py-1.5 rounded-md text-[13px] font-medium transition-colors flex items-center gap-1.5',
               cadence === 'yearly'
-                ? 'bg-white text-ink-900 shadow-sm border border-ink-200'
-                : 'text-ink-500 hover:text-ink-700',
+                ? 'bg-card text-foreground shadow-sm border border-border'
+                : 'text-muted-foreground hover:text-foreground',
             )}
           >
             Yearly
@@ -334,19 +334,19 @@ export default function BillingPage() {
       {/* Payment method (paid users, from Stripe) */}
       {isPaid && billing?.paymentMethod && (
         <>
-          <Separator className="my-8 bg-ink-200" />
+          <Separator className="my-8 bg-muted" />
           <div>
-            <p className="text-h3 text-ink-900 mb-4">Payment method</p>
-            <div className="flex items-center justify-between rounded-lg border border-ink-200 bg-white px-4 py-3">
+            <p className="text-h3 text-foreground mb-4">Payment method</p>
+            <div className="flex items-center justify-between rounded-lg border border-border bg-card px-4 py-3">
               <div className="flex items-center gap-3">
-                <div className="h-8 w-12 rounded bg-ink-100 flex items-center justify-center">
-                  <Lock size={12} className="text-ink-400" />
+                <div className="h-8 w-12 rounded bg-muted flex items-center justify-center">
+                  <Lock size={12} className="text-muted-foreground" />
                 </div>
                 <div>
-                  <p className="text-[13px] font-medium text-ink-900 capitalize">
+                  <p className="text-[13px] font-medium text-foreground capitalize">
                     {billing.paymentMethod.brand} ending in {billing.paymentMethod.last4}
                   </p>
-                  <p className="text-[12px] text-ink-500">
+                  <p className="text-[12px] text-muted-foreground">
                     Expires {billing.paymentMethod.expMonth} / {String(billing.paymentMethod.expYear).slice(2)}
                   </p>
                 </div>

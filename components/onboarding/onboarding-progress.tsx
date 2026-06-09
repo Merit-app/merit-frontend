@@ -19,7 +19,7 @@ export function OnboardingProgress({ total, current }: Props) {
               ? 'w-4 h-1.5 bg-merit-blue-600'
               : i < current
               ? 'w-1.5 h-1.5 bg-merit-blue-300'
-              : 'w-1.5 h-1.5 bg-ink-200',
+              : 'w-1.5 h-1.5 bg-muted',
           )}
         />
       ))}

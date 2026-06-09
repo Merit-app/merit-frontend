@@ -35,8 +35,8 @@ export function OrgVolunteersCard({ volunteers, totalVolunteers }: Props) {
   if (shown.length === 0) return null;
 
   return (
-    <div className="bg-white rounded-xl border border-ink-200 p-5">
-      <h2 className="text-[15px] font-semibold text-ink-900 mb-4">Recent Volunteers</h2>
+    <div className="bg-card rounded-xl border border-border p-5">
+      <h2 className="text-[15px] font-semibold text-foreground mb-4">Recent Volunteers</h2>
 
       <div className="flex flex-wrap gap-2 mb-3">
         {shown.map((v, i) => {
@@ -75,7 +75,7 @@ export function OrgVolunteersCard({ volunteers, totalVolunteers }: Props) {
       </div>
 
       {overflow > 0 && (
-        <p className="text-[12px] text-ink-500">
+        <p className="text-[12px] text-muted-foreground">
           And <span className="font-medium">{overflow}</span> others have volunteered here
         </p>
       )}

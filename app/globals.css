@@ -72,6 +72,74 @@
   --ring: #2563EB;              /* merit-blue-600 */
 }
 
+/* ─── Dark theme ───────────────────────────────────────────────────────────────
+   Activated by the `.dark` class on <html> (next-themes, attribute="class").
+   Every surface in the authenticated app reads these via semantic utilities
+   (bg-background / bg-card / bg-muted / text-foreground / border-border …), so
+   the whole student AND org product flips with a single class. */
+.dark {
+  --background: #0C0C0F;        /* near-black page */
+  --foreground: #F4F4F6;        /* soft off-white — easier on the eyes than pure white */
+  --shadow-elevated: 0 4px 12px -2px rgb(0 0 0 / 0.5), 0 2px 4px -1px rgb(0 0 0 / 0.4);
+
+  --card: #17181C;             /* elevated surface */
+  --card-foreground: #F4F4F6;
+  --popover: #1D1E23;
+  --popover-foreground: #F4F4F6;
+  --primary: #3B82F6;           /* merit-blue-500 — a touch brighter on dark */
+  --primary-foreground: #FFFFFF;
+  --secondary: #26262C;
+  --secondary-foreground: #F4F4F6;
+  --muted: #232429;
+  --muted-foreground: #ADADB8;  /* lifted for readability */
+  --accent: #292930;
+  --accent-foreground: #F4F4F6;
+  --destructive: #EF4444;
+  --destructive-foreground: #FFFFFF;
+  --border: #2D2E35;
+  --input: #3A3B44;
+  --ring: #3B82F6;
+
+  /* ── Tinted alert / badge surfaces ──────────────────────────────────────
+     The pastel "-50/-100" backgrounds and the matching dark "-700/-800" text
+     are used app-wide for alert boxes and badges. In dark mode the light tints
+     glow, so remap them: dark muted tint backgrounds + light text of the same
+     hue. The "-600" steps (buttons & links) are intentionally left untouched. */
+  --color-amber-50:  #2a2110;
+  --color-amber-100: #352915;
+  --color-amber-200: #463514;
+  --color-amber-700: #fcd34d;
+  --color-amber-800: #fde68a;
+
+  --color-blue-50:  #15233b;
+  --color-blue-100: #1b2f4d;
+  --color-blue-700: #93c5fd;
+  --color-blue-800: #bfdbfe;
+
+  --color-green-50:  #112a1b;
+  --color-green-100: #163a25;
+  --color-green-700: #86efac;
+  --color-green-800: #bbf7d0;
+
+  --color-red-50:  #2c1517;
+  --color-red-100: #3a1a1d;
+  --color-red-700: #fca5a5;
+  --color-red-800: #fecaca;
+
+  /* Merit-blue tint scale (custom @theme palette) */
+  --color-merit-blue-50:  #15233b;
+  --color-merit-blue-100: #1c3257;
+  --color-merit-blue-200: #1e3a5f;
+
+  /* Semantic status tokens — flip tint bg dark + brighten the foreground */
+  --color-success:    #4ade80;
+  --color-success-bg: #122a1c;
+  --color-warning:    #fbbf24;
+  --color-warning-bg: #2a2110;
+  --color-danger:     #f87171;
+  --color-danger-bg:  #2c1517;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -94,14 +162,6 @@
   --color-ring: var(--ring);
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
-}
-
-/* Merit is light-only — disable dark mode overrides */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #FAFAF9;
-    --foreground: #1C1917;
-  }
 }
 
 /* ─── Base resets ──────────────────────────────────────────────────────────── */

@@ -34,7 +34,7 @@ export function StudentSection() {
       <div className="text-center max-w-3xl mx-auto mb-20">
         <motion.div
           variants={item}
-          className="inline-flex items-center gap-2 bg-gray-100 text-gray-700 text-xs font-medium px-3 py-1.5 rounded-full mb-8"
+          className="inline-flex items-center gap-2 bg-muted text-foreground text-xs font-medium px-3 py-1.5 rounded-full mb-8"
         >
           <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
           Trusted by students across BC
@@ -42,16 +42,16 @@ export function StudentSection() {
 
         <motion.h1
           variants={item}
-          className="text-5xl md:text-7xl font-bold tracking-tight text-gray-900 leading-[1.05] mb-6"
+          className="text-5xl md:text-7xl font-bold tracking-tight text-foreground leading-[1.05] mb-6"
         >
           Service hours
           <br />
-          <span className="text-gray-400">you can actually prove.</span>
+          <span className="text-muted-foreground">you can actually prove.</span>
         </motion.h1>
 
         <motion.p
           variants={item}
-          className="text-xl text-gray-600 max-w-xl mx-auto mb-10 leading-relaxed"
+          className="text-xl text-muted-foreground max-w-xl mx-auto mb-10 leading-relaxed"
         >
           Log volunteer hours, get them verified by SMS, and export beautiful signed PDFs for
           college applications and graduation requirements.
@@ -60,20 +60,20 @@ export function StudentSection() {
         <motion.div variants={item} className="flex items-center justify-center gap-3 flex-wrap">
           <Link
             href="/signup"
-            className="bg-black text-white font-semibold px-7 py-3.5 rounded-full text-base hover:bg-gray-800 transition-colors flex items-center gap-2 shadow-sm hover:shadow-md"
+            className="bg-black text-white font-semibold px-7 py-3.5 rounded-full text-base hover:bg-muted transition-colors flex items-center gap-2 shadow-sm hover:shadow-md"
           >
             Start free
             <ArrowRight className="w-4 h-4" />
           </Link>
           <Link
             href="/login"
-            className="text-gray-700 font-medium px-7 py-3.5 rounded-full text-base hover:bg-gray-100 transition-colors"
+            className="text-foreground font-medium px-7 py-3.5 rounded-full text-base hover:bg-muted transition-colors"
           >
             Sign in
           </Link>
         </motion.div>
 
-        <motion.p variants={item} className="text-xs text-gray-400 mt-4">
+        <motion.p variants={item} className="text-xs text-muted-foreground mt-4">
           Free forever for students. No credit card.
         </motion.p>
       </div>
@@ -95,15 +95,15 @@ export function StudentSection() {
           { value: 'Free', label: 'For every student' },
         ].map((stat) => (
           <div key={stat.label}>
-            <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
-            <p className="text-sm text-gray-500 mt-1">{stat.label}</p>
+            <p className="text-3xl font-bold text-foreground">{stat.value}</p>
+            <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
           </div>
         ))}
       </motion.div>
 
       {/* Testimonials */}
       <motion.div variants={item} className="mt-32 max-w-4xl mx-auto">
-        <p className="text-xs font-semibold tracking-widest text-gray-400 uppercase text-center mb-12">
+        <p className="text-xs font-semibold tracking-widest text-muted-foreground uppercase text-center mb-12">
           From students who&apos;ve used it
         </p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -131,14 +131,14 @@ export function StudentSection() {
             },
           ].map((t) => (
             <div key={t.name} className="space-y-4">
-              <p className="text-gray-700 leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
+              <p className="text-foreground leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-600">
+                <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-muted-foreground">
                   {t.name[0]}
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">{t.name}</p>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-sm font-semibold text-foreground">{t.name}</p>
+                  <p className="text-xs text-muted-foreground">
                     {t.school} · {t.grade}
                   </p>
                 </div>
@@ -150,13 +150,13 @@ export function StudentSection() {
 
       {/* Final CTA */}
       <motion.div variants={item} className="mt-32 text-center max-w-2xl mx-auto">
-        <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+        <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
           Your advisor will notice the difference.
         </h2>
-        <p className="text-gray-600 mb-8">Stop tracking hours in a spreadsheet.</p>
+        <p className="text-muted-foreground mb-8">Stop tracking hours in a spreadsheet.</p>
         <Link
           href="/signup"
-          className="inline-flex items-center gap-2 bg-black text-white font-semibold px-8 py-4 rounded-full hover:bg-gray-800 transition-colors shadow-lg"
+          className="inline-flex items-center gap-2 bg-black text-white font-semibold px-8 py-4 rounded-full hover:bg-muted transition-colors shadow-lg"
         >
           Create your free account
           <ArrowRight className="w-4 h-4" />

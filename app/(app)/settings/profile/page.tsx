@@ -59,6 +59,7 @@ const accountSchema = z.object({
   firstName: z.string().min(1, 'Required'),
   lastName: z.string().min(1, 'Required'),
   school: z.string().min(1, 'Required'),
+  city: z.string().optional(),
   grade: z.number().min(9).max(12),
   graduationYear: z.number().min(2025).max(2035),
   email: z.string().email('Enter a valid email'),
@@ -107,7 +108,7 @@ function ProfilePreviewCard({
   }
 
   return (
-    <div className="rounded-2xl border border-ink-200 bg-white overflow-hidden shadow-sm">
+    <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-sm">
       {/* Header banner */}
       <div className="h-16 bg-gradient-to-br from-merit-blue-500 to-merit-blue-700" />
 
@@ -130,7 +131,7 @@ function ProfilePreviewCard({
               'flex items-center gap-1 text-[10px] font-medium px-2 py-1 rounded-full',
               isPublic
                 ? 'bg-green-50 text-green-700 border border-green-200'
-                : 'bg-ink-100 text-ink-500 border border-ink-200',
+                : 'bg-muted text-muted-foreground border border-border',
             )}
           >
             {isPublic ? <Globe size={9} /> : <Lock size={9} />}
@@ -139,43 +140,43 @@ function ProfilePreviewCard({
         </div>
 
         {/* Name / username */}
-        <p className="text-[15px] font-bold text-ink-900 leading-tight">{name || 'Your Name'}</p>
+        <p className="text-[15px] font-bold text-foreground leading-tight">{name || 'Your Name'}</p>
         {username ? (
-          <p className="text-[12px] text-ink-400 mt-0.5">@{username}</p>
+          <p className="text-[12px] text-muted-foreground mt-0.5">@{username}</p>
         ) : (
-          <p className="text-[12px] text-ink-300 mt-0.5 italic">@username not set</p>
+          <p className="text-[12px] text-muted-foreground mt-0.5 italic">@username not set</p>
         )}
 
         {/* Bio */}
-        <p className="text-[12px] text-ink-600 mt-2 leading-relaxed min-h-[32px]">
-          {bio || <span className="text-ink-300 italic">No bio yet</span>}
+        <p className="text-[12px] text-muted-foreground mt-2 leading-relaxed min-h-[32px]">
+          {bio || <span className="text-muted-foreground italic">No bio yet</span>}
         </p>
 
-        <Separator className="my-3 bg-ink-100" />
+        <Separator className="my-3 bg-muted" />
 
         {/* Stats */}
         <div className="grid grid-cols-2 gap-2 text-center">
-          <div className="rounded-lg bg-ink-50 px-2 py-2.5">
-            <div className="flex items-center justify-center gap-1 text-ink-400 mb-1">
+          <div className="rounded-lg bg-background px-2 py-2.5">
+            <div className="flex items-center justify-center gap-1 text-muted-foreground mb-1">
               <Clock size={11} />
               <span className="text-[10px]">Verified hours</span>
             </div>
-            <p className="text-[18px] font-bold text-ink-900">{verifiedHours}</p>
+            <p className="text-[18px] font-bold text-foreground">{verifiedHours}</p>
           </div>
-          <div className="rounded-lg bg-ink-50 px-2 py-2.5">
-            <div className="flex items-center justify-center gap-1 text-ink-400 mb-1">
+          <div className="rounded-lg bg-background px-2 py-2.5">
+            <div className="flex items-center justify-center gap-1 text-muted-foreground mb-1">
               <Building2 size={11} />
               <span className="text-[10px]">Organizations</span>
             </div>
-            <p className="text-[18px] font-bold text-ink-900">{orgCount}</p>
+            <p className="text-[18px] font-bold text-foreground">{orgCount}</p>
           </div>
         </div>
 
         {/* Shareable link */}
         {profileUrl && isPublic ? (
-          <div className="mt-3 flex items-center gap-2 rounded-lg border border-ink-200 bg-ink-50 px-3 py-2">
-            <Link2 size={12} className="text-ink-400 shrink-0" />
-            <span className="flex-1 text-[11px] text-ink-500 truncate">{profileUrl}</span>
+          <div className="mt-3 flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2">
+            <Link2 size={12} className="text-muted-foreground shrink-0" />
+            <span className="flex-1 text-[11px] text-muted-foreground truncate">{profileUrl}</span>
             <button
               type="button"
               onClick={copyLink}
@@ -186,7 +187,7 @@ function ProfilePreviewCard({
             </button>
           </div>
         ) : (
-          <p className="mt-3 text-[11px] text-ink-400 italic text-center">
+          <p className="mt-3 text-[11px] text-muted-foreground italic text-center">
             {!isPublic
               ? 'Make your profile public to share it.'
               : 'Set a username to get your shareable link.'}
@@ -194,8 +195,8 @@ function ProfilePreviewCard({
         )}
       </div>
 
-      <div className="border-t border-ink-100 px-5 py-2.5 bg-ink-50/50">
-        <p className="text-[10px] text-ink-400 text-center">Live preview · updates as you edit</p>
+      <div className="border-t border-border px-5 py-2.5 bg-background/50">
+        <p className="text-[10px] text-muted-foreground text-center">Live preview · updates as you edit</p>
       </div>
     </div>
   );
@@ -255,6 +256,7 @@ export default function ProfilePage() {
       firstName: user.firstName,
       lastName: user.lastName,
       school: user.school,
+      city: user.city ?? '',
       grade: user.grade,
       graduationYear: user.graduationYear,
       email: user.email,
@@ -287,6 +289,7 @@ export default function ProfilePage() {
         name: `${data.firstName} ${data.lastName}`.trim(),
         email: data.email !== user.email ? data.email : undefined,
         school: data.school,
+        city: data.city || undefined,
         grade: data.grade,
         graduationYear: data.graduationYear,
         phone: data.phone || undefined,
@@ -305,8 +308,8 @@ export default function ProfilePage() {
   return (
     <div className="max-w-5xl">
       <div className="mb-6">
-        <h2 className="text-h1 text-ink-900">Public Profile</h2>
-        <p className="text-small text-ink-500 mt-1">
+        <h2 className="text-h1 text-foreground">Public Profile</h2>
+        <p className="text-small text-muted-foreground mt-1">
           Manage your account info and control how you appear publicly on Merit.
         </p>
       </div>
@@ -322,7 +325,7 @@ export default function ProfilePage() {
             onToggle={setPreviewIsPublic}
           />
 
-          <Separator className="bg-ink-200" />
+          <Separator className="bg-muted" />
 
           {/* Avatar */}
           <AvatarUploadSection
@@ -330,45 +333,54 @@ export default function ProfilePage() {
             onPreviewChange={setPreviewAvatarUrl}
           />
 
-          <Separator className="bg-ink-200" />
+          <Separator className="bg-muted" />
 
           {/* Account info */}
           <section>
             <div className="mb-4">
-              <h3 className="text-[15px] font-semibold text-ink-900">Account info</h3>
-              <p className="text-[12px] text-ink-500 mt-0.5">Your name, school and contact details.</p>
+              <h3 className="text-[15px] font-semibold text-foreground">Account info</h3>
+              <p className="text-[12px] text-muted-foreground mt-0.5">Your name, school and contact details.</p>
             </div>
             <form onSubmit={handleSubmit(onAccountSubmit)} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <Label className="text-[13px] font-medium text-ink-900">First name</Label>
+                  <Label className="text-[13px] font-medium text-foreground">First name</Label>
                   <Input {...register('firstName')} className={cn(errors.firstName && 'border-danger')} />
                   {errors.firstName && <p className="text-[12px] text-danger">{errors.firstName.message}</p>}
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-[13px] font-medium text-ink-900">Last name</Label>
+                  <Label className="text-[13px] font-medium text-foreground">Last name</Label>
                   <Input {...register('lastName')} className={cn(errors.lastName && 'border-danger')} />
                   {errors.lastName && <p className="text-[12px] text-danger">{errors.lastName.message}</p>}
                 </div>
               </div>
 
-              <div className="space-y-1.5">
-                <Label className="text-[13px] font-medium text-ink-900">School</Label>
-                <Input {...register('school')} className={cn(errors.school && 'border-danger')} />
-                {errors.school && <p className="text-[13px] text-danger">{errors.school.message}</p>}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label className="text-[13px] font-medium text-foreground">School</Label>
+                  <Input {...register('school')} className={cn(errors.school && 'border-danger')} />
+                  {errors.school && <p className="text-[13px] text-danger">{errors.school.message}</p>}
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-[13px] font-medium text-foreground">
+                    City
+                    <span className="ml-1 text-[11px] font-normal text-muted-foreground">(for local leaderboard)</span>
+                  </Label>
+                  <Input {...register('city')} placeholder="e.g. Vancouver" />
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <Label className="text-[13px] font-medium text-ink-900">Grade</Label>
+                  <Label className="text-[13px] font-medium text-foreground">Grade</Label>
                   <Input type="number" min={9} max={12} {...register('grade', { valueAsNumber: true })} />
                   {errors.grade && <p className="text-[12px] text-danger">{errors.grade.message}</p>}
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-[13px] font-medium text-ink-900">Graduation year</Label>
+                  <Label className="text-[13px] font-medium text-foreground">Graduation year</Label>
                   <select
                     {...register('graduationYear', { valueAsNumber: true })}
-                    className="flex h-10 w-full rounded-lg border border-ink-200 bg-white px-3 text-[14px] text-ink-900 focus:outline-none hover:border-ink-300 transition-colors appearance-none"
+                    className="flex h-10 w-full rounded-lg border border-border bg-card px-3 text-[14px] text-foreground focus:outline-none hover:border-border transition-colors appearance-none"
                   >
                     <option value="">Select year</option>
                     {[2025, 2026, 2027, 2028, 2029].map((year) => (
@@ -379,18 +391,18 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              <Separator className="bg-ink-200" />
+              <Separator className="bg-muted" />
 
               <div className="space-y-1.5">
-                <Label className="text-[13px] font-medium text-ink-900">Email</Label>
+                <Label className="text-[13px] font-medium text-foreground">Email</Label>
                 <Input type="email" {...register('email')} className={cn(errors.email && 'border-danger')} />
-                <p className="text-[12px] text-ink-500">Changing your email requires re-verification.</p>
+                <p className="text-[12px] text-muted-foreground">Changing your email requires re-verification.</p>
                 {errors.email && <p className="text-[12px] text-danger">{errors.email.message}</p>}
               </div>
 
               <div className="space-y-1.5">
                 <div className="flex items-center gap-2">
-                  <Label className="text-[13px] font-medium text-ink-900">Phone number</Label>
+                  <Label className="text-[13px] font-medium text-foreground">Phone number</Label>
                   {user.phoneVerified && (
                     <span className="text-[11px] font-medium text-success bg-success-bg px-2 py-0.5 rounded-full">
                       Verified
@@ -398,27 +410,27 @@ export default function ProfilePage() {
                   )}
                 </div>
                 <Input type="tel" placeholder="+16045550194" {...register('phone')} />
-                <p className="text-[12px] text-ink-500">
+                <p className="text-[12px] text-muted-foreground">
                   E.164 format (e.g. +16045550194). Used for account recovery and SMS verification.
                 </p>
               </div>
 
-              <Separator className="bg-ink-200" />
+              <Separator className="bg-muted" />
 
               <div className="space-y-4">
                 <div>
-                  <p className="text-[13px] font-semibold text-ink-900">Service goal</p>
-                  <p className="text-[12px] text-ink-500 mt-0.5">
+                  <p className="text-[13px] font-semibold text-foreground">Service goal</p>
+                  <p className="text-[12px] text-muted-foreground mt-0.5">
                     Set the program and total hours you&apos;re working toward.
                   </p>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <Label className="text-[13px] font-medium text-ink-900">Program</Label>
+                    <Label className="text-[13px] font-medium text-foreground">Program</Label>
                     <select
                       {...register('goalProgram')}
                       onChange={handleProgramChange}
-                      className="flex h-10 w-full rounded-lg border border-ink-200 bg-white px-3 text-[14px] text-ink-900 focus:outline-none hover:border-ink-300 transition-colors appearance-none"
+                      className="flex h-10 w-full rounded-lg border border-border bg-card px-3 text-[14px] text-foreground focus:outline-none hover:border-border transition-colors appearance-none"
                     >
                       <option value="">Select program</option>
                       <option value="NHS">NHS (75 hrs)</option>
@@ -429,7 +441,7 @@ export default function ProfilePage() {
                     </select>
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-[13px] font-medium text-ink-900">Goal hours</Label>
+                    <Label className="text-[13px] font-medium text-foreground">Goal hours</Label>
                     <Input
                       type="number"
                       min={1}
@@ -456,13 +468,13 @@ export default function ProfilePage() {
             </form>
           </section>
 
-          <Separator className="bg-ink-200" />
+          <Separator className="bg-muted" />
 
           {/* Public profile */}
           <section>
             <div className="mb-4">
-              <h3 className="text-[15px] font-semibold text-ink-900">Public profile</h3>
-              <p className="text-[12px] text-ink-500 mt-0.5">
+              <h3 className="text-[15px] font-semibold text-foreground">Public profile</h3>
+              <p className="text-[12px] text-muted-foreground mt-0.5">
                 Customize how you appear on Merit&apos;s public directory.
               </p>
             </div>
@@ -471,7 +483,7 @@ export default function ProfilePage() {
               {/* Username */}
               <UsernameEditor />
 
-              <Separator className="bg-ink-200" />
+              <Separator className="bg-muted" />
 
               {/* Bio */}
               <BioEditor
@@ -479,15 +491,15 @@ export default function ProfilePage() {
                 onBioChange={setPreviewBio}
               />
 
-              <Separator className="bg-ink-200" />
+              <Separator className="bg-muted" />
 
               {/* Pinned badges */}
               <div>
                 <div className="flex items-center gap-1.5 mb-1">
-                  <Award size={13} className="text-ink-400" />
-                  <p className="text-[13px] font-medium text-ink-900">Pinned badges</p>
+                  <Award size={13} className="text-muted-foreground" />
+                  <p className="text-[13px] font-medium text-foreground">Pinned badges</p>
                 </div>
-                <p className="text-[12px] text-ink-500 mb-3">
+                <p className="text-[12px] text-muted-foreground mb-3">
                   Pin up to 3 badges to highlight on your profile.
                 </p>
                 {profileData && <TopBadgesPicker initialTopBadgeIds={profileData.topBadgeIds} />}
@@ -495,7 +507,7 @@ export default function ProfilePage() {
             </div>
           </section>
 
-          <Separator className="bg-ink-200" />
+          <Separator className="bg-muted" />
 
           {/* Change password */}
           <ChangePasswordSection />
@@ -503,7 +515,7 @@ export default function ProfilePage() {
 
         {/* ── Right: preview ── */}
         <div className="lg:sticky lg:top-6">
-          <p className="text-[11px] font-semibold text-ink-400 uppercase tracking-wide mb-3">
+          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-3">
             Profile preview
           </p>
           <ProfilePreviewCard
@@ -625,13 +637,13 @@ function AvatarUploadSection({
           <button
             type="button"
             onClick={handleRemove}
-            className="flex items-center gap-1.5 text-[12px] text-ink-400 hover:text-danger transition-colors"
+            className="flex items-center gap-1.5 text-[12px] text-muted-foreground hover:text-danger transition-colors"
           >
             <X size={12} />
             Remove photo
           </button>
         )}
-        <p className="text-[11px] text-ink-400">JPG, PNG or WebP · max 5 MB</p>
+        <p className="text-[11px] text-muted-foreground">JPG, PNG or WebP · max 5 MB</p>
       </div>
 
       <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
@@ -689,7 +701,7 @@ function PrivacyToggleSection({
         'rounded-xl border-2 p-4 transition-colors',
         isPublic
           ? 'border-green-300 bg-green-50'
-          : 'border-ink-200 bg-white',
+          : 'border-border bg-card',
       )}
     >
       <div className="flex items-start justify-between gap-4">
@@ -697,20 +709,20 @@ function PrivacyToggleSection({
           <div
             className={cn(
               'mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full',
-              isPublic ? 'bg-green-100' : 'bg-ink-100',
+              isPublic ? 'bg-green-100' : 'bg-muted',
             )}
           >
             {isPublic ? (
               <Globe size={15} className="text-green-700" />
             ) : (
-              <Lock size={15} className="text-ink-500" />
+              <Lock size={15} className="text-muted-foreground" />
             )}
           </div>
           <div className="min-w-0">
-            <p className={cn('text-[14px] font-semibold', isPublic ? 'text-green-900' : 'text-ink-900')}>
+            <p className={cn('text-[14px] font-semibold', isPublic ? 'text-green-900' : 'text-foreground')}>
               {isPublic ? 'Profile is public' : 'Profile is private'}
             </p>
-            <p className={cn('text-[12px] mt-0.5', isPublic ? 'text-green-700' : 'text-ink-500')}>
+            <p className={cn('text-[12px] mt-0.5', isPublic ? 'text-green-700' : 'text-muted-foreground')}>
               {isPublic
                 ? profileUrl
                   ? `Visible at meritco.app/u/${username}`
@@ -733,7 +745,7 @@ function PrivacyToggleSection({
         >
           <span
             className={cn(
-              'inline-block h-4 w-4 rounded-full bg-white shadow transition-transform',
+              'inline-block h-4 w-4 rounded-full bg-card shadow transition-transform',
               isPublic ? 'translate-x-6' : 'translate-x-1',
             )}
           />
@@ -742,7 +754,7 @@ function PrivacyToggleSection({
 
       {/* Copy link row — only when public + username set */}
       {isPublic && profileUrl && (
-        <div className="mt-3 flex items-center gap-2 rounded-lg border border-green-200 bg-white/70 px-3 py-2">
+        <div className="mt-3 flex items-center gap-2 rounded-lg border border-green-200 bg-card/70 px-3 py-2">
           <Link2 size={12} className="text-green-600 shrink-0" />
           <span className="flex-1 text-[12px] text-green-800 truncate font-mono">{profileUrl}</span>
           <button
@@ -801,8 +813,8 @@ function BioEditor({
 
   return (
     <div className="space-y-2">
-      <Label className="text-[13px] font-medium text-ink-900">Bio</Label>
-      <p className="text-[12px] text-ink-500">
+      <Label className="text-[13px] font-medium text-foreground">Bio</Label>
+      <p className="text-[12px] text-muted-foreground">
         A short description shown on your public profile. Max 200 characters.
       </p>
       <textarea
@@ -810,10 +822,10 @@ function BioEditor({
         onChange={handleChange}
         rows={3}
         placeholder="Tell the world what you're passionate about…"
-        className="flex w-full rounded-lg border border-ink-200 bg-white px-3 py-2 text-[14px] text-ink-900 placeholder:text-ink-400 focus:outline-none hover:border-ink-300 resize-none transition-colors"
+        className="flex w-full rounded-lg border border-border bg-card px-3 py-2 text-[14px] text-foreground placeholder:text-muted-foreground focus:outline-none hover:border-border resize-none transition-colors"
       />
       <div className="flex items-center justify-between">
-        <span className="text-[11px] text-ink-400">{bio.length}/200</span>
+        <span className="text-[11px] text-muted-foreground">{bio.length}/200</span>
         {bioError && <p className="text-[12px] text-danger">{bioError}</p>}
         <button
           type="button"
@@ -874,8 +886,8 @@ function ChangePasswordSection() {
   return (
     <section>
       <div className="mb-4">
-        <h3 className="text-[15px] font-semibold text-ink-900">Change password</h3>
-        <p className="text-[12px] text-ink-500 mt-0.5">
+        <h3 className="text-[15px] font-semibold text-foreground">Change password</h3>
+        <p className="text-[12px] text-muted-foreground mt-0.5">
           You&apos;ll remain signed in after changing your password.
         </p>
       </div>
@@ -893,7 +905,7 @@ function ChangePasswordSection() {
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 max-w-sm">
         <div className="space-y-1.5">
-          <Label className="text-[13px] font-medium text-ink-900">Current password</Label>
+          <Label className="text-[13px] font-medium text-foreground">Current password</Label>
           <PasswordInput
             type="password"
             {...register('currentPassword')}
@@ -904,7 +916,7 @@ function ChangePasswordSection() {
           )}
         </div>
         <div className="space-y-1.5">
-          <Label className="text-[13px] font-medium text-ink-900">New password</Label>
+          <Label className="text-[13px] font-medium text-foreground">New password</Label>
           <PasswordInput
             placeholder="8+ characters"
             {...register('newPassword')}
@@ -915,7 +927,7 @@ function ChangePasswordSection() {
           )}
         </div>
         <div className="space-y-1.5">
-          <Label className="text-[13px] font-medium text-ink-900">Confirm new password</Label>
+          <Label className="text-[13px] font-medium text-foreground">Confirm new password</Label>
           <PasswordInput
             {...register('confirmPassword')}
             className={cn(errors.confirmPassword && 'border-danger')}

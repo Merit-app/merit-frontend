@@ -16,8 +16,10 @@ import {
   Award,
   Bookmark,
   Trophy,
+  GraduationCap,
+  Users,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { UserMenu } from './user-menu';
 import { SidebarAvatar } from '@/components/profile/sidebar-avatar';
@@ -28,6 +30,7 @@ const primaryNav = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/hours', label: 'All sessions', icon: Clock },
   { href: '/organizations', label: 'Organizations', icon: Building2 },
+  { href: '/scholarships', label: 'Scholarships', icon: GraduationCap },
   { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
   { href: '/saved', label: 'Saved', icon: Bookmark },
   { href: '/badges', label: 'Badges', icon: Award },
@@ -65,9 +68,9 @@ function UpgradePrompt() {
     <div className="relative z-10 px-3 pb-2">
       {/* Dropdown panel */}
       {open && (
-        <div className="absolute bottom-full left-0 right-0 mx-3 mb-2 rounded-xl border border-ink-200 bg-white shadow-lg overflow-hidden z-50">
+        <div className="absolute bottom-full left-0 right-0 mx-3 mb-2 rounded-xl border border-border bg-card shadow-lg overflow-hidden z-50">
           <div className="px-4 pt-3.5 pb-2">
-            <p className="text-[12px] font-semibold text-ink-500 uppercase tracking-wide mb-2.5">
+            <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide mb-2.5">
               Upgrade your plan
             </p>
             <div className="space-y-2">
@@ -76,23 +79,23 @@ function UpgradePrompt() {
                   key={plan.name}
                   href={plan.href}
                   onClick={() => setOpen(false)}
-                  className="flex items-start gap-2.5 rounded-lg px-3 py-2.5 hover:bg-ink-50 transition-colors group"
+                  className="flex items-start gap-2.5 rounded-lg px-3 py-2.5 hover:bg-background transition-colors group"
                 >
                   <div className="mt-0.5 h-5 w-5 rounded-full bg-merit-blue-100 flex items-center justify-center shrink-0">
                     <Zap size={11} className="text-merit-blue-600" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <span className="text-[13px] font-medium text-ink-900">{plan.name}</span>
-                      <span className="text-[12px] text-ink-500">{plan.price}/mo</span>
+                      <span className="text-[13px] font-medium text-foreground">{plan.name}</span>
+                      <span className="text-[12px] text-muted-foreground">{plan.price}/mo</span>
                     </div>
-                    <p className="text-[12px] text-ink-400 mt-0.5 leading-snug">{plan.description}</p>
+                    <p className="text-[12px] text-muted-foreground mt-0.5 leading-snug">{plan.description}</p>
                   </div>
                 </Link>
               ))}
             </div>
           </div>
-          <div className="border-t border-ink-100 px-4 py-2.5">
+          <div className="border-t border-border px-4 py-2.5">
             <Link
               href="/settings/billing"
               onClick={() => setOpen(false)}
@@ -105,18 +108,18 @@ function UpgradePrompt() {
       )}
 
       {/* Pill */}
-      <div className="flex items-center gap-1.5 rounded-lg border border-ink-200 bg-white px-3 py-2">
+      <div className="flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-2">
         <Zap size={13} className="text-merit-blue-600 shrink-0" />
         <button
           onClick={() => setOpen((v) => !v)}
-          className="flex-1 text-left text-[12px] font-medium text-ink-700 hover:text-ink-900 transition-colors"
+          className="flex-1 text-left text-[12px] font-medium text-foreground hover:text-foreground transition-colors"
         >
           Upgrade for more features
         </button>
         <button
           onClick={() => setOpen((v) => !v)}
           aria-label="Toggle upgrade options"
-          className="text-ink-400 hover:text-ink-600 transition-colors"
+          className="text-muted-foreground hover:text-muted-foreground transition-colors"
         >
           <ChevronUp
             size={13}
@@ -128,7 +131,7 @@ function UpgradePrompt() {
             <button
               onClick={() => setDismissed(true)}
               aria-label="Dismiss"
-              className="text-ink-300 hover:text-ink-500 transition-colors"
+              className="text-muted-foreground hover:text-muted-foreground transition-colors"
             >
               <X size={13} />
             </button>
@@ -152,8 +155,8 @@ function OrgDashboardLink() {
   return (
     <>
       {/* Section divider + label */}
-      <div className="mx-1 mt-2 mb-1 h-px bg-ink-200" />
-      <p className="px-3 py-1 text-[10px] font-semibold text-ink-400 uppercase tracking-widest">
+      <div className="mx-1 mt-2 mb-1 h-px bg-muted" />
+      <p className="px-3 py-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">
         Organization
       </p>
 
@@ -162,9 +165,9 @@ function OrgDashboardLink() {
         href={href}
         className={cn(
           'group relative flex items-center gap-2.5 rounded-[6px] px-3 py-2 transition-colors duration-100',
-          'text-ink-700 hover:bg-ink-100 hover:text-ink-900 text-[13px] font-medium',
+          'text-foreground hover:bg-muted hover:text-foreground text-[13px] font-medium',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merit-blue-600 focus-visible:ring-offset-1',
-          isActive && 'bg-ink-100 text-ink-900',
+          isActive && 'bg-muted text-foreground',
         )}
       >
         {isActive && (
@@ -173,7 +176,7 @@ function OrgDashboardLink() {
         <Building2
           size={16}
           strokeWidth={isActive ? 2 : 1.75}
-          className={cn('shrink-0', isActive ? 'text-merit-blue-600' : 'text-ink-500 group-hover:text-ink-700')}
+          className={cn('shrink-0', isActive ? 'text-merit-blue-600' : 'text-muted-foreground group-hover:text-foreground')}
         />
         <span className="flex-1 truncate">{orgName ?? 'Org Dashboard'}</span>
         <span className="text-[9px] font-bold bg-merit-blue-600/10 text-merit-blue-600 px-1.5 py-0.5 rounded-full shrink-0">
@@ -183,16 +186,34 @@ function OrgDashboardLink() {
 
       {/* Multi-org hint */}
       {adminOrgs.length > 1 && (
-        <p className="px-3 text-[10px] text-ink-400">
+        <p className="px-3 text-[10px] text-muted-foreground">
           +{adminOrgs.length - 1} more org{adminOrgs.length > 2 ? 's' : ''}{' '}
           ·{' '}
-          <a href="/org" className="underline hover:text-ink-700">
+          <a href="/org" className="underline hover:text-foreground">
             Switch
           </a>
         </p>
       )}
     </>
   );
+}
+
+function ChapterNavLink({ active }: { active: boolean }) {
+  // The User type has no chapter flag, so we probe the coordinator endpoint once.
+  // 200 → user is a coordinator, show the link; 403/404 → hide it.
+  const [isCoordinator, setIsCoordinator] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    // Lazy import to avoid a hard dependency cycle with the API client.
+    import('@/lib/api')
+      .then(({ adminApi }) => adminApi.getChapter())
+      .then(() => { if (!cancelled) setIsCoordinator(true); })
+      .catch(() => { /* not a coordinator — leave hidden */ });
+    return () => { cancelled = true; };
+  }, []);
+
+  if (!isCoordinator) return null;
+  return <NavItem href="/chapter" label="Chapter" icon={Users} active={active} />;
 }
 
 export function Sidebar() {
@@ -206,14 +227,14 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="hidden md:flex fixed inset-y-0 left-0 z-30 w-60 flex-col bg-ink-50 border-r border-ink-200">
+    <aside className="hidden md:flex fixed inset-y-0 left-0 z-30 w-60 flex-col bg-background border-r border-border">
       {/* Logo */}
-      <div className="flex h-14 items-center px-5 border-b border-ink-200">
+      <div className="flex h-14 items-center px-5 border-b border-border">
         <Link href="/dashboard" className="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merit-blue-600 rounded-md">
-          <span className="text-[18px] font-semibold tracking-tight text-ink-900 group-hover:text-ink-700 transition-colors">
+          <span className="text-[18px] font-semibold tracking-tight text-foreground group-hover:text-foreground transition-colors">
             merit<span className="text-merit-blue-600">.</span>
           </span>
-          <p className="text-micro text-ink-500 mt-0.5">Service hours · 2024–25</p>
+          <p className="text-micro text-muted-foreground mt-0.5">Service hours · 2024–25</p>
         </Link>
       </div>
 
@@ -223,7 +244,7 @@ export function Sidebar() {
           <SidebarAvatar />
         </div>
 
-        <div className="mx-1 mb-2 h-px bg-ink-200" />
+        <div className="mx-1 mb-2 h-px bg-muted" />
 
         {/* Log hours CTA — primary */}
         <Link
@@ -244,14 +265,17 @@ export function Sidebar() {
           <NavItem key={href} href={href} label={label} icon={Icon} active={isActive(href)} />
         ))}
 
+        {/* Chapter (coordinator) link — only shown to chapter coordinators */}
+        {hydrated && <ChapterNavLink active={isActive('/chapter')} />}
+
         {/* Org dashboard — only shown to org admins, links to new standalone platform */}
         {hydrated && isOrgAdmin && (
           <OrgDashboardLink />
         )}
 
         {/* Divider before secondary nav (hidden when org section already has one) */}
-        {(!hydrated || !isOrgAdmin) && <div className="mx-1 my-2 h-px bg-ink-200" />}
-        {hydrated && isOrgAdmin && <div className="mx-1 mt-2 h-px bg-ink-200" />}
+        {(!hydrated || !isOrgAdmin) && <div className="mx-1 my-2 h-px bg-muted" />}
+        {hydrated && isOrgAdmin && <div className="mx-1 mt-2 h-px bg-muted" />}
 
         {/* Secondary nav */}
         {secondaryNav.map(({ href, label, icon: Icon }) => (
@@ -263,7 +287,7 @@ export function Sidebar() {
       <UpgradePrompt />
 
       {/* User menu (settings, logout) — compact at bottom */}
-      <div className="border-t border-ink-200 px-3 py-2">
+      <div className="border-t border-border px-3 py-2">
         <UserMenu compact />
       </div>
     </aside>
@@ -284,9 +308,9 @@ function NavItem({ href, label, icon: Icon, active, small }: NavItemProps) {
       href={href}
       className={cn(
         'group relative flex items-center gap-2.5 rounded-[6px] px-3 py-2 transition-colors duration-100',
-        'text-ink-700 hover:bg-ink-100 hover:text-ink-900',
+        'text-foreground hover:bg-muted hover:text-foreground',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merit-blue-600 focus-visible:ring-offset-1',
-        active && 'bg-ink-100 text-ink-900',
+        active && 'bg-muted text-foreground',
         small ? 'text-[13px]' : 'text-[13px] font-medium'
       )}
     >
@@ -297,7 +321,7 @@ function NavItem({ href, label, icon: Icon, active, small }: NavItemProps) {
       <Icon
         size={16}
         strokeWidth={active ? 2 : 1.75}
-        className={cn('shrink-0', active ? 'text-merit-blue-600' : 'text-ink-500 group-hover:text-ink-700')}
+        className={cn('shrink-0', active ? 'text-merit-blue-600' : 'text-muted-foreground group-hover:text-foreground')}
       />
       {label}
     </Link>

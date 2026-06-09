@@ -84,8 +84,8 @@ export default function BadgesPage() {
       {/* ── Header ─────────────────────────────────────────────────────── */}
       <div className="flex items-start justify-between mb-4">
         <div>
-          <h1 className="text-2xl font-bold text-ink-900">Your Badges</h1>
-          <p className="text-sm text-ink-500 mt-1">
+          <h1 className="text-2xl font-bold text-foreground">Your Badges</h1>
+          <p className="text-sm text-muted-foreground mt-1">
             {earned.length} earned · {locked.length} locked
           </p>
         </div>
@@ -95,7 +95,7 @@ export default function BadgesPage() {
               type="button"
               onClick={() => handleRefresh()}
               disabled={refreshing}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-ink-200 bg-white hover:bg-ink-50 text-[13px] font-medium text-ink-700 transition-colors disabled:opacity-50"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card hover:bg-background text-[13px] font-medium text-foreground transition-colors disabled:opacity-50"
             >
               <RefreshCw size={13} className={refreshing ? 'animate-spin' : ''} />
               {refreshing ? 'Refreshing…' : 'Refresh'}
@@ -110,7 +110,7 @@ export default function BadgesPage() {
         {TIER_LEGEND.map(({ label, ring }) => (
           <div key={label} className="flex items-center gap-2">
             <div className={cn('w-4 h-4 rounded-full shadow-sm', ring)} />
-            <span className="text-[12px] text-ink-500">{label}</span>
+            <span className="text-[12px] text-muted-foreground">{label}</span>
           </div>
         ))}
       </div>
@@ -118,7 +118,7 @@ export default function BadgesPage() {
       {/* ── Earned ─────────────────────────────────────────────────────── */}
       {earned.length > 0 && (
         <section className="mb-10">
-          <h2 className="text-[13px] font-semibold text-ink-500 uppercase tracking-wide mb-4">
+          <h2 className="text-[13px] font-semibold text-muted-foreground uppercase tracking-wide mb-4">
             Earned ({earned.length})
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
@@ -144,7 +144,7 @@ export default function BadgesPage() {
       {/* ── Locked ─────────────────────────────────────────────────────── */}
       {locked.length > 0 && (
         <section>
-          <h2 className="text-[13px] font-semibold text-ink-500 uppercase tracking-wide mb-4">
+          <h2 className="text-[13px] font-semibold text-muted-foreground uppercase tracking-wide mb-4">
             Locked ({locked.length})
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
@@ -171,8 +171,8 @@ export default function BadgesPage() {
       {/* ── Empty ──────────────────────────────────────────────────────── */}
       {entries.length === 0 && (
         <div className="text-center py-16">
-          <p className="text-[15px] font-semibold text-ink-900 mb-2">No badges yet</p>
-          <p className="text-sm text-ink-400">
+          <p className="text-[15px] font-semibold text-foreground mb-2">No badges yet</p>
+          <p className="text-sm text-muted-foreground">
             Log and verify volunteer hours to start earning badges.
           </p>
         </div>

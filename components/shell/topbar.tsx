@@ -59,17 +59,17 @@ export function Topbar() {
   return (
     <>
       {/* Topbar: left-0 on mobile, left-60 on md */}
-      <header className="fixed top-0 left-0 md:left-60 right-0 z-20 flex h-14 items-center justify-between border-b border-ink-200 bg-white px-4 md:px-6">
+      <header className="fixed top-0 left-0 md:left-60 right-0 z-20 flex h-14 items-center justify-between border-b border-border bg-card px-4 md:px-6">
         {/* Left: hamburger on mobile, title on desktop */}
         <div className="flex items-center gap-3">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="flex md:hidden h-8 w-8 items-center justify-center rounded-lg text-ink-500 hover:bg-ink-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merit-blue-600"
+            className="flex md:hidden h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merit-blue-600"
             aria-label="Open menu"
           >
             <Menu size={18} />
           </button>
-          <h1 className="text-h2 text-ink-900">{title}</h1>
+          <h1 className="text-h2 text-foreground">{title}</h1>
         </div>
 
         {/* Right controls */}
@@ -78,8 +78,8 @@ export function Topbar() {
           <button
             onClick={open}
             className={cn(
-              'hidden sm:flex items-center gap-2 rounded-lg border border-ink-200 bg-ink-50 px-3 py-1.5',
-              'text-[13px] text-ink-500 hover:border-ink-300 hover:text-ink-700',
+              'hidden sm:flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-1.5',
+              'text-[13px] text-muted-foreground hover:border-border hover:text-foreground',
               'transition-colors duration-100 cursor-pointer',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merit-blue-600'
             )}
@@ -87,7 +87,7 @@ export function Topbar() {
           >
             <Search size={14} />
             <span className="hidden sm:inline">Search</span>
-            <kbd className="hidden sm:inline ml-1 text-[11px] text-ink-400 font-medium bg-ink-100 px-1 rounded">⌘K</kbd>
+            <kbd className="hidden sm:inline ml-1 text-[11px] text-muted-foreground font-medium bg-muted px-1 rounded">⌘K</kbd>
           </button>
 
           {/* Theme toggle */}
@@ -98,7 +98,7 @@ export function Topbar() {
             onClick={() => router.push('/settings/notifications')}
             className={cn(
               'relative flex h-8 w-8 items-center justify-center rounded-lg',
-              'text-ink-500 hover:bg-ink-100 hover:text-ink-700',
+              'text-muted-foreground hover:bg-muted hover:text-foreground',
               'transition-colors duration-100 cursor-pointer',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merit-blue-600'
             )}
@@ -113,14 +113,14 @@ export function Topbar() {
 
       {/* Mobile sidebar sheet — slides from left */}
       <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-        <SheetContent side="left" className="w-64 p-0 bg-ink-50">
+        <SheetContent side="left" className="w-64 p-0 bg-background">
           {/* Logo */}
-          <div className="flex h-14 items-center px-5 border-b border-ink-200">
+          <div className="flex h-14 items-center px-5 border-b border-border">
             <Link href="/dashboard" onClick={() => setSidebarOpen(false)}>
-              <span className="text-[18px] font-semibold tracking-tight text-ink-900">
+              <span className="text-[18px] font-semibold tracking-tight text-foreground">
                 merit<span className="text-merit-blue-600">.</span>
               </span>
-              <p className="text-[11px] text-ink-500 mt-0.5">Service hours · 2024–25</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">Service hours · 2024–25</p>
             </Link>
           </div>
 
@@ -136,8 +136,8 @@ export function Topbar() {
                   primary
                     ? 'bg-merit-blue-600 text-white hover:bg-merit-blue-700 mb-1'
                     : isActive(href)
-                    ? 'bg-ink-100 text-ink-900'
-                    : 'text-ink-700 hover:bg-ink-100 hover:text-ink-900'
+                    ? 'bg-muted text-foreground'
+                    : 'text-foreground hover:bg-muted hover:text-foreground'
                 )}
               >
                 {!primary && isActive(href) && (
@@ -151,7 +151,7 @@ export function Topbar() {
                       ? 'text-white'
                       : isActive(href)
                       ? 'text-merit-blue-600'
-                      : 'text-ink-500'
+                      : 'text-muted-foreground'
                   )}
                 />
                 {label}
@@ -160,7 +160,7 @@ export function Topbar() {
           </nav>
 
           {/* User menu at bottom */}
-          <div className="absolute bottom-0 left-0 right-0 border-t border-ink-200 px-3 py-3">
+          <div className="absolute bottom-0 left-0 right-0 border-t border-border px-3 py-3">
             <UserMenu />
           </div>
         </SheetContent>

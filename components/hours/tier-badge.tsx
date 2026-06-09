@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import type { VerificationTier } from '@/lib/types';
 
 export function TierBadge({ tier }: { tier: VerificationTier }) {
-  if (!tier) return <span className="text-[12px] text-ink-400">—</span>;
+  if (!tier) return <span className="text-[12px] text-muted-foreground">—</span>;
 
   if (tier === 'institution') {
     return (
@@ -15,7 +15,7 @@ export function TierBadge({ tier }: { tier: VerificationTier }) {
   }
 
   return (
-    <span className="text-[11px] font-medium text-ink-500 bg-ink-100 px-2 py-0.5 rounded-full">
+    <span className="text-[11px] font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
       Supervisor
     </span>
   );

@@ -105,6 +105,7 @@ export function mapUser(raw: any): User {
     avatarUrl: raw.avatar_url ?? undefined,
     profilePublic: raw.profile_public ?? true,
     bio: raw.bio ?? undefined,
+    city: raw.city ?? undefined,
   };
 }
 
@@ -268,7 +269,7 @@ export const orgsApi = {
 export const usersApi = {
   me: () => request<{ data: { user: any } }>('GET', '/users/me'),
   update: (body: {
-    name?: string; email?: string; school?: string; grade?: number;
+    name?: string; email?: string; school?: string; grade?: number; city?: string;
     graduationYear?: number; phone?: string; goalHours?: number; goalProgram?: string;
     notifications?: Record<string, boolean>; marketingConsent?: boolean;
   }) => request<{ data: { user: any } }>('PATCH', '/users/me', body),
@@ -443,6 +444,104 @@ export const leaderboardApi = {
     ),
 };
 
+// ─── Chapter / Coordinator (institutional) API ───────────────────────────────
+
+export interface RosterImportRow {
+  name: string;
+  email: string;
+  graduationYear?: number | null;
+}
+
+export interface ComplianceStudent {
+  id: string;
+  name: string;
+  email: string;
+  graduationYear: number | null;
+  verifiedHours: number;
+  requiredHours: number;
+  met: boolean;
+  remaining: number;
+}
+
+export interface ComplianceReport {
+  chapterName: string;
+  requiredHours: number;
+  totalStudents: number;
+  metCount: number;
+  notMetCount: number;
+  byGradYear: { graduationYear: number | null; total: number; met: number }[];
+  students: ComplianceStudent[];
+}
+
+export interface RosterImportResult {
+  created: number;
+  skippedExisting: number;
+  errors: { email: string; reason: string }[];
+  invites: { email: string; name: string; inviteToken: string }[];
+}
+
+export const adminApi = {
+  getChapter: () => request<{ data: any }>('GET', '/admin/chapter'),
+
+  updateChapter: (body: {
+    name?: string;
+    requiredHours?: number;
+    verifiedEmailDomain?: string;
+    contactEmail?: string;
+  }) => request<{ data: any }>('PATCH', '/admin/chapter', body),
+
+  getMembers: () => request<{ data: any[] }>('GET', '/admin/members'),
+
+  getCompliance: () => request<{ data: ComplianceReport }>('GET', '/admin/compliance'),
+
+  importRoster: (rows: RosterImportRow[]) =>
+    request<{ data: RosterImportResult }>('POST', '/admin/roster/import', { rows }),
+
+  getInvites: () => request<{ data: any[] }>('GET', '/admin/invites'),
+
+  /** Download the cohort compliance report as a CSV blob. */
+  exportComplianceCsv: (): Promise<Blob> =>
+    fetch(`${BASE}/admin/compliance/export`, {
+      headers: { Authorization: `Bearer ${getAccessToken() ?? ''}` },
+    }).then((r) => r.blob()),
+
+  // Accept a chapter roster invite (student joins their chapter).
+  acceptInvite: (token: string) =>
+    request<{ data: { joined: boolean; chapterId: string } }>('POST', '/admin/invites/accept', { token }),
+
+  // ── Platform-admin: school leads & provisioning ──
+  listSchoolLeads: (status?: string) =>
+    request<{ data: any[] }>('GET', `/admin/schools${status ? `?status=${status}` : ''}`),
+
+  provisionChapter: (body: {
+    leadId?: string;
+    schoolName: string;
+    coordinatorEmail: string;
+    coordinatorName?: string;
+    maxMembers?: number;
+    requiredHours?: number;
+  }) => request<{ data: { chapterId: string; status: string } }>('POST', '/admin/schools/provision', body),
+
+  rejectSchoolLead: (leadId: string) =>
+    request<{ data: { status: string } }>('POST', `/admin/schools/${leadId}/reject`),
+
+  // Coordinator claims a provisioned chapter via the email-locked token.
+  claimChapter: (token: string) =>
+    request<{ data: { chapterId: string; name: string } }>('POST', '/chapter/claim', { token }),
+};
+
+// ── Public: school early-access lead capture (no auth) ──
+export const schoolApi = {
+  submitLead: (body: {
+    schoolName: string;
+    coordinatorName: string;
+    email: string;
+    role?: string;
+    studentCount?: number;
+    note?: string;
+  }) => request<{ data: { id: string; status: string } }>('POST', '/school-leads', body, true),
+};
+
 // ─── Org Platform API ────────────────────────────────────────────────────────
 
 export const orgAuthApi = {
@@ -578,6 +677,52 @@ export const orgSignupApi = {
         expiresAt: number | null;
       };
     }>('POST', '/auth/org/signup', data, true),
+};
+
+// ─── Scholarships API ─────────────────────────────────────────────────────────
+
+export const scholarshipsApi = {
+  list: (params?: {
+    search?: string;
+    category?: string;
+    location?: string;
+    limit?: number;
+    offset?: number;
+  }) => {
+    const qs = new URLSearchParams();
+    if (params?.search)   qs.set('search',   params.search);
+    if (params?.category) qs.set('category', params.category);
+    if (params?.location) qs.set('location', params.location);
+    if (params?.limit  != null) qs.set('limit',  String(params.limit));
+    if (params?.offset != null) qs.set('offset', String(params.offset));
+    const suffix = qs.toString() ? `?${qs}` : '';
+    return request<{ data: { scholarships: any[]; savedIds: string[] } }>('GET', `/scholarships${suffix}`);
+  },
+
+  forMe: () =>
+    request<{ data: { scholarships: any[]; matchedCategories: string[]; savedIds: string[] } }>('GET', '/scholarships/for-me'),
+
+  saved: () =>
+    request<{ data: { scholarships: any[] } }>('GET', '/scholarships/saved'),
+
+  get: (id: string) =>
+    request<{ data: { scholarship: any; isSaved: boolean } }>('GET', `/scholarships/${id}`),
+
+  toggleSave: (id: string) =>
+    request<{ data: { saved: boolean } }>('POST', `/scholarships/${id}/save`, {}),
+
+  // Org-posted
+  listOrgScholarships: (orgId: string) =>
+    orgRequest<{ data: any[] }>('GET', `/org/${orgId}/scholarships`),
+
+  createOrgScholarship: (orgId: string, body: {
+    title: string; amount_label?: string; deadline?: string; is_rolling?: boolean;
+    url: string; description?: string; requirements?: string; eligibility?: string;
+    categories: string[]; renewable?: boolean;
+  }) => orgRequest<{ data: any }>('POST', `/org/${orgId}/scholarships`, body),
+
+  deleteOrgScholarship: (orgId: string, scholarshipId: string) =>
+    orgRequest<{ data: { deleted: boolean } }>('DELETE', `/org/${orgId}/scholarships/${scholarshipId}`),
 };
 
 // ─── Billing API ─────────────────────────────────────────────────────────────

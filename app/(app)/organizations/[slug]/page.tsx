@@ -103,15 +103,15 @@ export default function AppOrgProfilePage({ params }: { params: Promise<{ slug: 
   if (loading) {
     return (
       <div className="px-4 py-6 md:px-8 max-w-4xl mx-auto space-y-4 animate-pulse">
-        <div className="bg-white rounded-xl border border-ink-200 overflow-hidden">
-          <div className="h-40 bg-ink-100" />
+        <div className="bg-card rounded-xl border border-border overflow-hidden">
+          <div className="h-40 bg-muted" />
           <div className="p-5 space-y-3">
-            <div className="h-6 bg-ink-100 rounded w-48" />
-            <div className="h-4 bg-ink-100 rounded w-32" />
+            <div className="h-6 bg-muted rounded w-48" />
+            <div className="h-4 bg-muted rounded w-32" />
           </div>
         </div>
-        <div className="h-32 bg-white rounded-xl border border-ink-200" />
-        <div className="h-40 bg-white rounded-xl border border-ink-200" />
+        <div className="h-32 bg-card rounded-xl border border-border" />
+        <div className="h-40 bg-card rounded-xl border border-border" />
       </div>
     );
   }
@@ -121,10 +121,10 @@ export default function AppOrgProfilePage({ params }: { params: Promise<{ slug: 
   return (
     <div className="px-4 py-6 md:px-8 max-w-4xl mx-auto space-y-4">
       {/* Breadcrumb */}
-      <p className="text-[12px] text-ink-400">
-        <Link href="/organizations" className="hover:text-ink-700 transition-colors">Organizations</Link>
+      <p className="text-[12px] text-muted-foreground">
+        <Link href="/organizations" className="hover:text-foreground transition-colors">Organizations</Link>
         {' · '}
-        <span className="text-ink-600">{org.name}</span>
+        <span className="text-muted-foreground">{org.name}</span>
       </p>
 
       {/* Cover + Header */}
@@ -150,13 +150,13 @@ export default function AppOrgProfilePage({ params }: { params: Promise<{ slug: 
             <button
               onClick={handleToggleFollow}
               aria-label={isFollowing ? 'Unfollow' : 'Bookmark'}
-              className="h-8 px-3 rounded-lg bg-white/80 backdrop-blur-sm border border-white/60 flex items-center gap-1.5 text-[12px] font-medium hover:bg-white transition-colors shadow-sm"
+              className="h-8 px-3 rounded-lg bg-card/80 backdrop-blur-sm border border-white/60 flex items-center gap-1.5 text-[12px] font-medium hover:bg-card transition-colors shadow-sm"
             >
               <Bookmark
                 size={13}
-                className={cn(isFollowing ? 'fill-merit-blue-600 text-merit-blue-600' : 'text-ink-600')}
+                className={cn(isFollowing ? 'fill-merit-blue-600 text-merit-blue-600' : 'text-muted-foreground')}
               />
-              <span className={isFollowing ? 'text-merit-blue-600' : 'text-ink-700'}>
+              <span className={isFollowing ? 'text-merit-blue-600' : 'text-foreground'}>
                 {isFollowing ? 'Saved' : 'Save'}
               </span>
             </button>

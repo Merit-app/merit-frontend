@@ -9,6 +9,7 @@ import {
   authApi, usersApi, mapUser, ApiError,
 } from '@/lib/api';
 import { toast } from 'sonner';
+import { OrgCover } from '@/components/orgs/org-cover';
 import {
   Building2, Users, CreditCard, Lock, Loader2,
   Eye, EyeOff, X, UserPlus, Crown, Shield,
@@ -23,10 +24,10 @@ type Role = 'owner' | 'admin' | 'coordinator';
 const ROLE_RANK: Record<Role, number> = { coordinator: 0, admin: 1, owner: 2 };
 const ROLE_LABELS: Record<Role, string> = { coordinator: 'Coordinator', admin: 'Admin', owner: 'Owner' };
 const ROLE_ICONS: Record<Role, React.ElementType> = { owner: Crown, admin: Shield, coordinator: UserIcon };
-const ROLE_COLORS: Record<Role, string> = { owner: 'text-amber-400', admin: 'text-blue-400', coordinator: 'text-gray-400' };
+const ROLE_COLORS: Record<Role, string> = { owner: 'text-warning', admin: 'text-primary', coordinator: 'text-muted-foreground' };
 
 const INPUT_CLASS =
-  'bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-3 text-sm placeholder-gray-600 focus:outline-none focus:border-gray-500 transition-colors';
+  'bg-muted border border-border text-foreground rounded-xl px-4 py-3 text-sm placeholder-gray-600 focus:outline-none focus:border-border transition-colors';
 
 // ── Main page (inner — needs useSearchParams) ─────────────────────────────────
 function OrgSettingsInner() {
@@ -83,7 +84,7 @@ function OrgSettingsInner() {
   if (orgLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-6 h-6 text-gray-600 animate-spin" />
+        <Loader2 className="w-6 h-6 text-muted-foreground animate-spin" />
       </div>
     );
   }
@@ -91,20 +92,20 @@ function OrgSettingsInner() {
   return (
     <div className="max-w-3xl space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-white">Settings</h1>
-        <p className="text-gray-400 text-sm mt-1">Manage your organization, team, and account</p>
+        <h1 className="text-2xl font-bold text-foreground">Settings</h1>
+        <p className="text-muted-foreground text-sm mt-1">Manage your organization, team, and account</p>
       </div>
 
       {/* Role badge */}
       <div className="flex items-center gap-2 text-sm flex-wrap">
-        <span className="text-gray-500">You&apos;re a</span>
+        <span className="text-muted-foreground">You&apos;re a</span>
         <span className={`font-semibold ${ROLE_COLORS[userRole]}`}>{ROLE_LABELS[userRole]}</span>
-        <span className="text-gray-600">of this organization.</span>
-        {!canEdit && <span className="text-gray-600">Contact an admin to make org changes.</span>}
+        <span className="text-muted-foreground">of this organization.</span>
+        {!canEdit && <span className="text-muted-foreground">Contact an admin to make org changes.</span>}
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-gray-800">
+      <div className="border-b border-border">
         <div className="flex -mb-px overflow-x-auto">
           {TABS.map((tab) => (
             <button
@@ -112,8 +113,8 @@ function OrgSettingsInner() {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition-colors shrink-0 ${
                 activeTab === tab.id
-                  ? 'border-white text-white'
-                  : 'border-transparent text-gray-500 hover:text-gray-300'
+                  ? 'border-foreground text-foreground'
+                  : 'border-transparent text-muted-foreground hover:text-muted-foreground'
               }`}
             >
               <tab.icon className="w-4 h-4" />
@@ -143,7 +144,7 @@ function OrgSettingsInner() {
 
 export default function OrgSettingsPage() {
   return (
-    <Suspense fallback={<div className="flex items-center justify-center h-64"><Loader2 className="w-6 h-6 text-gray-600 animate-spin" /></div>}>
+    <Suspense fallback={<div className="flex items-center justify-center h-64"><Loader2 className="w-6 h-6 text-muted-foreground animate-spin" /></div>}>
       <OrgSettingsInner />
     </Suspense>
   );
@@ -198,10 +199,10 @@ function OrganizationTab({ orgId, org, canEdit, isOwner }: { orgId: string; org:
 
   if (!org) {
     return (
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 text-center space-y-3">
-        <Building2 className="w-8 h-8 text-gray-700 mx-auto" />
-        <p className="text-gray-500 text-sm">Organization data couldn&apos;t be loaded.</p>
-        <button onClick={() => qc.invalidateQueries({ queryKey: ['org-settings', orgId] })} className="text-sm text-white underline">
+      <div className="bg-card border border-border rounded-2xl p-8 text-center space-y-3">
+        <Building2 className="w-8 h-8 text-foreground mx-auto" />
+        <p className="text-muted-foreground text-sm">Organization data couldn&apos;t be loaded.</p>
+        <button onClick={() => qc.invalidateQueries({ queryKey: ['org-settings', orgId] })} className="text-sm text-foreground underline">
           Retry
         </button>
       </div>
@@ -210,19 +211,16 @@ function OrganizationTab({ orgId, org, canEdit, isOwner }: { orgId: string; org:
 
   return (
     <div className="space-y-6">
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+      <div className="bg-card border border-border rounded-2xl overflow-hidden">
         {/* Cover */}
-        <div className="relative h-36 bg-gradient-to-r from-gray-800 to-gray-700 group">
-          {org.cover_url && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={org.cover_url} alt="Cover" className="w-full h-full object-cover" />
-          )}
+        <div className="relative h-36 group">
+          <OrgCover name={org.name ?? 'Organization'} coverUrl={org.cover_url} sizes="(max-width: 768px) 100vw, 700px" />
           {canEdit && (
             <>
               <div onClick={() => coverRef.current?.click()} className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
-                <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg">
-                  <Camera className="w-4 h-4 text-white" />
-                  <span className="text-white text-sm font-medium">Change cover</span>
+                <div className="flex items-center gap-2 bg-card/20 backdrop-blur-sm px-4 py-2 rounded-lg">
+                  <Camera className="w-4 h-4 text-foreground" />
+                  <span className="text-foreground text-sm font-medium">Change cover</span>
                 </div>
               </div>
               <input ref={coverRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden"
@@ -235,7 +233,7 @@ function OrganizationTab({ orgId, org, canEdit, isOwner }: { orgId: string; org:
         <div className="px-6 pb-6">
           <div className="flex items-end gap-4 -mt-8 mb-4">
             <div className="relative group shrink-0">
-              <div className="w-16 h-16 rounded-2xl bg-gray-800 border-4 border-gray-900 overflow-hidden flex items-center justify-center text-white font-bold text-xl shadow-lg">
+              <div className="w-16 h-16 rounded-2xl bg-muted border-4 border-border overflow-hidden flex items-center justify-center text-foreground font-bold text-xl shadow-lg">
                 {org.logo_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={org.logo_url} alt="" className="w-full h-full object-cover" />
@@ -246,7 +244,7 @@ function OrganizationTab({ orgId, org, canEdit, isOwner }: { orgId: string; org:
               {canEdit && (
                 <>
                   <div onClick={() => logoRef.current?.click()} className="absolute inset-0 rounded-2xl bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
-                    <Camera className="w-4 h-4 text-white" />
+                    <Camera className="w-4 h-4 text-foreground" />
                   </div>
                   <input ref={logoRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden"
                     onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadImage(f, 'logo'); e.target.value = ''; }} />
@@ -254,12 +252,12 @@ function OrganizationTab({ orgId, org, canEdit, isOwner }: { orgId: string; org:
               )}
             </div>
             <div className="pb-1 flex-1 min-w-0">
-              <h3 className="text-lg font-bold text-white truncate">{org.name ?? 'Your Organization'}</h3>
-              {org.category && <p className="text-gray-400 text-sm">{org.category}</p>}
-              {org.city && <p className="text-gray-500 text-xs mt-0.5">{org.city}</p>}
+              <h3 className="text-lg font-bold text-foreground truncate">{org.name ?? 'Your Organization'}</h3>
+              {org.category && <p className="text-muted-foreground text-sm">{org.category}</p>}
+              {org.city && <p className="text-muted-foreground text-xs mt-0.5">{org.city}</p>}
             </div>
             {canEdit && !editing && (
-              <button onClick={() => setEditing(true)} className="shrink-0 text-sm text-gray-400 hover:text-white border border-gray-700 hover:border-gray-500 px-4 py-2 rounded-xl transition-colors">
+              <button onClick={() => setEditing(true)} className="shrink-0 text-sm text-muted-foreground hover:text-foreground border border-border hover:border-border px-4 py-2 rounded-xl transition-colors">
                 Edit
               </button>
             )}
@@ -286,8 +284,8 @@ function OrganizationTab({ orgId, org, canEdit, isOwner }: { orgId: string; org:
               </FormField>
               <Toggle label="Currently accepting volunteers" description="Shows a 'Recruiting' badge on your public page" value={form.is_recruiting} onChange={(v) => setForm((f) => ({ ...f, is_recruiting: v }))} />
               <div className="flex gap-3 pt-2">
-                <button onClick={() => setEditing(false)} className="px-5 py-2.5 rounded-xl text-sm text-gray-400 hover:text-white border border-gray-700 transition-colors">Cancel</button>
-                <button onClick={handleSave} disabled={saving} className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-white text-gray-900 hover:bg-gray-200 disabled:opacity-50 transition-colors flex items-center gap-2">
+                <button onClick={() => setEditing(false)} className="px-5 py-2.5 rounded-xl text-sm text-muted-foreground hover:text-foreground border border-border transition-colors">Cancel</button>
+                <button onClick={handleSave} disabled={saving} className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-foreground text-background hover:bg-muted disabled:opacity-50 transition-colors flex items-center gap-2">
                   {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                   {saving ? 'Saving...' : 'Save changes'}
                 </button>
@@ -301,14 +299,14 @@ function OrganizationTab({ orgId, org, canEdit, isOwner }: { orgId: string; org:
                 { l: 'Contact email', v: org.contact_email },
                 { l: 'Contact phone', v: org.contact_phone },
               ].filter((r) => r.v).map((r) => (
-                <div key={r.l} className="flex gap-3 py-2 border-b border-gray-800/50 last:border-0">
-                  <span className="text-gray-600 w-28 shrink-0 text-xs font-medium uppercase tracking-wide pt-0.5">{r.l}</span>
-                  <span className="text-gray-300 break-all">{r.v}</span>
+                <div key={r.l} className="flex gap-3 py-2 border-b border-border/50 last:border-0">
+                  <span className="text-muted-foreground w-28 shrink-0 text-xs font-medium uppercase tracking-wide pt-0.5">{r.l}</span>
+                  <span className="text-muted-foreground break-all">{r.v}</span>
                 </div>
               ))}
               <div className="flex gap-3 py-2">
-                <span className="text-gray-600 w-28 shrink-0 text-xs font-medium uppercase tracking-wide pt-0.5">Recruiting</span>
-                <span className={`text-sm font-medium ${org.is_recruiting ? 'text-green-400' : 'text-gray-500'}`}>
+                <span className="text-muted-foreground w-28 shrink-0 text-xs font-medium uppercase tracking-wide pt-0.5">Recruiting</span>
+                <span className={`text-sm font-medium ${org.is_recruiting ? 'text-success' : 'text-muted-foreground'}`}>
                   {org.is_recruiting ? 'Yes — accepting volunteers' : 'Not currently'}
                 </span>
               </div>
@@ -319,12 +317,12 @@ function OrganizationTab({ orgId, org, canEdit, isOwner }: { orgId: string; org:
 
       {/* Public page link */}
       <a href={`/orgs/${org.slug}`} target="_blank" rel="noreferrer"
-        className="flex items-center justify-between bg-gray-900 border border-gray-800 rounded-2xl p-4 hover:border-gray-700 transition-colors group">
+        className="flex items-center justify-between bg-card border border-border rounded-2xl p-4 hover:border-border transition-colors group">
         <div>
-          <p className="text-white text-sm font-medium">Public page</p>
-          <p className="text-gray-500 text-xs mt-0.5">meritco.app/orgs/{org.slug}</p>
+          <p className="text-foreground text-sm font-medium">Public page</p>
+          <p className="text-muted-foreground text-xs mt-0.5">meritco.app/orgs/{org.slug}</p>
         </div>
-        <ExternalLink className="w-4 h-4 text-gray-500 group-hover:text-white transition-colors" />
+        <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
       </a>
 
       {/* Danger Zone — owner only */}
@@ -363,16 +361,16 @@ function DangerZone({ orgId, orgName }: { orgId: string; orgName: string }) {
       <div className="bg-red-500/5 border border-red-500/20 rounded-2xl p-5">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
-            <h3 className="text-red-400 font-semibold text-sm">Delete organization</h3>
-            <p className="text-gray-500 text-xs mt-1 max-w-md">
-              Permanently delete <span className="text-gray-300">{orgName}</span> and all its data —
+            <h3 className="text-danger font-semibold text-sm">Delete organization</h3>
+            <p className="text-muted-foreground text-xs mt-1 max-w-md">
+              Permanently delete <span className="text-muted-foreground">{orgName}</span> and all its data —
               events, messages, team, and reports. Volunteers&apos; logged hours are kept but unlinked.
               This cannot be undone.
             </p>
           </div>
           <button
             onClick={() => { setOpen(true); setConfirmText(''); }}
-            className="shrink-0 flex items-center gap-2 text-sm font-medium text-red-400 border border-red-500/30 hover:bg-red-500/10 px-4 py-2 rounded-xl transition-colors"
+            className="shrink-0 flex items-center gap-2 text-sm font-medium text-danger border border-red-500/30 hover:bg-red-500/10 px-4 py-2 rounded-xl transition-colors"
           >
             <Trash2 className="w-4 h-4" />
             Delete organization
@@ -382,34 +380,34 @@ function DangerZone({ orgId, orgName }: { orgId: string; orgName: string }) {
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => !deleting && setOpen(false)}>
-          <div className="w-full max-w-md bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-4" onClick={(e) => e.stopPropagation()}>
+          <div className="w-full max-w-md bg-card border border-border rounded-2xl p-6 space-y-4" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center shrink-0">
-                <AlertCircle className="w-5 h-5 text-red-400" />
+                <AlertCircle className="w-5 h-5 text-danger" />
               </div>
-              <h3 className="text-white font-bold">Delete {orgName}?</h3>
+              <h3 className="text-foreground font-bold">Delete {orgName}?</h3>
             </div>
-            <p className="text-gray-400 text-sm">
+            <p className="text-muted-foreground text-sm">
               This permanently deletes the organization and all its data. This action
-              <span className="text-red-400 font-medium"> cannot be undone</span>.
+              <span className="text-danger font-medium"> cannot be undone</span>.
             </p>
             <div>
-              <label className="block text-xs text-gray-500 mb-1.5">
-                Type <span className="text-gray-300 font-medium">{orgName}</span> to confirm
+              <label className="block text-xs text-muted-foreground mb-1.5">
+                Type <span className="text-muted-foreground font-medium">{orgName}</span> to confirm
               </label>
               <input
                 value={confirmText}
                 onChange={(e) => setConfirmText(e.target.value)}
                 placeholder={orgName}
                 autoFocus
-                className="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-2.5 text-sm placeholder-gray-600 focus:outline-none focus:border-red-500/50"
+                className="w-full bg-muted border border-border text-foreground rounded-xl px-4 py-2.5 text-sm placeholder-gray-600 focus:outline-none focus:border-red-500/50"
               />
             </div>
             <div className="flex gap-3 justify-end pt-2">
               <button
                 onClick={() => setOpen(false)}
                 disabled={deleting}
-                className="px-4 py-2 rounded-xl text-sm text-gray-400 hover:text-white border border-gray-700 transition-colors disabled:opacity-50"
+                className="px-4 py-2 rounded-xl text-sm text-muted-foreground hover:text-foreground border border-border transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -467,12 +465,12 @@ function TeamTab({ orgId, admins, userRole, currentUserId }: {
   return (
     <div className="space-y-6">
       {canManage && (
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-4">
+        <div className="bg-card border border-border rounded-2xl p-5 space-y-4">
           <div>
-            <h3 className="font-semibold text-white flex items-center gap-2">
+            <h3 className="font-semibold text-foreground flex items-center gap-2">
               <UserPlus className="w-4 h-4" />Invite team member
             </h3>
-            <p className="text-gray-500 text-sm mt-1">
+            <p className="text-muted-foreground text-sm mt-1">
               They&apos;ll receive an email with a link to join your org dashboard.
             </p>
           </div>
@@ -486,29 +484,29 @@ function TeamTab({ orgId, admins, userRole, currentUserId }: {
               <option value="admin">Admin</option>
             </select>
             <button onClick={invite} disabled={inviting || !email}
-              className="px-5 py-2.5 rounded-xl bg-white text-gray-900 text-sm font-semibold hover:bg-gray-100 disabled:opacity-50 transition-colors flex items-center gap-2">
+              className="px-5 py-2.5 rounded-xl bg-foreground text-background text-sm font-semibold hover:bg-muted disabled:opacity-50 transition-colors flex items-center gap-2">
               {inviting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Invite'}
             </button>
           </div>
-          <div className="text-xs text-gray-600 space-y-1 pt-1 border-t border-gray-800">
-            <p><span className="text-gray-400 font-medium">Coordinator</span> — verify sessions, view volunteers, run events</p>
-            <p><span className="text-gray-400 font-medium">Admin</span> — everything + invite/remove members, manage billing</p>
-            <p><span className="text-gray-400 font-medium">Owner</span> — full control including transferring ownership</p>
+          <div className="text-xs text-muted-foreground space-y-1 pt-1 border-t border-border">
+            <p><span className="text-muted-foreground font-medium">Coordinator</span> — verify sessions, view volunteers, run events</p>
+            <p><span className="text-muted-foreground font-medium">Admin</span> — everything + invite/remove members, manage billing</p>
+            <p><span className="text-muted-foreground font-medium">Owner</span> — full control including transferring ownership</p>
           </div>
         </div>
       )}
 
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-800">
-          <h3 className="font-semibold text-white text-sm">Team members ({admins.length})</h3>
+      <div className="bg-card border border-border rounded-2xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-border">
+          <h3 className="font-semibold text-foreground text-sm">Team members ({admins.length})</h3>
         </div>
         {admins.length === 0 ? (
           <div className="p-8 text-center">
-            <Users className="w-8 h-8 text-gray-700 mx-auto mb-2" />
-            <p className="text-gray-500 text-sm">No team members yet</p>
+            <Users className="w-8 h-8 text-foreground mx-auto mb-2" />
+            <p className="text-muted-foreground text-sm">No team members yet</p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-800">
+          <div className="divide-y divide-border">
             {admins.map((member: any) => {
               const u = member.users ?? member;
               const memberId = u?.id;
@@ -519,7 +517,7 @@ function TeamTab({ orgId, admins, userRole, currentUserId }: {
 
               return (
                 <div key={memberId ?? member.role} className="flex items-center gap-4 px-5 py-4">
-                  <div className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-sm font-bold text-gray-300 shrink-0 overflow-hidden">
+                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-sm font-bold text-muted-foreground shrink-0 overflow-hidden">
                     {u?.avatar_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={u.avatar_url} alt="" className="w-full h-full object-cover" />
@@ -529,29 +527,29 @@ function TeamTab({ orgId, admins, userRole, currentUserId }: {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className="text-white text-sm font-medium truncate">{u?.name ?? 'Unknown'}</p>
+                      <p className="text-foreground text-sm font-medium truncate">{u?.name ?? 'Unknown'}</p>
                       {isMe && (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-gray-300 font-medium uppercase tracking-wide shrink-0">
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-card/10 text-muted-foreground font-medium uppercase tracking-wide shrink-0">
                           You
                         </span>
                       )}
                     </div>
-                    <p className="text-gray-500 text-xs truncate">{u?.email}</p>
+                    <p className="text-muted-foreground text-xs truncate">{u?.email}</p>
                   </div>
-                  <span className={`flex items-center gap-1.5 text-xs font-medium shrink-0 ${ROLE_COLORS[memberRole] ?? 'text-gray-400'}`}>
+                  <span className={`flex items-center gap-1.5 text-xs font-medium shrink-0 ${ROLE_COLORS[memberRole] ?? 'text-muted-foreground'}`}>
                     <RoleIcon className="w-3.5 h-3.5" />
                     {ROLE_LABELS[memberRole] ?? memberRole}
                   </span>
                   {canRemoveThis && (
                     confirmRemove === memberId ? (
                       <div className="flex items-center gap-2 shrink-0">
-                        <button onClick={() => setConfirmRemove(null)} className="text-xs text-gray-500 hover:text-white transition-colors">Cancel</button>
-                        <button onClick={() => remove(memberId)} className="text-xs px-2.5 py-1.5 rounded-lg bg-red-500/20 text-red-400 font-medium hover:bg-red-500/30 transition-colors">
+                        <button onClick={() => setConfirmRemove(null)} className="text-xs text-muted-foreground hover:text-foreground transition-colors">Cancel</button>
+                        <button onClick={() => remove(memberId)} className="text-xs px-2.5 py-1.5 rounded-lg bg-red-500/20 text-danger font-medium hover:bg-red-500/30 transition-colors">
                           Remove
                         </button>
                       </div>
                     ) : (
-                      <button onClick={() => setConfirmRemove(memberId)} className="text-gray-600 hover:text-red-400 transition-colors shrink-0">
+                      <button onClick={() => setConfirmRemove(memberId)} className="text-muted-foreground hover:text-danger transition-colors shrink-0">
                         <X className="w-4 h-4" />
                       </button>
                     )
@@ -565,8 +563,8 @@ function TeamTab({ orgId, admins, userRole, currentUserId }: {
 
       {!canManage && (
         <div className="flex items-start gap-3 bg-blue-500/5 border border-blue-500/20 rounded-2xl p-4">
-          <AlertCircle className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
-          <p className="text-blue-300 text-sm">
+          <AlertCircle className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+          <p className="text-primary text-sm">
             As a Coordinator, you can view team members but cannot invite or remove anyone. Contact an Admin or Owner to make changes.
           </p>
         </div>
@@ -613,10 +611,10 @@ function AccountTab() {
 
   return (
     <div className="space-y-6">
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-5">
+      <div className="bg-card border border-border rounded-2xl p-6 space-y-5">
         <div>
-          <h3 className="font-semibold text-white">Your account</h3>
-          <p className="text-gray-500 text-sm mt-1">Personal login info. Used across both student and org dashboards.</p>
+          <h3 className="font-semibold text-foreground">Your account</h3>
+          <p className="text-muted-foreground text-sm mt-1">Personal login info. Used across both student and org dashboards.</p>
         </div>
         <FormField label="Full name">
           <Input value={name} onChange={setName} placeholder="Your name" />
@@ -624,15 +622,15 @@ function AccountTab() {
         <FormField label="Email address">
           <Input value={email} onChange={setEmail} placeholder="you@example.com" type="email" />
           {email !== user?.email && email && (
-            <p className="text-xs text-amber-400 mt-1.5 flex items-center gap-1.5">
+            <p className="text-xs text-warning mt-1.5 flex items-center gap-1.5">
               <AlertCircle className="w-3 h-3" />
               You&apos;ll need to confirm your new email after saving.
             </p>
           )}
         </FormField>
-        <div className="flex justify-end pt-2 border-t border-gray-800">
+        <div className="flex justify-end pt-2 border-t border-border">
           <button onClick={save} disabled={!hasChanges || saving || !name || !email}
-            className="px-5 py-2.5 rounded-xl bg-white text-gray-900 text-sm font-semibold hover:bg-gray-100 disabled:opacity-50 transition-colors flex items-center gap-2">
+            className="px-5 py-2.5 rounded-xl bg-foreground text-background text-sm font-semibold hover:bg-muted disabled:opacity-50 transition-colors flex items-center gap-2">
             {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
             {saving ? 'Saving...' : 'Save changes'}
           </button>
@@ -675,25 +673,25 @@ function PasswordTab() {
 
   return (
     <form onSubmit={save} className="space-y-6">
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-5">
+      <div className="bg-card border border-border rounded-2xl p-6 space-y-5">
         <div>
-          <h3 className="font-semibold text-white">Change password</h3>
-          <p className="text-gray-500 text-sm mt-1">Choose a strong password you don&apos;t use elsewhere.</p>
+          <h3 className="font-semibold text-foreground">Change password</h3>
+          <p className="text-muted-foreground text-sm mt-1">Choose a strong password you don&apos;t use elsewhere.</p>
         </div>
         <PwField label="Current password" value={current} onChange={setCurrent} show={showCurrent} setShow={setShowCurrent} placeholder="Enter your current password" />
         <PwField label="New password" value={next} onChange={setNext} show={showNext} setShow={setShowNext} placeholder="At least 8 characters" error={tooShort ? 'Must be at least 8 characters' : undefined} />
         <PwField label="Confirm new password" value={confirm} onChange={setConfirm} show={showConfirm} setShow={setShowConfirm} placeholder="Re-enter new password" error={mismatch ? 'Passwords do not match' : undefined} />
-        <div className="flex justify-end pt-2 border-t border-gray-800">
+        <div className="flex justify-end pt-2 border-t border-border">
           <button type="submit" disabled={!canSave || saving}
-            className="px-5 py-2.5 rounded-xl bg-white text-gray-900 text-sm font-semibold hover:bg-gray-100 disabled:opacity-50 transition-colors flex items-center gap-2">
+            className="px-5 py-2.5 rounded-xl bg-foreground text-background text-sm font-semibold hover:bg-muted disabled:opacity-50 transition-colors flex items-center gap-2">
             {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
             {saving ? 'Updating...' : 'Update password'}
           </button>
         </div>
       </div>
       <div className="bg-blue-500/5 border border-blue-500/20 rounded-2xl p-4 flex gap-3">
-        <Lock className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
-        <div className="text-xs text-blue-400/80 space-y-1">
+        <Lock className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+        <div className="text-xs text-primary/80 space-y-1">
           <p>Use a unique password not used on other sites.</p>
           <p>Mix uppercase, lowercase, numbers, and symbols.</p>
           <p>Avoid using your name or email in your password.</p>
@@ -767,15 +765,15 @@ function BillingTab({ orgId, currentPlan }: { orgId: string; currentPlan?: strin
       {isActive && (
         <div className="bg-green-500/10 border border-green-500/20 rounded-2xl p-4 flex items-center justify-between">
           <div>
-            <p className="text-green-400 font-semibold text-sm capitalize">{plan} — active</p>
+            <p className="text-success font-semibold text-sm capitalize">{plan} — active</p>
             {billing?.currentPeriodEnd && (
-              <p className="text-gray-500 text-xs mt-0.5">
+              <p className="text-muted-foreground text-xs mt-0.5">
                 Renews {new Date(billing.currentPeriodEnd).toLocaleDateString('en-CA', { month: 'long', day: 'numeric', year: 'numeric' })}
                 {billing.cancelAtPeriodEnd ? ' (cancels at period end)' : ''}
               </p>
             )}
           </div>
-          <button onClick={portal} disabled={loading === 'portal'} className="text-sm text-gray-400 hover:text-white transition-colors flex items-center gap-1.5">
+          <button onClick={portal} disabled={loading === 'portal'} className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5">
             {loading === 'portal' && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
             Manage subscription →
           </button>
@@ -783,12 +781,12 @@ function BillingTab({ orgId, currentPlan }: { orgId: string; currentPlan?: strin
       )}
 
       {!isActive && (
-        <div className="flex items-center gap-1 p-1 bg-gray-800 rounded-xl w-fit">
+        <div className="flex items-center gap-1 p-1 bg-muted rounded-xl w-fit">
           {(['monthly', 'yearly'] as const).map((i) => (
             <button key={i} onClick={() => setBillingInterval(i)}
-              className={`px-5 py-2 rounded-lg text-sm font-medium transition-colors ${billingInterval === i ? 'bg-white text-gray-900' : 'text-gray-400 hover:text-white'}`}>
+              className={`px-5 py-2 rounded-lg text-sm font-medium transition-colors ${billingInterval === i ? 'bg-foreground text-background' : 'text-muted-foreground hover:text-foreground'}`}>
               {i === 'monthly' ? 'Monthly' : 'Yearly'}
-              {i === 'yearly' && <span className="ml-1.5 text-[10px] text-green-400 font-bold">2 months free</span>}
+              {i === 'yearly' && <span className="ml-1.5 text-[10px] text-success font-bold">2 months free</span>}
             </button>
           ))}
         </div>
@@ -803,44 +801,44 @@ function BillingTab({ orgId, currentPlan }: { orgId: string; currentPlan?: strin
 
           return (
             <div key={p.id} className={`rounded-2xl border p-5 flex flex-col ${
-              p.id === 'pro' && !isCurrent ? 'border-white/20 bg-white/5' : 'border-gray-800 bg-gray-900'
+              p.id === 'pro' && !isCurrent ? 'border-white/20 bg-card/5' : 'border-border bg-card'
             } ${isCurrent ? 'border-green-500/30' : ''}`}>
               {p.tag && (
-                <span className="text-[10px] font-bold bg-white/10 text-white px-2 py-0.5 rounded-full w-fit mb-3 uppercase tracking-wide">
+                <span className="text-[10px] font-bold bg-card/10 text-foreground px-2 py-0.5 rounded-full w-fit mb-3 uppercase tracking-wide">
                   {p.tag}
                 </span>
               )}
-              <p className="font-bold text-white text-lg">{p.name}</p>
-              <p className="text-gray-500 text-xs mt-0.5 mb-4">{p.sub}</p>
+              <p className="font-bold text-foreground text-lg">{p.name}</p>
+              <p className="text-muted-foreground text-xs mt-0.5 mb-4">{p.sub}</p>
               <div className="mb-5">
                 {monthlyPrice === 0 ? (
-                  <p className="text-3xl font-bold text-white">Free</p>
+                  <p className="text-3xl font-bold text-foreground">Free</p>
                 ) : (
                   <>
-                    <p className="text-3xl font-bold text-white">
-                      ${monthlyPrice}<span className="text-base font-normal text-gray-500">/mo</span>
+                    <p className="text-3xl font-bold text-foreground">
+                      ${monthlyPrice}<span className="text-base font-normal text-muted-foreground">/mo</span>
                     </p>
                     {billingInterval === 'yearly' && (
-                      <p className="text-xs text-gray-500 mt-0.5">${p.price.yearly}/yr billed annually</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">${p.price.yearly}/yr billed annually</p>
                     )}
                   </>
                 )}
               </div>
               <ul className="space-y-2.5 flex-1 mb-6">
                 {p.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-xs text-gray-400">
-                    <Check className="w-3.5 h-3.5 text-gray-600 shrink-0 mt-0.5" />{f}
+                  <li key={f} className="flex items-start gap-2 text-xs text-muted-foreground">
+                    <Check className="w-3.5 h-3.5 text-muted-foreground shrink-0 mt-0.5" />{f}
                   </li>
                 ))}
               </ul>
               {isCurrent ? (
-                <div className="w-full py-2.5 rounded-xl text-center text-sm font-medium text-green-400 bg-green-500/10 border border-green-500/20">✓ Current plan</div>
+                <div className="w-full py-2.5 rounded-xl text-center text-sm font-medium text-success bg-green-500/10 border border-green-500/20">✓ Current plan</div>
               ) : p.id === 'basic' ? (
-                <div className="w-full py-2.5 rounded-xl text-center text-sm text-gray-600 border border-gray-800">Free forever</div>
+                <div className="w-full py-2.5 rounded-xl text-center text-sm text-muted-foreground border border-border">Free forever</div>
               ) : (
                 <button onClick={() => checkout(p.id as 'pro' | 'enterprise')} disabled={loading === p.id}
                   className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2 disabled:opacity-50 ${
-                    p.id === 'pro' ? 'bg-white text-gray-900 hover:bg-gray-200' : 'bg-gray-800 text-white hover:bg-gray-700'
+                    p.id === 'pro' ? 'bg-foreground text-background hover:bg-muted' : 'bg-muted text-foreground hover:bg-muted'
                   }`}>
                   {loading === p.id && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                   {loading === p.id ? 'Loading...' : `Upgrade to ${p.name}`}
@@ -850,7 +848,7 @@ function BillingTab({ orgId, currentPlan }: { orgId: string; currentPlan?: strin
           );
         })}
       </div>
-      <p className="text-xs text-gray-600 text-center">14-day free trial on all paid plans. Cancel anytime. No contracts.</p>
+      <p className="text-xs text-muted-foreground text-center">14-day free trial on all paid plans. Cancel anytime. No contracts.</p>
     </div>
   );
 }
@@ -859,7 +857,7 @@ function BillingTab({ orgId, currentPlan }: { orgId: string; currentPlan?: strin
 function FormField({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">{label}</label>
+      <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">{label}</label>
       {children}
     </div>
   );
@@ -889,14 +887,14 @@ function Toggle({ label, description, value, onChange }: {
   label: string; description: string; value: boolean; onChange: (v: boolean) => void;
 }) {
   return (
-    <div className="flex items-center gap-4 p-4 bg-gray-800/50 rounded-xl border border-gray-700">
+    <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-xl border border-border">
       <button type="button" onClick={() => onChange(!value)}
-        className={`relative w-10 h-6 rounded-full transition-colors shrink-0 ${value ? 'bg-white' : 'bg-gray-600'}`}>
-        <span className={`absolute top-1 w-4 h-4 rounded-full bg-gray-900 transition-transform ${value ? 'translate-x-5' : 'translate-x-1'}`} />
+        className={`relative w-10 h-6 rounded-full transition-colors shrink-0 ${value ? 'bg-card' : 'bg-gray-600'}`}>
+        <span className={`absolute top-1 w-4 h-4 rounded-full bg-card transition-transform ${value ? 'translate-x-5' : 'translate-x-1'}`} />
       </button>
       <div>
-        <p className="text-white text-sm font-medium">{label}</p>
-        <p className="text-gray-500 text-xs">{description}</p>
+        <p className="text-foreground text-sm font-medium">{label}</p>
+        <p className="text-muted-foreground text-xs">{description}</p>
       </div>
     </div>
   );
@@ -913,11 +911,11 @@ function PwField({ label, value, onChange, show, setShow, placeholder, error }: 
           onChange={(e) => onChange(e.target.value)}
           className={`${INPUT_CLASS} w-full pr-10 ${error ? 'border-red-500' : ''}`} />
         <button type="button" onClick={() => setShow(!show)}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300">
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground">
           {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
         </button>
       </div>
-      {error && <p className="text-xs text-red-400 mt-1.5">{error}</p>}
+      {error && <p className="text-xs text-danger mt-1.5">{error}</p>}
     </FormField>
   );
 }

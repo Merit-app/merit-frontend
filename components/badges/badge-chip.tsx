@@ -212,8 +212,8 @@ export function BadgeMedallion({
           </div>
         </div>
         {!earned && (
-          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center">
-            <Lock className="w-2.5 h-2.5 text-gray-400" />
+          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-card border border-border shadow-sm flex items-center justify-center">
+            <Lock className="w-2.5 h-2.5 text-muted-foreground" />
           </div>
         )}
       </div>

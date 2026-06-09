@@ -41,13 +41,13 @@ export function PrivacyToggle({ isPublic: initialPublic, username }: Props) {
           {isPublic ? (
             <Globe size={14} className="text-merit-blue-600 shrink-0" />
           ) : (
-            <Lock size={14} className="text-ink-400 shrink-0" />
+            <Lock size={14} className="text-muted-foreground shrink-0" />
           )}
-          <p className="text-[13px] font-medium text-ink-900">
+          <p className="text-[13px] font-medium text-foreground">
             {isPublic ? 'Public profile' : 'Private profile'}
           </p>
         </div>
-        <p className="text-[12px] text-ink-500 mt-0.5">
+        <p className="text-[12px] text-muted-foreground mt-0.5">
           {isPublic
             ? profileUrl
               ? `Anyone can view your profile at ${profileUrl}`
@@ -68,7 +68,7 @@ export function PrivacyToggle({ isPublic: initialPublic, username }: Props) {
         }`}
       >
         <span
-          className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${
+          className={`inline-block h-4 w-4 rounded-full bg-card shadow transition-transform ${
             isPublic ? 'translate-x-6' : 'translate-x-1'
           }`}
         />

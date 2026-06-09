@@ -17,7 +17,7 @@ export function ClaimButton({ orgId, orgName, orgWebsiteUrl }: ClaimButtonProps)
     <>
       <button
         onClick={() => setOpen(true)}
-        className="text-sm text-gray-500 hover:text-gray-900 transition-colors flex items-center gap-1.5"
+        className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5"
       >
         <Shield className="w-3.5 h-3.5" />
         Claim this page

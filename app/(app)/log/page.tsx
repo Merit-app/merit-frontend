@@ -238,8 +238,8 @@ export default function LogPage() {
   return (
     <div className="px-4 py-4 md:px-8 md:py-6">
       <div className="mb-5">
-        <h1 className="text-h1 text-ink-900">Log hours</h1>
-        <p className="text-small text-ink-500 mt-1">
+        <h1 className="text-h1 text-foreground">Log hours</h1>
+        <p className="text-small text-muted-foreground mt-1">
           {mode === 'verified'
             ? "Fill in the details and we'll text your supervisor to verify."
             : 'Self-tracked hours are saved instantly — no supervisor needed.'}
@@ -247,15 +247,15 @@ export default function LogPage() {
       </div>
 
       {/* ── Mode toggle ────────────────────────────────────────────────────── */}
-      <div className="flex rounded-xl border border-ink-200 overflow-hidden mb-6 max-w-sm">
+      <div className="flex rounded-xl border border-border overflow-hidden mb-6 max-w-sm">
         <button
           type="button"
           onClick={() => setMode('verified')}
           className={cn(
             'flex-1 py-3 text-sm font-medium transition-colors flex items-center justify-center gap-2',
             mode === 'verified'
-              ? 'bg-ink-900 text-white'
-              : 'bg-white text-ink-500 hover:bg-ink-50',
+              ? 'bg-merit-blue-600 text-white'
+              : 'bg-card text-muted-foreground hover:bg-background',
           )}
         >
           <CheckCircle2 className="w-4 h-4" />
@@ -268,7 +268,7 @@ export default function LogPage() {
             'flex-1 py-3 text-sm font-medium transition-colors flex items-center justify-center gap-2',
             mode === 'tracked'
               ? 'bg-amber-500 text-white'
-              : 'bg-white text-ink-500 hover:bg-ink-50',
+              : 'bg-card text-muted-foreground hover:bg-background',
           )}
         >
           <Clock className="w-4 h-4" />
@@ -300,7 +300,7 @@ export default function LogPage() {
 
           {/* Organization */}
           <div className="space-y-1.5">
-            <Label className="text-[13px] font-medium text-ink-900">Organization</Label>
+            <Label className="text-[13px] font-medium text-foreground">Organization</Label>
             <OrgCombobox
               value={org}
               onChange={(o) => { setOrg(o); setOrgError(false); }}
@@ -310,7 +310,7 @@ export default function LogPage() {
 
           {/* Date */}
           <div className="space-y-1.5">
-            <Label className="text-[13px] font-medium text-ink-900">Date</Label>
+            <Label className="text-[13px] font-medium text-foreground">Date</Label>
             {mode === 'verified' ? (
               <Controller
                 name="date"
@@ -322,7 +322,7 @@ export default function LogPage() {
                         type="button"
                         className={cn(
                           'flex h-10 w-full items-center px-3 rounded-lg border text-left text-[14px] transition-colors',
-                          'border-ink-200 hover:border-ink-300 bg-white text-ink-900',
+                          'border-border hover:border-border bg-card text-foreground',
                           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merit-blue-600',
                         )}
                       >
@@ -351,7 +351,7 @@ export default function LogPage() {
                         type="button"
                         className={cn(
                           'flex h-10 w-full items-center px-3 rounded-lg border text-left text-[14px] transition-colors',
-                          'border-ink-200 hover:border-ink-300 bg-white text-ink-900',
+                          'border-border hover:border-border bg-card text-foreground',
                           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merit-blue-600',
                         )}
                       >
@@ -374,7 +374,7 @@ export default function LogPage() {
 
           {/* Hours */}
           <div className="space-y-1.5">
-            <Label className="text-[13px] font-medium text-ink-900">Hours worked</Label>
+            <Label className="text-[13px] font-medium text-foreground">Hours worked</Label>
             {mode === 'verified' ? (
               <>
                 <Input
@@ -398,12 +398,12 @@ export default function LogPage() {
                 )}
               </>
             )}
-            <p className="text-[12px] text-ink-400">Max 12 hrs per session</p>
+            <p className="text-[12px] text-muted-foreground">Max 12 hrs per session</p>
           </div>
 
           {/* Activity */}
           <div className="space-y-1.5">
-            <Label className="text-[13px] font-medium text-ink-900">Activity description</Label>
+            <Label className="text-[13px] font-medium text-foreground">Activity description</Label>
             <div className="relative">
               {mode === 'verified' ? (
                 <Textarea
@@ -424,7 +424,7 @@ export default function LogPage() {
               )}
               <span className={cn(
                 'absolute bottom-2.5 right-3 text-[11px] tabular-nums pointer-events-none',
-                activityLen > 450 ? 'text-danger' : 'text-ink-400',
+                activityLen > 450 ? 'text-danger' : 'text-muted-foreground',
               )}>
                 {activityLen}/500
               </span>
@@ -439,16 +439,16 @@ export default function LogPage() {
 
           {/* Supervisor section — verified mode only */}
           {mode === 'verified' && (
-            <div className="rounded-lg bg-ink-50 border border-ink-200 p-4 space-y-4">
+            <div className="rounded-lg bg-background border border-border p-4 space-y-4">
               <div>
-                <p className="text-[13px] font-semibold text-ink-900">Who supervised you?</p>
-                <p className="text-[12px] text-ink-500 mt-0.5">
+                <p className="text-[13px] font-semibold text-foreground">Who supervised you?</p>
+                <p className="text-[12px] text-muted-foreground mt-0.5">
                   They&apos;ll get one text to confirm — no account or app required.
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label className="text-[13px] font-medium text-ink-900">Name</Label>
+                  <Label className="text-[13px] font-medium text-foreground">Name</Label>
                   <Input
                     {...verifiedForm.register('supervisorName')}
                     placeholder="Sarah Kim"
@@ -461,7 +461,7 @@ export default function LogPage() {
                   )}
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-[13px] font-medium text-ink-900">Mobile number</Label>
+                  <Label className="text-[13px] font-medium text-foreground">Mobile number</Label>
                   <Input
                     {...verifiedForm.register('supervisorPhone')}
                     type="tel"
@@ -485,7 +485,7 @@ export default function LogPage() {
                 </button>
               ) : (
                 <div className="space-y-1.5">
-                  <Label className="text-[13px] font-medium text-ink-900">Email (optional)</Label>
+                  <Label className="text-[13px] font-medium text-foreground">Email (optional)</Label>
                   <Input
                     {...verifiedForm.register('supervisorEmail')}
                     type="email"
@@ -499,8 +499,8 @@ export default function LogPage() {
           {/* Tracker note — tracked mode only */}
           {mode === 'tracked' && (
             <div className="space-y-1.5">
-              <Label className="text-[13px] font-medium text-ink-900">
-                Note <span className="text-ink-400 font-normal">(optional)</span>
+              <Label className="text-[13px] font-medium text-foreground">
+                Note <span className="text-muted-foreground font-normal">(optional)</span>
               </Label>
               <Input
                 {...trackedForm.register('trackerNote')}

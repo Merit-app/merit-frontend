@@ -8,8 +8,8 @@ import { Loader2, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
 const inputClass =
-  'w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-3 text-sm placeholder-gray-600 focus:outline-none focus:border-gray-500 transition-colors';
-const labelClass = 'block text-sm font-medium text-gray-400 mb-1.5';
+  'w-full bg-muted border border-border text-foreground rounded-xl px-4 py-3 text-sm placeholder-gray-600 focus:outline-none focus:border-border transition-colors';
+const labelClass = 'block text-sm font-medium text-muted-foreground mb-1.5';
 
 export default function CreateEventPage() {
   const { orgId } = useParams<{ orgId: string }>();
@@ -67,18 +67,18 @@ export default function CreateEventPage() {
   return (
     <div className="max-w-2xl space-y-6">
       <div className="flex items-center gap-4">
-        <Link href={`/org/${orgId}/events`} className="text-gray-400 hover:text-white transition-colors">
+        <Link href={`/org/${orgId}/events`} className="text-muted-foreground hover:text-foreground transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-white">Create event</h1>
-          <p className="text-gray-400 text-sm mt-0.5">Set up a volunteer shift or opportunity</p>
+          <h1 className="text-2xl font-bold text-foreground">Create event</h1>
+          <p className="text-muted-foreground text-sm mt-0.5">Set up a volunteer shift or opportunity</p>
         </div>
       </div>
 
       <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
         <div>
-          <label className={labelClass}>Event title <span className="text-red-400">*</span></label>
+          <label className={labelClass}>Event title <span className="text-danger">*</span></label>
           <input
             value={form.title}
             onChange={(e) => update('title', e.target.value)}
@@ -90,7 +90,7 @@ export default function CreateEventPage() {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className={labelClass}>Start time <span className="text-red-400">*</span></label>
+            <label className={labelClass}>Start time <span className="text-danger">*</span></label>
             <input
               type="datetime-local"
               value={form.startTime}
@@ -99,7 +99,7 @@ export default function CreateEventPage() {
             />
           </div>
           <div>
-            <label className={labelClass}>End time <span className="text-red-400">*</span></label>
+            <label className={labelClass}>End time <span className="text-danger">*</span></label>
             <input
               type="datetime-local"
               value={form.endTime}
@@ -167,21 +167,21 @@ export default function CreateEventPage() {
         </div>
 
         {/* Auto-log toggle */}
-        <div className="flex items-center gap-3 p-4 bg-gray-800/50 rounded-xl border border-gray-700">
+        <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-xl border border-border">
           <button
             type="button"
             onClick={() => update('autoLogHours', !form.autoLogHours)}
             className={`relative w-10 h-6 rounded-full transition-colors ${
-              form.autoLogHours ? 'bg-white' : 'bg-gray-600'
+              form.autoLogHours ? 'bg-card' : 'bg-gray-600'
             }`}
           >
-            <span className={`absolute top-1 w-4 h-4 rounded-full bg-gray-900 transition-transform ${
+            <span className={`absolute top-1 w-4 h-4 rounded-full bg-card transition-transform ${
               form.autoLogHours ? 'translate-x-5' : 'translate-x-1'
             }`} />
           </button>
           <div>
-            <p className="text-white text-sm font-medium">Auto-log hours on completion</p>
-            <p className="text-gray-500 text-xs">
+            <p className="text-foreground text-sm font-medium">Auto-log hours on completion</p>
+            <p className="text-muted-foreground text-xs">
               Hours added for all checked-in volunteers when you mark the event complete
             </p>
           </div>
@@ -192,7 +192,7 @@ export default function CreateEventPage() {
             type="button"
             onClick={(e) => handleSubmit(e, false)}
             disabled={isLoading}
-            className="flex-1 py-3 rounded-xl bg-gray-800 text-gray-300 text-sm font-medium hover:bg-gray-700 hover:text-white disabled:opacity-50 transition-colors"
+            className="flex-1 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted hover:text-foreground disabled:opacity-50 transition-colors"
           >
             Save as draft
           </button>
@@ -200,7 +200,7 @@ export default function CreateEventPage() {
             type="button"
             onClick={(e) => handleSubmit(e, true)}
             disabled={isLoading}
-            className="flex-1 py-3 rounded-xl bg-white text-gray-900 text-sm font-semibold hover:bg-gray-100 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+            className="flex-1 py-3 rounded-xl bg-foreground text-background text-sm font-semibold hover:bg-muted disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
           >
             {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
             {isLoading ? 'Creating...' : 'Publish + notify volunteers'}

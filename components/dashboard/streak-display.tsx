@@ -14,8 +14,8 @@ export function StreakDisplay() {
 
   if (streak === 0) {
     return (
-      <div className="bg-white rounded-xl border border-ink-200 p-5 mb-6">
-        <p className="text-[13px] text-ink-600">
+      <div className="bg-card rounded-xl border border-border p-5 mb-6">
+        <p className="text-[13px] text-muted-foreground">
           Log hours this week to start a streak 🔥
         </p>
       </div>
@@ -24,10 +24,10 @@ export function StreakDisplay() {
 
   return (
     <div className="bg-gradient-to-br from-warning/20 to-merit-blue-50 rounded-xl border border-warning/30 p-5 mb-6">
-      <p className="text-[28px] font-bold text-ink-900 mb-1">
+      <p className="text-[28px] font-bold text-foreground mb-1">
         🔥 {formatStreak(streak)}
       </p>
-      <p className="text-[13px] text-ink-600">Current streak</p>
+      <p className="text-[13px] text-muted-foreground">Current streak</p>
     </div>
   );
 }

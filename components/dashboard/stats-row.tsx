@@ -22,11 +22,11 @@ interface StatCardProps {
 
 function StatCard({ label, value, sub, subPositive, sparkData }: StatCardProps) {
   return (
-    <div className="bg-white rounded-xl border border-ink-200 p-5 flex flex-col gap-3">
-      <p className="text-micro text-ink-500">{label}</p>
+    <div className="bg-card rounded-xl border border-border p-5 flex flex-col gap-3">
+      <p className="text-micro text-muted-foreground">{label}</p>
       <div>
-        <p className="text-[28px] font-medium text-ink-900 leading-none tabular-nums">{value}</p>
-        <p className={`text-[12px] mt-1 font-medium ${subPositive === true ? 'text-success' : subPositive === false ? 'text-danger' : 'text-ink-500'}`}>
+        <p className="text-[28px] font-medium text-foreground leading-none tabular-nums">{value}</p>
+        <p className={`text-[12px] mt-1 font-medium ${subPositive === true ? 'text-success' : subPositive === false ? 'text-danger' : 'text-muted-foreground'}`}>
           {sub}
         </p>
       </div>
@@ -41,7 +41,7 @@ function StatsRowSkeleton() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
       {[0, 1, 2].map((i) => (
-        <div key={i} className="bg-white rounded-xl border border-ink-200 p-5 flex flex-col gap-3">
+        <div key={i} className="bg-card rounded-xl border border-border p-5 flex flex-col gap-3">
           <Skeleton className="h-3 w-20" />
           <div className="space-y-1.5">
             <Skeleton className="h-7 w-24" />
@@ -61,7 +61,10 @@ export function StatsRow() {
   if (!hydrated) return <StatsRowSkeleton />;
 
   const stats = useMemo(() => {
-    const verified = sessions.filter((s) => s.status === 'verified');
+    // "Verified" = org-verified only. Self-tracked sessions are stored as status
+    // 'verified' but are excluded here so the headline matches the Self-tracked
+    // card and the Activity chart's split.
+    const verified = sessions.filter((s) => s.status === 'verified' && !s.selfReported);
     const now = new Date();
 
     // This week vs last week hours
@@ -105,7 +108,7 @@ export function StatsRow() {
       return Array.from({ length: 8 }, (_, i) => {
         const cutoff = subWeeks(now, 7 - i);
         const before = sessions.filter((s) => parseISO(s.date) <= cutoff);
-        const v = before.length === 0 ? 0 : Math.round((before.filter((s) => s.status === 'verified').length / before.length) * 100);
+        const v = before.length === 0 ? 0 : Math.round((before.filter((s) => s.status === 'verified' && !s.selfReported).length / before.length) * 100);
         return { v };
       });
     }

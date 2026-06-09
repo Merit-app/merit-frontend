@@ -107,6 +107,7 @@ export interface User {
   avatarUrl?: string;
   profilePublic?: boolean;
   bio?: string;
+  city?: string;
 }
 
 export interface Goal {

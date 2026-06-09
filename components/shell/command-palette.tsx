@@ -73,11 +73,11 @@ export function CommandPalette() {
             <CommandShortcut>⌘N</CommandShortcut>
           </CommandItem>
           <CommandItem onSelect={() => runCommand(() => router.push('/export'))}>
-            <FileDown size={15} className="mr-2 text-ink-500" />
+            <FileDown size={15} className="mr-2 text-muted-foreground" />
             Export PDF
           </CommandItem>
           <CommandItem onSelect={() => runCommand(() => router.push('/dashboard'))}>
-            <LayoutDashboard size={15} className="mr-2 text-ink-500" />
+            <LayoutDashboard size={15} className="mr-2 text-muted-foreground" />
             Go to dashboard
           </CommandItem>
         </CommandGroup>
@@ -87,19 +87,19 @@ export function CommandPalette() {
         {/* Navigation */}
         <CommandGroup heading="Navigation">
           <CommandItem onSelect={() => runCommand(() => router.push('/dashboard'))}>
-            <LayoutDashboard size={15} className="mr-2 text-ink-500" />
+            <LayoutDashboard size={15} className="mr-2 text-muted-foreground" />
             Dashboard
           </CommandItem>
           <CommandItem onSelect={() => runCommand(() => router.push('/hours'))}>
-            <Clock size={15} className="mr-2 text-ink-500" />
+            <Clock size={15} className="mr-2 text-muted-foreground" />
             All sessions
           </CommandItem>
           <CommandItem onSelect={() => runCommand(() => router.push('/organizations'))}>
-            <Building2 size={15} className="mr-2 text-ink-500" />
+            <Building2 size={15} className="mr-2 text-muted-foreground" />
             Organizations
           </CommandItem>
           <CommandItem onSelect={() => runCommand(() => router.push('/export'))}>
-            <FileDown size={15} className="mr-2 text-ink-500" />
+            <FileDown size={15} className="mr-2 text-muted-foreground" />
             Export
           </CommandItem>
         </CommandGroup>
@@ -109,23 +109,23 @@ export function CommandPalette() {
         {/* Settings */}
         <CommandGroup heading="Settings">
           <CommandItem onSelect={() => runCommand(() => router.push('/settings/profile'))}>
-            <User size={15} className="mr-2 text-ink-500" />
+            <User size={15} className="mr-2 text-muted-foreground" />
             Profile settings
           </CommandItem>
           <CommandItem onSelect={() => runCommand(() => router.push('/settings/notifications'))}>
-            <Bell size={15} className="mr-2 text-ink-500" />
+            <Bell size={15} className="mr-2 text-muted-foreground" />
             Notifications
           </CommandItem>
           <CommandItem onSelect={() => runCommand(() => router.push('/settings/billing'))}>
-            <CreditCard size={15} className="mr-2 text-ink-500" />
+            <CreditCard size={15} className="mr-2 text-muted-foreground" />
             Plan & billing
           </CommandItem>
           <CommandItem onSelect={() => runCommand(() => router.push('/settings/integrations'))}>
-            <Puzzle size={15} className="mr-2 text-ink-500" />
+            <Puzzle size={15} className="mr-2 text-muted-foreground" />
             Integrations
           </CommandItem>
           <CommandItem onSelect={() => runCommand(() => router.push('/settings/account'))}>
-            <Shield size={15} className="mr-2 text-ink-500" />
+            <Shield size={15} className="mr-2 text-muted-foreground" />
             Account
           </CommandItem>
         </CommandGroup>
@@ -140,9 +140,9 @@ export function CommandPalette() {
                   key={s.id}
                   onSelect={() => runCommand(() => router.push(`/hours?session=${s.id}`))}
                 >
-                  <Clock size={15} className="mr-2 text-ink-500" />
+                  <Clock size={15} className="mr-2 text-muted-foreground" />
                   <span className="truncate">{s.org}</span>
-                  <span className="ml-auto text-ink-400 text-[12px] shrink-0 pl-2">
+                  <span className="ml-auto text-muted-foreground text-[12px] shrink-0 pl-2">
                     {formatSessionDate(s.date)} · {formatHours(s.hours)}
                   </span>
                 </CommandItem>
@@ -161,7 +161,7 @@ export function CommandPalette() {
                   key={org.id}
                   onSelect={() => runCommand(() => router.push(`/organizations/${org.slug}`))}
                 >
-                  <Building2 size={15} className="mr-2 text-ink-500" />
+                  <Building2 size={15} className="mr-2 text-muted-foreground" />
                   {org.name}
                 </CommandItem>
               ))}

@@ -77,20 +77,20 @@ export default function ReportsPage() {
   return (
     <div className="max-w-2xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">Reports</h1>
-        <p className="text-gray-400 text-sm mt-1">
+        <h1 className="text-2xl font-bold text-foreground">Reports</h1>
+        <p className="text-muted-foreground text-sm mt-1">
           Generate impact reports for grant applications and board meetings
         </p>
       </div>
 
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-5">
+      <div className="bg-card border border-border rounded-2xl p-6 space-y-5">
         <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center shrink-0">
-            <FileText className="w-6 h-6 text-white" />
+          <div className="w-12 h-12 rounded-xl bg-card/5 flex items-center justify-center shrink-0">
+            <FileText className="w-6 h-6 text-foreground" />
           </div>
           <div>
-            <p className="font-semibold text-white">Grant Impact Report</p>
-            <p className="text-gray-400 text-sm mt-1">
+            <p className="font-semibold text-foreground">Grant Impact Report</p>
+            <p className="text-muted-foreground text-sm mt-1">
               Professional PDF showing total volunteers, hours, program breakdown, and top volunteers —
               formatted for grant submissions.
             </p>
@@ -99,21 +99,21 @@ export default function ReportsPage() {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">From</label>
+            <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">From</label>
             <input
               type="date"
               value={from}
               onChange={(e) => setFrom(e.target.value)}
-              className="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gray-500"
+              className="w-full bg-muted border border-border text-foreground rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-border"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">To</label>
+            <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">To</label>
             <input
               type="date"
               value={to}
               onChange={(e) => setTo(e.target.value)}
-              className="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gray-500"
+              className="w-full bg-muted border border-border text-foreground rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-border"
             />
           </div>
         </div>
@@ -123,7 +123,7 @@ export default function ReportsPage() {
             <button
               key={p.label}
               onClick={() => { setFrom(p.from); setTo(p.to); }}
-              className="px-3 py-1.5 rounded-lg bg-gray-800 text-gray-400 text-xs font-medium hover:bg-gray-700 hover:text-white transition-colors"
+              className="px-3 py-1.5 rounded-lg bg-muted text-muted-foreground text-xs font-medium hover:bg-muted hover:text-foreground transition-colors"
             >
               {p.label}
             </button>
@@ -133,7 +133,7 @@ export default function ReportsPage() {
         <button
           onClick={handleGrantReport}
           disabled={isGenerating}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-white text-gray-900 font-semibold text-sm hover:bg-gray-100 disabled:opacity-50 transition-colors"
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-foreground text-background font-semibold text-sm hover:bg-muted disabled:opacity-50 transition-colors"
         >
           {isGenerating ? (
             <><Loader2 className="w-4 h-4 animate-spin" />Generating...</>

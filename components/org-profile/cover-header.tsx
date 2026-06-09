@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { Globe, CheckCircle, ShieldCheck, Clock } from 'lucide-react';
+import { OrgCover } from '@/components/orgs/org-cover';
 
 interface Props {
   id: string;
@@ -25,23 +26,6 @@ interface Props {
 
 function getInitials(name: string) {
   return name.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2);
-}
-
-// Deterministic gradient per org name
-const GRADIENTS = [
-  'from-blue-200 to-indigo-300',
-  'from-violet-200 to-purple-300',
-  'from-emerald-200 to-teal-300',
-  'from-amber-200 to-orange-300',
-  'from-rose-200 to-pink-300',
-  'from-sky-200 to-cyan-300',
-  'from-lime-200 to-green-300',
-  'from-fuchsia-200 to-violet-300',
-];
-function coverGradient(name: string) {
-  let h = 0;
-  for (const c of name) h = (h * 31 + c.charCodeAt(0)) & 0x7fffffff;
-  return GRADIENTS[h % GRADIENTS.length];
 }
 
 export function OrgCoverHeader({
@@ -68,14 +52,10 @@ export function OrgCoverHeader({
     : null;
 
   return (
-    <div className="bg-white rounded-xl border border-ink-200 overflow-hidden">
+    <div className="bg-card rounded-xl border border-border overflow-hidden">
       {/* Cover */}
       <div className="relative h-36 sm:h-44">
-        {coverUrl ? (
-          <Image src={coverUrl} alt="" fill className="object-cover" sizes="100vw" />
-        ) : (
-          <div className={`w-full h-full bg-gradient-to-br ${coverGradient(name)}`} />
-        )}
+        <OrgCover name={name} coverUrl={coverUrl} sizes="100vw" />
 
         {/* Actions row in top-right of cover */}
         {actions && (
@@ -89,7 +69,7 @@ export function OrgCoverHeader({
       <div className="px-5 pb-5">
         {/* Logo overlapping cover */}
         <div className="relative -mt-8 mb-3 flex items-end justify-between">
-          <div className="w-16 h-16 rounded-2xl bg-white border-2 border-white shadow-sm flex items-center justify-center text-xl font-bold text-merit-blue-700 bg-merit-blue-100 shrink-0 overflow-hidden relative">
+          <div className="w-16 h-16 rounded-2xl bg-card border-2 border-white shadow-sm flex items-center justify-center text-xl font-bold text-merit-blue-700 bg-merit-blue-100 shrink-0 overflow-hidden relative">
             {logoUrl ? (
               <Image src={logoUrl} alt={name} fill className="object-cover rounded-2xl" sizes="64px" />
             ) : (
@@ -99,11 +79,11 @@ export function OrgCoverHeader({
         </div>
 
         {/* Name */}
-        <h1 className="text-2xl font-bold text-ink-900 leading-tight mb-1">{name}</h1>
+        <h1 className="text-2xl font-bold text-foreground leading-tight mb-1">{name}</h1>
 
         {/* Category · Location */}
         {(category || location) && (
-          <p className="text-sm text-ink-500 mb-2">
+          <p className="text-sm text-muted-foreground mb-2">
             {[category, location].filter(Boolean).join(' · ')}
           </p>
         )}
@@ -150,7 +130,7 @@ export function OrgCoverHeader({
 
         {/* Claim link / status */}
         {showClaimLink && !claimed && (
-          <p className="mt-3 text-[12px] text-ink-400">
+          <p className="mt-3 text-[12px] text-muted-foreground">
             Is this your organization?{' '}
             {claimStatus === 'pending' ? (
               <span className="inline-flex items-center gap-1 text-amber-600">

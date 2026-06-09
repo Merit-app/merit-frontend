@@ -13,8 +13,8 @@ export function ErrorState({ message = 'Something went wrong', onRetry }: Props)
         <AlertCircle className="w-6 h-6 text-red-500" />
       </div>
       <div>
-        <p className="font-medium text-sm text-ink-900">{message}</p>
-        <p className="text-xs text-ink-400 mt-1">Please try again</p>
+        <p className="font-medium text-sm text-foreground">{message}</p>
+        <p className="text-xs text-muted-foreground mt-1">Please try again</p>
       </div>
       {onRetry && (
         <Button variant="outline" size="sm" onClick={onRetry}>

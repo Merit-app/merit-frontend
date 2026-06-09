@@ -67,12 +67,12 @@ export function TopBadgesPicker({ initialTopBadgeIds }: Props) {
   }
 
   if (loading) {
-    return <p className="text-[12px] text-ink-400">Loading badges…</p>;
+    return <p className="text-[12px] text-muted-foreground">Loading badges…</p>;
   }
 
   if (earned.length === 0) {
     return (
-      <p className="text-[12px] text-ink-400">
+      <p className="text-[12px] text-muted-foreground">
         You haven&apos;t earned any badges yet. Log and verify volunteer hours to earn them.
       </p>
     );
@@ -80,9 +80,9 @@ export function TopBadgesPicker({ initialTopBadgeIds }: Props) {
 
   return (
     <div className="space-y-3">
-      <p className="text-[12px] text-ink-500">
+      <p className="text-[12px] text-muted-foreground">
         Select up to 3 badges to pin to your public profile.{' '}
-        <span className="text-ink-400">({selected.length}/3 selected)</span>
+        <span className="text-muted-foreground">({selected.length}/3 selected)</span>
       </p>
 
       <div className="flex flex-wrap gap-2">

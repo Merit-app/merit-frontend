@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function OrgLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-background text-foreground">
       {children}
     </div>
   );

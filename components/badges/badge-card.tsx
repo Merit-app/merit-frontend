@@ -79,7 +79,7 @@ function Medallion({ tier, iconName, earned }: { tier: BadgeCardProps['tier']; i
       </div>
       {/* Lock overlay for locked badges */}
       {!earned && (
-        <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-white border border-border flex items-center justify-center shadow-sm">
+        <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-card border border-border flex items-center justify-center shadow-sm">
           <Lock className="w-3 h-3 text-muted-foreground" />
         </div>
       )}
@@ -98,18 +98,18 @@ export function EarnedBadgeCard({ id, name, description, tier, iconName, earnedA
     <motion.div
       whileHover={{ scale: 1.05, y: -2 }}
       transition={{ duration: 0.15 }}
-      className="bg-white rounded-2xl border border-border p-5 flex flex-col items-center text-center gap-3 shadow-sm cursor-default"
+      className="bg-card rounded-2xl border border-border p-5 flex flex-col items-center text-center gap-3 shadow-sm cursor-default"
     >
       <Medallion tier={tier} iconName={iconName} earned />
       <div className="space-y-1">
-        <p className="text-[14px] font-bold text-ink-900 leading-snug">{name}</p>
+        <p className="text-[14px] font-bold text-foreground leading-snug">{name}</p>
         <span className={cn('inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full', s.pill)}>
           {s.label}
         </span>
       </div>
-      <p className="text-[11px] text-ink-500 leading-snug">{description}</p>
+      <p className="text-[11px] text-muted-foreground leading-snug">{description}</p>
       {earnedAt && (
-        <p className="text-[11px] text-ink-400">Earned {formatDate(earnedAt)}</p>
+        <p className="text-[11px] text-muted-foreground">Earned {formatDate(earnedAt)}</p>
       )}
     </motion.div>
   );
@@ -123,22 +123,22 @@ export function LockedBadgeCard({ id, name, description, tier, iconName, progres
   const pct = hasProgress ? Math.min(100, Math.round(((progressCurrent ?? 0) / (progressTarget ?? 1)) * 100)) : 0;
 
   return (
-    <div className="bg-white rounded-2xl border border-border p-5 flex flex-col items-center text-center gap-3 opacity-70">
+    <div className="bg-card rounded-2xl border border-border p-5 flex flex-col items-center text-center gap-3 opacity-70">
       <Medallion tier={tier} iconName={iconName} earned={false} />
       <div className="space-y-1">
-        <p className="text-[14px] font-semibold text-ink-600 leading-snug">{name}</p>
+        <p className="text-[14px] font-semibold text-muted-foreground leading-snug">{name}</p>
         <span className={cn('inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full opacity-60', s.pill)}>
           {s.label}
         </span>
       </div>
-      <p className="text-[11px] text-ink-400 leading-snug">{description}</p>
+      <p className="text-[11px] text-muted-foreground leading-snug">{description}</p>
       {hasProgress && (
         <div className="w-full space-y-1">
-          <div className="flex justify-between text-[10px] text-ink-400">
+          <div className="flex justify-between text-[10px] text-muted-foreground">
             <span>{progressLabel ?? 'Progress'}</span>
             <span>{progressCurrent} / {progressTarget}</span>
           </div>
-          <div className="h-1.5 rounded-full bg-ink-100 overflow-hidden">
+          <div className="h-1.5 rounded-full bg-muted overflow-hidden">
             <div className="h-full bg-ink-300 rounded-full transition-all" style={{ width: `${pct}%` }} />
           </div>
         </div>

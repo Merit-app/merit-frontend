@@ -57,28 +57,28 @@ export default function NotificationsPage() {
   return (
     <div className="max-w-2xl">
       <div className="mb-6">
-        <h2 className="text-h1 text-ink-900">Notifications</h2>
-        <p className="text-small text-ink-500 mt-1">Choose what Merit contacts you about.</p>
+        <h2 className="text-h1 text-foreground">Notifications</h2>
+        <p className="text-small text-muted-foreground mt-1">Choose what Merit contacts you about.</p>
       </div>
 
-      <div className="rounded-3xl border border-ink-200 bg-ink-50 p-5 mb-6 flex items-center gap-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-merit-blue-600">
+      <div className="rounded-3xl border border-border bg-background p-5 mb-6 flex items-center gap-4">
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-card text-merit-blue-600">
           <Bell size={20} />
         </div>
         <div>
-          <p className="text-[14px] font-semibold text-ink-900">You're all caught up</p>
-          <p className="text-[13px] text-ink-500">
+          <p className="text-[14px] font-semibold text-foreground">You're all caught up</p>
+          <p className="text-[13px] text-muted-foreground">
             Notifications will appear here when your hours are verified or disputed.
           </p>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-ink-200 divide-y divide-ink-200">
+      <div className="bg-card rounded-xl border border-border divide-y divide-border">
         {NOTIFICATION_OPTIONS.map(({ key, label, description }) => (
           <div key={key} className="flex items-center justify-between px-5 py-4 gap-6">
             <div className="min-w-0">
-              <p className="text-[13px] font-medium text-ink-900">{label}</p>
-              <p className="text-small text-ink-500 mt-0.5">{description}</p>
+              <p className="text-[13px] font-medium text-foreground">{label}</p>
+              <p className="text-small text-muted-foreground mt-0.5">{description}</p>
             </div>
             {/* Toggle */}
             <button
@@ -87,12 +87,12 @@ export default function NotificationsPage() {
               onClick={() => toggle(key)}
               className={[
                 'relative shrink-0 h-5 w-9 rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merit-blue-600 focus-visible:ring-offset-2',
-                notifications[key] ? 'bg-merit-blue-600' : 'bg-ink-200',
+                notifications[key] ? 'bg-merit-blue-600' : 'bg-muted',
               ].join(' ')}
             >
               <span
                 className={[
-                  'absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-200',
+                  'absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-card shadow-sm transition-transform duration-200',
                   notifications[key] ? 'translate-x-4' : 'translate-x-0',
                 ].join(' ')}
               />

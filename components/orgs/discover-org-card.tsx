@@ -6,26 +6,12 @@ import { Bookmark, CheckCircle, ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { DiscoverOrg } from '@/lib/types';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { OrgCover, getOrgInitials as getInitials } from '@/components/orgs/org-cover';
 
 interface Props {
   org: DiscoverOrg;
   isFollowing: boolean;
   onToggleFollow: (orgId: string) => void;
-}
-
-function getInitials(name: string) {
-  return name.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2);
-}
-
-// Deterministic flat header color from org name
-const HEADER_COLORS = [
-  'bg-violet-200', 'bg-blue-200', 'bg-emerald-200',
-  'bg-amber-200', 'bg-rose-200', 'bg-sky-200', 'bg-indigo-200',
-];
-function headerColor(name: string): string {
-  let h = 0;
-  for (const c of name) h = (h * 31 + c.charCodeAt(0)) & 0x7fffffff;
-  return HEADER_COLORS[h % HEADER_COLORS.length];
 }
 
 // Deterministic avatar bg/text color
@@ -49,16 +35,12 @@ export function DiscoverOrgCard({ org, isFollowing, onToggleFollow }: Props) {
   const color = avatarColor(org.name);
 
   return (
-    <div className="rounded-xl border border-border overflow-hidden bg-white flex flex-col hover:shadow-md transition-shadow duration-150">
+    <div className="rounded-xl border border-border overflow-hidden bg-card flex flex-col hover:shadow-md transition-shadow duration-150">
       {/* ── Header area ────────────────────────────────────────────────── */}
       <div className="h-24 w-full relative flex-shrink-0">
         {/* Cover image or flat color */}
         <Link href={`/organizations/${org.slug}`} className="block absolute inset-0">
-          {org.coverUrl ? (
-            <Image src={org.coverUrl} alt="" fill className="object-cover" sizes="(max-width: 768px) 100vw, 350px" />
-          ) : (
-            <div className={`w-full h-full ${headerColor(org.name)}`} />
-          )}
+          <OrgCover name={org.name} coverUrl={org.coverUrl} sizes="(max-width: 768px) 100vw, 350px" initialSize="sm" />
         </Link>
 
         {/* Bookmark button — top-right of header */}
@@ -100,13 +82,13 @@ export function DiscoverOrgCard({ org, isFollowing, onToggleFollow }: Props) {
 
       {/* ── Body ───────────────────────────────────────────────────────── */}
       <Link href={`/organizations/${org.slug}`} className="flex flex-col flex-1 px-4 pb-4 pt-8">
-        <h3 className="text-[14px] font-bold text-ink-900 leading-snug mb-1 truncate">
+        <h3 className="text-[14px] font-bold text-foreground leading-snug mb-1 truncate">
           {org.name}
         </h3>
 
         <div className="flex flex-wrap items-center gap-1 mb-2">
           {org.category && (
-            <span className="text-[11px] font-medium text-ink-500 bg-ink-100 px-2 py-0.5 rounded-full">
+            <span className="text-[11px] font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
               {org.category}
             </span>
           )}
@@ -123,13 +105,13 @@ export function DiscoverOrgCard({ org, isFollowing, onToggleFollow }: Props) {
         </div>
 
         {location && (
-          <p className="text-[12px] text-ink-400 mb-1.5 truncate">{location}</p>
+          <p className="text-[12px] text-muted-foreground mb-1.5 truncate">{location}</p>
         )}
 
-        <p className="text-[12px] text-ink-500">
+        <p className="text-[12px] text-muted-foreground">
           {org.studentCount > 0
-            ? <><span className="font-semibold text-ink-700">{org.studentCount}</span> {org.studentCount === 1 ? 'student' : 'students'} volunteer here</>
-            : <span className="text-ink-400 italic">Be the first to volunteer here</span>
+            ? <><span className="font-semibold text-foreground">{org.studentCount}</span> {org.studentCount === 1 ? 'student' : 'students'} volunteer here</>
+            : <span className="text-muted-foreground italic">Be the first to volunteer here</span>
           }
         </p>
       </Link>

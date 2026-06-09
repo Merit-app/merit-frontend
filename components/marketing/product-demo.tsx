@@ -23,16 +23,16 @@ interface Step {
 function Phone({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative">
-      <div className="w-[220px] bg-gray-950 rounded-[36px] p-[10px] shadow-[0_40px_80px_rgba(0,0,0,0.4)] relative">
-        <div className="bg-white rounded-[28px] overflow-hidden h-[420px] relative flex flex-col">
+      <div className="w-[220px] bg-background rounded-[36px] p-[10px] shadow-[0_40px_80px_rgba(0,0,0,0.4)] relative">
+        <div className="bg-card rounded-[28px] overflow-hidden h-[420px] relative flex flex-col">
           {/* Status bar */}
-          <div className="bg-white px-5 pt-3 pb-1 flex items-center justify-between shrink-0">
-            <span className="text-[10px] font-semibold text-gray-900">9:41</span>
-            <div className="w-20 h-5 bg-gray-950 rounded-full absolute left-1/2 -translate-x-1/2 top-0" />
+          <div className="bg-card px-5 pt-3 pb-1 flex items-center justify-between shrink-0">
+            <span className="text-[10px] font-semibold text-foreground">9:41</span>
+            <div className="w-20 h-5 bg-background rounded-full absolute left-1/2 -translate-x-1/2 top-0" />
             <div className="flex items-center gap-1">
-              <Signal className="w-3 h-3 text-gray-900" />
-              <Wifi className="w-3 h-3 text-gray-900" />
-              <Battery className="w-3 h-3 text-gray-900" />
+              <Signal className="w-3 h-3 text-foreground" />
+              <Wifi className="w-3 h-3 text-foreground" />
+              <Battery className="w-3 h-3 text-foreground" />
             </div>
           </div>
           <div className="flex-1 overflow-hidden">{children}</div>
@@ -41,10 +41,10 @@ function Phone({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </div>
-      <div className="absolute left-[-3px] top-20 w-[3px] h-8 bg-gray-700 rounded-l-sm" />
-      <div className="absolute left-[-3px] top-32 w-[3px] h-12 bg-gray-700 rounded-l-sm" />
-      <div className="absolute left-[-3px] top-48 w-[3px] h-12 bg-gray-700 rounded-l-sm" />
-      <div className="absolute right-[-3px] top-28 w-[3px] h-16 bg-gray-700 rounded-r-sm" />
+      <div className="absolute left-[-3px] top-20 w-[3px] h-8 bg-muted rounded-l-sm" />
+      <div className="absolute left-[-3px] top-32 w-[3px] h-12 bg-muted rounded-l-sm" />
+      <div className="absolute left-[-3px] top-48 w-[3px] h-12 bg-muted rounded-l-sm" />
+      <div className="absolute right-[-3px] top-28 w-[3px] h-16 bg-muted rounded-r-sm" />
     </div>
   );
 }
@@ -53,20 +53,20 @@ function Phone({ children }: { children: React.ReactNode }) {
 
 function StudentAppHome() {
   return (
-    <div className="h-full bg-gray-50 flex flex-col">
-      <div className="bg-white px-4 pt-2 pb-3 border-b border-gray-100">
-        <p className="font-bold text-gray-900">merit.</p>
-        <p className="text-[10px] text-gray-400">SERVICE HOURS · 2024–25</p>
+    <div className="h-full bg-muted flex flex-col">
+      <div className="bg-card px-4 pt-2 pb-3 border-b border-border">
+        <p className="font-bold text-foreground">merit.</p>
+        <p className="text-[10px] text-muted-foreground">SERVICE HOURS · 2024–25</p>
       </div>
       <div className="flex-1 px-4 pt-4 space-y-3">
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white rounded-xl p-3 shadow-sm border border-gray-100"
+          className="bg-card rounded-xl p-3 shadow-sm border border-border"
         >
-          <p className="text-[10px] text-gray-400">THIS WEEK</p>
-          <p className="text-2xl font-bold text-gray-900">4 hrs</p>
+          <p className="text-[10px] text-muted-foreground">THIS WEEK</p>
+          <p className="text-2xl font-bold text-foreground">4 hrs</p>
           <p className="text-[9px] text-green-600 font-medium">+4 hrs vs last week</p>
         </motion.div>
         <motion.div
@@ -85,11 +85,11 @@ function StudentAppHome() {
 
 function SupervisorIdle() {
   return (
-    <div className="h-full bg-gray-100 flex flex-col items-center justify-center gap-3">
-      <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
-        <MessageSquare className="w-5 h-5 text-gray-400" />
+    <div className="h-full bg-muted flex flex-col items-center justify-center gap-3">
+      <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+        <MessageSquare className="w-5 h-5 text-muted-foreground" />
       </div>
-      <p className="text-[10px] text-gray-400 text-center px-6">
+      <p className="text-[10px] text-muted-foreground text-center px-6">
         Supervisor&apos;s phone — waiting
       </p>
     </div>
@@ -105,10 +105,10 @@ function LogFormFilling({ progress }: { progress: number }) {
   ];
 
   return (
-    <div className="h-full bg-white flex flex-col">
-      <div className="px-4 pt-3 pb-2 border-b border-gray-100 flex items-center gap-2">
-        <ChevronRight className="w-3 h-3 text-gray-400 rotate-180" />
-        <p className="text-xs font-semibold text-gray-900">Log hours</p>
+    <div className="h-full bg-card flex flex-col">
+      <div className="px-4 pt-3 pb-2 border-b border-border flex items-center gap-2">
+        <ChevronRight className="w-3 h-3 text-muted-foreground rotate-180" />
+        <p className="text-xs font-semibold text-foreground">Log hours</p>
       </div>
       <div className="flex-1 px-4 pt-3 space-y-2.5 overflow-hidden">
         {fields.map((field, i) => (
@@ -118,11 +118,11 @@ function LogFormFilling({ progress }: { progress: number }) {
             animate={{ opacity: progress > i * 0.2 ? 1 : 0.2 }}
             transition={{ duration: 0.3 }}
           >
-            <p className="text-[9px] text-gray-400 font-medium mb-0.5">
+            <p className="text-[9px] text-muted-foreground font-medium mb-0.5">
               {field.label.toUpperCase()}
             </p>
-            <div className="bg-gray-50 border border-gray-200 rounded-lg px-2.5 py-1.5 relative overflow-hidden">
-              <p className="text-[10px] text-gray-700">{field.value}</p>
+            <div className="bg-muted border border-border rounded-lg px-2.5 py-1.5 relative overflow-hidden">
+              <p className="text-[10px] text-foreground">{field.value}</p>
               {progress > i * 0.2 && progress < (i + 1) * 0.2 + 0.1 && (
                 <motion.div
                   className="absolute right-2 top-1/2 -translate-y-1/2 w-px h-3 bg-blue-500"
@@ -137,9 +137,9 @@ function LogFormFilling({ progress }: { progress: number }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: progress > 0.7 ? 1 : 0.2 }}
         >
-          <p className="text-[9px] text-gray-400 font-medium mb-0.5">SUPERVISOR PHONE</p>
-          <div className="bg-gray-50 border border-gray-200 rounded-lg px-2.5 py-1.5">
-            <p className="text-[10px] text-gray-700">+1 604 555 0142</p>
+          <p className="text-[9px] text-muted-foreground font-medium mb-0.5">SUPERVISOR PHONE</p>
+          <div className="bg-muted border border-border rounded-lg px-2.5 py-1.5">
+            <p className="text-[10px] text-foreground">+1 604 555 0142</p>
           </div>
         </motion.div>
       </div>
@@ -159,9 +159,9 @@ function LogFormFilling({ progress }: { progress: number }) {
 
 function StudentWaiting() {
   return (
-    <div className="h-full bg-white flex flex-col">
-      <div className="px-4 pt-3 pb-2 border-b border-gray-100">
-        <p className="text-xs font-semibold text-gray-900">Session logged</p>
+    <div className="h-full bg-card flex flex-col">
+      <div className="px-4 pt-3 pb-2 border-b border-border">
+        <p className="text-xs font-semibold text-foreground">Session logged</p>
       </div>
       <div className="flex-1 flex flex-col items-center justify-center gap-3 px-6">
         <motion.div
@@ -171,10 +171,10 @@ function StudentWaiting() {
         >
           <Clock className="w-6 h-6 text-amber-500" />
         </motion.div>
-        <p className="text-xs font-semibold text-gray-900 text-center">
+        <p className="text-xs font-semibold text-foreground text-center">
           Waiting for supervisor
         </p>
-        <p className="text-[10px] text-gray-400 text-center">
+        <p className="text-[10px] text-muted-foreground text-center">
           John Smith will receive an SMS to verify your 4 hours at Vancouver Rotary Foundation
         </p>
         <div className="bg-amber-50 border border-amber-100 rounded-lg px-3 py-2 w-full">
@@ -188,11 +188,11 @@ function StudentWaiting() {
 
 function SupervisorSMSArriving() {
   return (
-    <div className="h-full bg-gray-100 flex flex-col">
+    <div className="h-full bg-muted flex flex-col">
       <div className="flex-1 flex flex-col items-center justify-center gap-2">
-        <p className="text-[10px] text-gray-500 font-medium">9:41 AM</p>
-        <p className="text-2xl font-semibold text-gray-900">Tuesday</p>
-        <p className="text-[10px] text-gray-400">May 28, 2026</p>
+        <p className="text-[10px] text-muted-foreground font-medium">9:41 AM</p>
+        <p className="text-2xl font-semibold text-foreground">Tuesday</p>
+        <p className="text-[10px] text-muted-foreground">May 28, 2026</p>
       </div>
       <motion.div
         initial={{ y: -80, opacity: 0 }}
@@ -200,17 +200,17 @@ function SupervisorSMSArriving() {
         transition={{ delay: 0.5, type: 'spring', damping: 20 }}
         className="mx-3 mb-4"
       >
-        <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-lg">
+        <div className="bg-card/90 backdrop-blur-sm rounded-2xl p-3 shadow-lg">
           <div className="flex items-center gap-2 mb-1.5">
             <div className="w-7 h-7 rounded-full bg-green-500 flex items-center justify-center">
               <MessageSquare className="w-3.5 h-3.5 text-white" />
             </div>
             <div>
-              <p className="text-[10px] font-semibold text-gray-900">Merit · Text Message</p>
-              <p className="text-[9px] text-gray-400">now</p>
+              <p className="text-[10px] font-semibold text-foreground">Merit · Text Message</p>
+              <p className="text-[9px] text-muted-foreground">now</p>
             </div>
           </div>
-          <p className="text-[10px] text-gray-700 leading-relaxed">
+          <p className="text-[10px] text-foreground leading-relaxed">
             <span className="font-medium">Sarah</span> logged 4 volunteer hours at
             Vancouver Rotary on May 28. Reply{' '}
             <span className="font-bold text-green-600">YES</span> to verify.
@@ -223,20 +223,20 @@ function SupervisorSMSArriving() {
 
 function SupervisorReplying() {
   return (
-    <div className="h-full bg-white flex flex-col">
-      <div className="px-4 pt-3 pb-2 border-b border-gray-100 flex items-center gap-2">
+    <div className="h-full bg-card flex flex-col">
+      <div className="px-4 pt-3 pb-2 border-b border-border flex items-center gap-2">
         <div className="w-7 h-7 rounded-full bg-green-500 flex items-center justify-center text-white text-[10px] font-bold">
           JS
         </div>
         <div>
-          <p className="text-[10px] font-semibold text-gray-900">Merit Verification</p>
-          <p className="text-[9px] text-gray-400">+1 778 555 0100</p>
+          <p className="text-[10px] font-semibold text-foreground">Merit Verification</p>
+          <p className="text-[9px] text-muted-foreground">+1 778 555 0100</p>
         </div>
       </div>
       <div className="flex-1 px-4 pt-4 space-y-2">
         <div className="max-w-[85%]">
-          <div className="bg-gray-100 rounded-2xl rounded-tl-sm px-3 py-2">
-            <p className="text-[10px] text-gray-700 leading-relaxed">
+          <div className="bg-muted rounded-2xl rounded-tl-sm px-3 py-2">
+            <p className="text-[10px] text-foreground leading-relaxed">
               Sarah logged 4 volunteer hours at Vancouver Rotary on May 28. Reply{' '}
               <span className="font-bold text-green-600">YES</span> to verify.
             </p>
@@ -258,16 +258,16 @@ function SupervisorReplying() {
           transition={{ delay: 1.4 }}
           className="max-w-[85%]"
         >
-          <div className="bg-gray-100 rounded-2xl rounded-tl-sm px-3 py-2">
-            <p className="text-[10px] text-gray-700">
+          <div className="bg-muted rounded-2xl rounded-tl-sm px-3 py-2">
+            <p className="text-[10px] text-foreground">
               ✓ Verified! Sarah&apos;s 4 hours at Vancouver Rotary are confirmed. Thank you!
             </p>
           </div>
         </motion.div>
       </div>
       <div className="px-4 pb-3 flex items-center gap-2">
-        <div className="flex-1 bg-gray-100 rounded-full px-3 py-2">
-          <p className="text-[10px] text-gray-400">iMessage</p>
+        <div className="flex-1 bg-muted rounded-full px-3 py-2">
+          <p className="text-[10px] text-muted-foreground">iMessage</p>
         </div>
         <div className="w-7 h-7 rounded-full bg-blue-500 flex items-center justify-center">
           <Send className="w-3 h-3 text-white" />
@@ -279,9 +279,9 @@ function SupervisorReplying() {
 
 function SessionVerified() {
   return (
-    <div className="h-full bg-white flex flex-col">
-      <div className="px-4 pt-3 pb-2 border-b border-gray-100">
-        <p className="text-xs font-semibold text-gray-900">All sessions</p>
+    <div className="h-full bg-card flex flex-col">
+      <div className="px-4 pt-3 pb-2 border-b border-border">
+        <p className="text-xs font-semibold text-foreground">All sessions</p>
       </div>
       <div className="flex-1 px-4 pt-3 space-y-2">
         <motion.div
@@ -291,7 +291,7 @@ function SessionVerified() {
           className="rounded-xl p-3 border border-green-200"
         >
           <div className="flex items-center justify-between mb-1">
-            <p className="text-[10px] font-semibold text-gray-900">
+            <p className="text-[10px] font-semibold text-foreground">
               Vancouver Rotary Foundation
             </p>
             <motion.div
@@ -302,7 +302,7 @@ function SessionVerified() {
               <CheckCircle2 className="w-4 h-4 text-green-500" />
             </motion.div>
           </div>
-          <p className="text-[9px] text-gray-400">Food bank sorting · May 28</p>
+          <p className="text-[9px] text-muted-foreground">Food bank sorting · May 28</p>
           <div className="flex items-center justify-between mt-1.5">
             <motion.span
               initial={{ color: '#F59E0B' }}
@@ -312,7 +312,7 @@ function SessionVerified() {
             >
               ✓ Verified
             </motion.span>
-            <span className="text-[10px] font-bold text-gray-900">4h</span>
+            <span className="text-[10px] font-bold text-foreground">4h</span>
           </div>
         </motion.div>
         {[
@@ -325,11 +325,11 @@ function SessionVerified() {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 + i * 0.1 }}
-            className="rounded-xl p-3 border border-gray-100"
+            className="rounded-xl p-3 border border-border"
           >
             <div className="flex items-center justify-between">
-              <p className="text-[10px] font-medium text-gray-700">{s.org}</p>
-              <span className="text-[10px] font-bold text-gray-900">{s.hrs}</span>
+              <p className="text-[10px] font-medium text-foreground">{s.org}</p>
+              <span className="text-[10px] font-bold text-foreground">{s.hrs}</span>
             </div>
             <span
               className={`text-[9px] font-medium ${
@@ -347,9 +347,9 @@ function SessionVerified() {
 
 function PDFGenerating() {
   return (
-    <div className="h-full bg-white flex flex-col">
-      <div className="px-4 pt-3 pb-2 border-b border-gray-100">
-        <p className="text-xs font-semibold text-gray-900">Export</p>
+    <div className="h-full bg-card flex flex-col">
+      <div className="px-4 pt-3 pb-2 border-b border-border">
+        <p className="text-xs font-semibold text-foreground">Export</p>
       </div>
       <div className="flex-1 flex flex-col items-center justify-center px-5 gap-4">
         <motion.div
@@ -360,12 +360,12 @@ function PDFGenerating() {
           <FileText className="w-5 h-5 text-blue-600" />
         </motion.div>
         <div className="text-center">
-          <p className="text-xs font-semibold text-gray-900">Generating PDF</p>
-          <p className="text-[10px] text-gray-400 mt-1">
+          <p className="text-xs font-semibold text-foreground">Generating PDF</p>
+          <p className="text-[10px] text-muted-foreground mt-1">
             15 verified hours · 4 organizations
           </p>
         </div>
-        <div className="w-full bg-gray-100 rounded-full h-1.5">
+        <div className="w-full bg-muted rounded-full h-1.5">
           <motion.div
             initial={{ width: '0%' }}
             animate={{ width: '100%' }}
@@ -384,13 +384,13 @@ function PDFPreview() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.5 }}
-      className="h-full bg-gray-50 flex flex-col p-3"
+      className="h-full bg-muted flex flex-col p-3"
     >
-      <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200 flex-1 flex flex-col">
-        <div className="bg-gray-900 px-4 py-3">
-          <p className="text-[8px] text-gray-400 tracking-widest">MERIT · VERIFIED RECORD</p>
+      <div className="bg-card rounded-xl overflow-hidden shadow-sm border border-border flex-1 flex flex-col">
+        <div className="bg-card px-4 py-3">
+          <p className="text-[8px] text-muted-foreground tracking-widest">MERIT · VERIFIED RECORD</p>
           <p className="text-sm font-bold text-white mt-0.5">Sarah Kim</p>
-          <p className="text-[9px] text-gray-400">
+          <p className="text-[9px] text-muted-foreground">
             Burnaby North · Grade 11 · Class of 2027
           </p>
         </div>
@@ -403,25 +403,25 @@ function PDFPreview() {
           ].map((row) => (
             <div
               key={row.org}
-              className="flex items-center text-[9px] py-1 border-b border-gray-100 gap-2"
+              className="flex items-center text-[9px] py-1 border-b border-border gap-2"
             >
               <span className="text-green-600 font-bold">✓</span>
-              <span className="flex-1 text-gray-700 truncate">{row.org}</span>
-              <span className="text-gray-400">{row.date}</span>
-              <span className="font-bold text-gray-900">{row.hrs}</span>
+              <span className="flex-1 text-foreground truncate">{row.org}</span>
+              <span className="text-muted-foreground">{row.date}</span>
+              <span className="font-bold text-foreground">{row.hrs}</span>
             </div>
           ))}
           <div className="flex justify-between pt-1">
-            <span className="text-[9px] font-bold text-gray-700">Total verified</span>
-            <span className="text-[10px] font-bold text-gray-900">15h</span>
+            <span className="text-[9px] font-bold text-foreground">Total verified</span>
+            <span className="text-[10px] font-bold text-foreground">15h</span>
           </div>
-          <div className="flex items-center gap-2 pt-1.5 border-t border-gray-100">
-            <div className="w-8 h-8 border border-gray-300 rounded grid grid-cols-3 gap-px p-0.5">
+          <div className="flex items-center gap-2 pt-1.5 border-t border-border">
+            <div className="w-8 h-8 border border-border rounded grid grid-cols-3 gap-px p-0.5">
               {[1, 1, 0, 1, 0, 1, 0, 1, 1].map((v, i) => (
-                <div key={i} className={`rounded-sm ${v ? 'bg-gray-800' : ''}`} />
+                <div key={i} className={`rounded-sm ${v ? 'bg-muted' : ''}`} />
               ))}
             </div>
-            <p className="text-[8px] text-gray-400 leading-tight">
+            <p className="text-[8px] text-muted-foreground leading-tight">
               Scan to verify
               <br />
               meritco.app/verify/...
@@ -435,9 +435,9 @@ function PDFPreview() {
 
 function SharingPDF() {
   return (
-    <div className="h-full bg-white flex flex-col">
-      <div className="px-4 pt-3 pb-2 border-b border-gray-100">
-        <p className="text-xs font-semibold text-gray-900">Share</p>
+    <div className="h-full bg-card flex flex-col">
+      <div className="px-4 pt-3 pb-2 border-b border-border">
+        <p className="text-xs font-semibold text-foreground">Share</p>
       </div>
       <div className="flex-1 flex flex-col">
         <div className="flex-1 flex items-center justify-center">
@@ -445,12 +445,12 @@ function SharingPDF() {
             <div className="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center mx-auto mb-2">
               <FileText className="w-5 h-5 text-red-500" />
             </div>
-            <p className="text-[10px] font-semibold text-gray-700">merit-record-sarah.pdf</p>
-            <p className="text-[9px] text-gray-400">287 KB · 1 page</p>
+            <p className="text-[10px] font-semibold text-foreground">merit-record-sarah.pdf</p>
+            <p className="text-[9px] text-muted-foreground">287 KB · 1 page</p>
           </div>
         </div>
-        <div className="border-t border-gray-100 px-4 py-3 space-y-2">
-          <p className="text-[9px] text-gray-400 font-medium">SHARE TO</p>
+        <div className="border-t border-border px-4 py-3 space-y-2">
+          <p className="text-[9px] text-muted-foreground font-medium">SHARE TO</p>
           {[
             { icon: '📧', label: 'Email to Ms. Thompson', sub: 'School counsellor' },
             { icon: '📋', label: 'Copy PDF link', sub: 'Shareable URL' },
@@ -461,13 +461,13 @@ function SharingPDF() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.3 + i * 0.2 }}
               className={`flex items-center gap-3 p-2.5 rounded-xl ${
-                i === 0 ? 'bg-blue-50 border border-blue-100' : 'bg-gray-50'
+                i === 0 ? 'bg-blue-50 border border-blue-100' : 'bg-muted'
               }`}
             >
               <span className="text-lg">{item.icon}</span>
               <div>
-                <p className="text-[10px] font-semibold text-gray-900">{item.label}</p>
-                <p className="text-[9px] text-gray-400">{item.sub}</p>
+                <p className="text-[10px] font-semibold text-foreground">{item.label}</p>
+                <p className="text-[9px] text-muted-foreground">{item.sub}</p>
               </div>
             </motion.div>
           ))}
@@ -479,9 +479,9 @@ function SharingPDF() {
 
 function CounsellorEmail() {
   return (
-    <div className="h-full bg-gray-50 flex flex-col">
-      <div className="px-4 pt-3 pb-2 bg-white border-b border-gray-100">
-        <p className="text-xs font-semibold text-gray-900">Mail</p>
+    <div className="h-full bg-muted flex flex-col">
+      <div className="px-4 pt-3 pb-2 bg-card border-b border-border">
+        <p className="text-xs font-semibold text-foreground">Mail</p>
       </div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -489,20 +489,20 @@ function CounsellorEmail() {
         transition={{ delay: 0.6, type: 'spring' }}
         className="mx-3 mt-4"
       >
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-2 mb-3 pb-3 border-b border-gray-100">
+        <div className="bg-card rounded-2xl p-4 shadow-sm border border-border">
+          <div className="flex items-center gap-2 mb-3 pb-3 border-b border-border">
             <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-[10px] font-bold">
               SK
             </div>
             <div>
-              <p className="text-[10px] font-semibold text-gray-900">Sarah Kim</p>
-              <p className="text-[9px] text-gray-400">To: ms.thompson@school.ca</p>
+              <p className="text-[10px] font-semibold text-foreground">Sarah Kim</p>
+              <p className="text-[9px] text-muted-foreground">To: ms.thompson@school.ca</p>
             </div>
           </div>
-          <p className="text-[10px] font-semibold text-gray-900 mb-1">
+          <p className="text-[10px] font-semibold text-foreground mb-1">
             My verified service hours — Merit PDF
           </p>
-          <p className="text-[9px] text-gray-500 leading-relaxed">
+          <p className="text-[9px] text-muted-foreground leading-relaxed">
             Hi Ms. Thompson, please find my verified volunteer hour record attached.
             All 15 hours are supervisor-verified and include a QR code for independent
             verification.
@@ -510,10 +510,10 @@ function CounsellorEmail() {
           <div className="mt-3 flex items-center gap-2 bg-red-50 rounded-xl p-2.5 border border-red-100">
             <FileText className="w-4 h-4 text-red-500 shrink-0" />
             <div>
-              <p className="text-[9px] font-semibold text-gray-800">
+              <p className="text-[9px] font-semibold text-foreground">
                 merit-record-sarah.pdf
               </p>
-              <p className="text-[8px] text-gray-400">287 KB · Verified ✓</p>
+              <p className="text-[8px] text-muted-foreground">287 KB · Verified ✓</p>
             </div>
           </div>
         </div>
@@ -611,18 +611,18 @@ export function ProductDemo() {
   const step = steps[currentStep];
 
   return (
-    <section className="py-24 overflow-hidden bg-gray-950">
+    <section className="py-24 overflow-hidden bg-background">
       <div className="max-w-6xl mx-auto px-6">
 
         {/* Section header */}
         <div className="text-center mb-16">
-          <p className="text-xs font-semibold tracking-widest text-gray-500 uppercase mb-4">
+          <p className="text-xs font-semibold tracking-widest text-muted-foreground uppercase mb-4">
             See it in action
           </p>
           <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight">
             From zero to verified
             <br />
-            <span className="text-gray-400">in under two minutes.</span>
+            <span className="text-muted-foreground">in under two minutes.</span>
           </h2>
         </div>
 
@@ -637,8 +637,8 @@ export function ProductDemo() {
               }}
               className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-300 ${
                 currentStep === i
-                  ? 'bg-white text-gray-900 shadow-lg'
-                  : 'text-gray-500 hover:text-gray-300'
+                  ? 'bg-card text-foreground shadow-lg'
+                  : 'text-muted-foreground hover:text-muted-foreground'
               }`}
             >
               {i + 1}. {s.label}
@@ -655,7 +655,7 @@ export function ProductDemo() {
           {/* Left phone — always visible */}
           <div className="relative">
             <div className="text-center mb-4">
-              <span className="text-[10px] text-gray-500 font-medium tracking-widest uppercase">
+              <span className="text-[10px] text-muted-foreground font-medium tracking-widest uppercase">
                 Student
               </span>
             </div>
@@ -690,7 +690,7 @@ export function ProductDemo() {
           {/* Right phone — desktop only */}
           <div className="hidden md:block relative">
             <div className="text-center mb-4">
-              <span className="text-[10px] text-gray-500 font-medium tracking-widest uppercase">
+              <span className="text-[10px] text-muted-foreground font-medium tracking-widest uppercase">
                 {currentStep >= 5 ? 'PDF record' : 'Supervisor'}
               </span>
             </div>
@@ -720,15 +720,15 @@ export function ProductDemo() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.3 }}
-              className="text-gray-400 text-sm text-center max-w-md px-4"
+              className="text-muted-foreground text-sm text-center max-w-md px-4"
             >
               {step.caption}
             </motion.p>
           </AnimatePresence>
 
-          <div className="w-64 h-px bg-gray-800 rounded-full overflow-hidden">
+          <div className="w-64 h-px bg-muted rounded-full overflow-hidden">
             <motion.div
-              className="h-full bg-white rounded-full"
+              className="h-full bg-card rounded-full"
               style={{ width: `${progress * 100}%` }}
             />
           </div>
@@ -744,14 +744,14 @@ export function ProductDemo() {
                 aria-label={`Go to step ${i + 1}`}
                 className={`rounded-full transition-all duration-300 ${
                   currentStep === i
-                    ? 'w-6 h-1.5 bg-white'
-                    : 'w-1.5 h-1.5 bg-gray-700 hover:bg-gray-500'
+                    ? 'w-6 h-1.5 bg-card'
+                    : 'w-1.5 h-1.5 bg-muted hover:bg-gray-500'
                 }`}
               />
             ))}
           </div>
 
-          <p className="text-[10px] text-gray-600">
+          <p className="text-[10px] text-muted-foreground">
             Hover to pause · Click any step to jump
           </p>
         </div>

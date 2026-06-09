@@ -16,8 +16,8 @@ const CATEGORIES = [
 ];
 
 const input =
-  'w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-3 text-sm placeholder-gray-600 focus:outline-none focus:border-white transition-colors';
-const label = 'block text-sm font-medium text-gray-300 mb-1.5';
+  'w-full bg-muted border border-border text-foreground rounded-xl px-4 py-3 text-sm placeholder-gray-600 focus:outline-none focus:border-ring transition-colors';
+const label = 'block text-sm font-medium text-muted-foreground mb-1.5';
 
 type AuthMode = 'new' | 'existing';
 
@@ -151,40 +151,40 @@ export default function OrgCreatePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 flex flex-col items-center py-12 px-6">
+    <div className="min-h-screen bg-background flex flex-col items-center py-12 px-6">
       <div className="mb-8 text-center">
-        <a href="/org" className="text-2xl font-bold text-white">merit.</a>
-        <p className="text-gray-500 text-sm mt-1">Create your organization</p>
+        <a href="/org" className="text-2xl font-bold text-foreground">merit.</a>
+        <p className="text-muted-foreground text-sm mt-1">Create your organization</p>
       </div>
 
       <form onSubmit={handleSubmit} className="w-full max-w-md space-y-6">
         {error && (
           <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3">
-            <p className="text-sm text-red-400">{error}</p>
+            <p className="text-sm text-danger">{error}</p>
           </div>
         )}
 
         {/* Account */}
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-4">
-          <h2 className="text-white font-semibold text-sm">Your account</h2>
+        <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
+          <h2 className="text-foreground font-semibold text-sm">Your account</h2>
 
           {loggedIn ? (
-            <div className="flex items-center justify-between gap-3 bg-gray-800/60 border border-gray-700 rounded-xl px-4 py-3">
+            <div className="flex items-center justify-between gap-3 bg-muted/60 border border-border rounded-xl px-4 py-3">
               <div className="min-w-0">
-                <p className="text-gray-300 text-xs">Creating as</p>
-                <p className="text-white text-sm font-medium truncate">{user?.email}</p>
+                <p className="text-muted-foreground text-xs">Creating as</p>
+                <p className="text-foreground text-sm font-medium truncate">{user?.email}</p>
               </div>
-              <button type="button" onClick={() => logoutStore()} className="text-xs text-gray-400 hover:text-white shrink-0">
+              <button type="button" onClick={() => logoutStore()} className="text-xs text-muted-foreground hover:text-foreground shrink-0">
                 Use a different account
               </button>
             </div>
           ) : (
             <>
               {/* mode toggle */}
-              <div className="flex gap-1 p-1 bg-gray-800 rounded-xl">
+              <div className="flex gap-1 p-1 bg-muted rounded-xl">
                 {([['new', 'Create new account'], ['existing', 'Use existing account']] as const).map(([m, lbl]) => (
                   <button key={m} type="button" onClick={() => { setMode(m); setError(null); }}
-                    className={`flex-1 py-2 rounded-lg text-xs font-medium transition-colors ${mode === m ? 'bg-white text-gray-900' : 'text-gray-400 hover:text-white'}`}>
+                    className={`flex-1 py-2 rounded-lg text-xs font-medium transition-colors ${mode === m ? 'bg-foreground text-background' : 'text-muted-foreground hover:text-foreground'}`}>
                     {lbl}
                   </button>
                 ))}
@@ -199,29 +199,29 @@ export default function OrgCreatePage() {
                 <div className="relative">
                   <input type={showPw ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)}
                     placeholder={mode === 'new' ? 'At least 8 characters' : 'Your password'} className={`${input} pr-10`} required />
-                  <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300">
+                  <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground">
                     {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
-                {pwTooShort && <p className="text-xs text-red-400 mt-1">Must be at least 8 characters</p>}
+                {pwTooShort && <p className="text-xs text-danger mt-1">Must be at least 8 characters</p>}
               </div>
               {mode === 'new' && (
                 <div>
                   <label className={label}>Confirm password</label>
                   <input type={showPw ? 'text' : 'password'} value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder="Re-enter password" className={input} required />
-                  {mismatch && <p className="text-xs text-red-400 mt-1">Passwords don&apos;t match</p>}
+                  {mismatch && <p className="text-xs text-danger mt-1">Passwords don&apos;t match</p>}
                 </div>
               )}
               {mode === 'new' && (
-                <p className="text-gray-500 text-xs">This Merit login works for the org and (optionally) the student side.</p>
+                <p className="text-muted-foreground text-xs">This Merit login works for the org and (optionally) the student side.</p>
               )}
             </>
           )}
         </div>
 
         {/* Organization */}
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-4">
-          <h2 className="text-white font-semibold text-sm">Organization details</h2>
+        <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
+          <h2 className="text-foreground font-semibold text-sm">Organization details</h2>
           <div>
             <label className={label}>Organization name</label>
             <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Vancouver Rotary Foundation" className={input} required />
@@ -239,7 +239,7 @@ export default function OrgCreatePage() {
             </div>
           </div>
 
-          <button type="button" onClick={() => setShowMore(!showMore)} className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white transition-colors">
+          <button type="button" onClick={() => setShowMore(!showMore)} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
             <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showMore ? 'rotate-180' : ''}`} />
             {showMore ? 'Hide optional details' : 'Add more details (optional — set up later)'}
           </button>
@@ -264,23 +264,23 @@ export default function OrgCreatePage() {
         </div>
 
         {/* Admins */}
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-3">
-          <h2 className="text-white font-semibold text-sm">Invite admins <span className="text-gray-500 font-normal">(optional)</span></h2>
-          <p className="text-gray-500 text-xs -mt-1">They&apos;ll get an email invite. New users are prompted to create a Merit account.</p>
+        <div className="bg-card border border-border rounded-2xl p-6 space-y-3">
+          <h2 className="text-foreground font-semibold text-sm">Invite admins <span className="text-muted-foreground font-normal">(optional)</span></h2>
+          <p className="text-muted-foreground text-xs -mt-1">They&apos;ll get an email invite. New users are prompted to create a Merit account.</p>
           <div className="flex gap-2">
             <input type="email" value={adminInput} onChange={(e) => setAdminInput(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addAdmin(); } }}
               placeholder="admin@organization.org" className={`${input} flex-1`} />
-            <button type="button" onClick={addAdmin} className="px-3 rounded-xl bg-gray-800 text-white hover:bg-gray-700 transition-colors">
+            <button type="button" onClick={addAdmin} className="px-3 rounded-xl bg-muted text-foreground hover:bg-muted transition-colors">
               <Plus className="w-4 h-4" />
             </button>
           </div>
           {adminEmails.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {adminEmails.map((e) => (
-                <span key={e} className="flex items-center gap-1.5 text-xs bg-gray-800 text-gray-300 px-2.5 py-1 rounded-lg">
+                <span key={e} className="flex items-center gap-1.5 text-xs bg-muted text-muted-foreground px-2.5 py-1 rounded-lg">
                   {e}
-                  <button type="button" onClick={() => setAdminEmails((a) => a.filter((x) => x !== e))} className="text-gray-500 hover:text-red-400">
+                  <button type="button" onClick={() => setAdminEmails((a) => a.filter((x) => x !== e))} className="text-muted-foreground hover:text-danger">
                     <X className="w-3 h-3" />
                   </button>
                 </span>
@@ -290,15 +290,15 @@ export default function OrgCreatePage() {
         </div>
 
         <button type="submit" disabled={!canSubmit}
-          className="w-full bg-white text-gray-900 font-semibold py-3 rounded-xl text-sm hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2">
+          className="w-full bg-foreground text-background font-semibold py-3 rounded-xl text-sm hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2">
           {loading && <Loader2 className="w-4 h-4 animate-spin" />}
           {loading ? 'Creating…' : 'Create organization'}
         </button>
 
         {!loggedIn && (
-          <p className="text-center text-sm text-gray-500">
+          <p className="text-center text-sm text-muted-foreground">
             Just want to sign in?{' '}
-            <Link href="/org/login" className="text-gray-300 hover:text-white">Org login</Link>
+            <Link href="/org/login" className="text-muted-foreground hover:text-foreground">Org login</Link>
           </p>
         )}
       </form>

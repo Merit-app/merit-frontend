@@ -43,7 +43,7 @@ export function MarketingNavbar() {
     <nav
       data-tab={activeSection}
       className="sticky top-0 z-50 backdrop-blur-xl transition-colors duration-500 border-b
-        bg-white/70 border-gray-200/60
+        bg-card/70 border-border/60
         data-[tab=organizations]:bg-black/70 data-[tab=organizations]:border-white/10"
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-2 sm:gap-4">
@@ -52,7 +52,7 @@ export function MarketingNavbar() {
           href="/"
           data-tab={activeSection}
           className="font-bold text-xl transition-colors duration-500
-            text-gray-900 data-[tab=organizations]:text-white"
+            text-foreground data-[tab=organizations]:text-white"
         >
           merit.
         </Link>
@@ -61,7 +61,7 @@ export function MarketingNavbar() {
         <div
           data-tab={activeSection}
           className="relative flex items-center p-1 rounded-full transition-colors duration-500
-            bg-gray-100 data-[tab=organizations]:bg-white/10"
+            bg-muted data-[tab=organizations]:bg-card/10"
         >
           {(['students', 'organizations'] as Section[]).map((t) => {
             const active = activeSection === t;
@@ -75,7 +75,7 @@ export function MarketingNavbar() {
                   className={`relative z-10 transition-colors duration-300 ${
                     active
                       ? isDark ? 'text-black' : 'text-white'
-                      : isDark ? 'text-gray-400' : 'text-gray-600'
+                      : isDark ? 'text-muted-foreground' : 'text-muted-foreground'
                   }`}
                 >
                   {t === 'students' ? 'For students' : 'For organizations'}
@@ -83,7 +83,7 @@ export function MarketingNavbar() {
                 {active && (
                   <motion.div
                     layoutId="tab-indicator"
-                    className={`absolute inset-0 rounded-full ${isDark ? 'bg-white' : 'bg-black'}`}
+                    className={`absolute inset-0 rounded-full ${isDark ? 'bg-card' : 'bg-black'}`}
                     transition={
                       reducedMotion
                         ? { duration: 0 }
@@ -101,13 +101,13 @@ export function MarketingNavbar() {
           <div className="flex items-center gap-3">
             <Link
               href="/login"
-              className="hidden sm:inline text-sm text-gray-600 hover:text-black transition-colors"
+              className="hidden sm:inline text-sm text-muted-foreground hover:text-black transition-colors"
             >
               Sign in
             </Link>
             <Link
               href="/signup"
-              className="bg-black text-white text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 rounded-full hover:bg-gray-800 transition-colors whitespace-nowrap"
+              className="bg-black text-white text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 rounded-full hover:bg-muted transition-colors whitespace-nowrap"
             >
               Get started
             </Link>
@@ -116,15 +116,16 @@ export function MarketingNavbar() {
           <div className="flex items-center gap-3">
             <Link
               href="/org/login"
-              className="hidden sm:inline text-sm text-gray-400 hover:text-white transition-colors"
+              className="hidden sm:inline text-sm text-muted-foreground hover:text-white transition-colors"
             >
               Sign in
             </Link>
             <Link
               href="/org/create"
-              className="bg-white text-black text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 rounded-full hover:bg-gray-200 transition-colors whitespace-nowrap"
+              className="bg-card text-black text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 rounded-full hover:bg-muted transition-colors whitespace-nowrap"
             >
-              Create your organization
+              <span className="sm:hidden">Get started</span>
+              <span className="hidden sm:inline">Create your organization</span>
             </Link>
           </div>
         )}

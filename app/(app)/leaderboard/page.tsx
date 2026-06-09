@@ -20,9 +20,10 @@ const TYPE_OPTIONS: {
   icon: React.ElementType
   needsUser?: boolean
   needsSchool?: boolean
+  needsCity?: boolean
 }[] = [
   { value: 'global', label: 'Global', icon: Globe },
-  { value: 'local', label: 'Local', icon: MapPin, needsUser: true },
+  { value: 'local', label: 'Local', icon: MapPin, needsUser: true, needsCity: true },
   { value: 'school', label: 'School', icon: GraduationCap, needsSchool: true },
   { value: 'personal', label: 'My Stats', icon: User, needsUser: true },
   { value: 'groups', label: 'Groups', icon: Users, needsUser: true },
@@ -34,7 +35,7 @@ const PERIOD_OPTIONS: { value: LeaderboardPeriod; label: string }[] = [
   { value: 'week', label: 'This week' },
 ]
 
-const MIN_THRESHOLD = 3
+const MIN_THRESHOLD = 10
 
 // ── Group modals ──────────────────────────────────────────────────────────────
 
@@ -226,16 +227,18 @@ export default function LeaderboardPage() {
 
   // Determine school/city scope for scoped leaderboards
   const school = type === 'school' ? (user?.school ?? undefined) : undefined
+  const city   = type === 'local'  ? (user?.city  ?? undefined) : undefined
 
   // Main leaderboard query
   const { data: lbData, isLoading: lbLoading } = useQuery({
-    queryKey: queryKeys.leaderboard(type as LeaderboardType, period, school),
+    queryKey: queryKeys.leaderboard(type as LeaderboardType, period, school, city),
     queryFn: async () => {
       if (type === 'personal' || type === 'groups') return null
       const res = await leaderboardApi.get({
         type: type as LeaderboardType,
         period,
         school,
+        city,
         limit: 50,
       })
       return res.data
@@ -311,7 +314,8 @@ export default function LeaderboardPage() {
         {TYPE_OPTIONS.map((opt) => {
           const disabled =
             (opt.needsUser && !user) ||
-            (opt.needsSchool && !user?.school)
+            (opt.needsSchool && !user?.school) ||
+            (opt.needsCity && !user?.city)
 
           return (
             <button
@@ -368,6 +372,19 @@ export default function LeaderboardPage() {
               Settings → Profile
             </a>{' '}
             to see your school leaderboard.
+          </p>
+        </div>
+      )}
+
+      {/* City missing notice */}
+      {type === 'local' && !user?.city && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+          <p className="text-sm text-amber-800">
+            Add your city in{' '}
+            <a href="/settings/profile" className="underline font-medium">
+              Settings → Profile
+            </a>{' '}
+            to see your local leaderboard.
           </p>
         </div>
       )}
@@ -517,7 +534,7 @@ export default function LeaderboardPage() {
                   <p className="text-xs text-amber-700">
                     Share the invite code to get more people in the group!
                   </p>
-                  <div className="rounded-xl border-2 border-amber-300 bg-white px-4 py-2 flex items-center gap-2">
+                  <div className="rounded-xl border-2 border-amber-300 bg-card px-4 py-2 flex items-center gap-2">
                     <span className="flex-1 font-mono font-bold tracking-widest text-amber-900">
                       {groupsData?.groups?.find((g: any) => g.id === activeGroupId)?.code}
                     </span>
