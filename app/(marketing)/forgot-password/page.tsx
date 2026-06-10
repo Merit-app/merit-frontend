@@ -132,14 +132,16 @@ export default function ForgotPasswordPage() {
           )}
         </div>
 
-        <p className="mt-5 text-center text-small text-ink-500">
-          <Link
-            href="/login"
-            className="text-merit-blue-600 hover:text-merit-blue-700 font-medium transition-colors"
-          >
-            Back to sign in
-          </Link>
-        </p>
+        {!sent && (
+          <p className="mt-5 text-center text-small text-ink-500">
+            <Link
+              href="/login"
+              className="text-merit-blue-600 hover:text-merit-blue-700 font-medium transition-colors"
+            >
+              Back to sign in
+            </Link>
+          </p>
+        )}
       </div>
     </div>
   );
