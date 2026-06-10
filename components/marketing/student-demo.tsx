@@ -63,9 +63,9 @@ export function StudentDemo() {
             </p>
             <div className="h-0.5 bg-muted rounded-full overflow-hidden">
               {i < step ? (
-                <div className="h-full w-full bg-card" />
+                <div className="h-full w-full bg-foreground/30" />
               ) : i === step ? (
-                <motion.div className="h-full bg-card origin-left" style={{ scaleX: progress }} />
+                <motion.div className="h-full bg-merit-blue-600 origin-left" style={{ scaleX: progress }} />
               ) : null}
             </div>
           </button>
@@ -73,9 +73,11 @@ export function StudentDemo() {
       </div>
 
       {/* Two phones */}
-      <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-10 lg:gap-16">
+      <div className="relative flex flex-col md:flex-row items-center justify-center gap-8 md:gap-10 lg:gap-16">
+        {/* Ambient glow behind the phones */}
+        <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[420px] w-[90%] max-w-3xl -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-tr from-merit-blue-500/10 via-violet-500/[0.07] to-cyan-400/10 blur-3xl" />
         {/* Student phone */}
-        <div className="relative flex flex-col items-center">
+        <div className="relative flex flex-col items-center md:-rotate-1 transition-transform duration-300 hover:rotate-0">
           <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-4">Student</p>
           <Phone>
             <AnimatePresence mode="wait">
@@ -101,7 +103,7 @@ export function StudentDemo() {
         </div>
 
         {/* Supervisor phone — hidden on mobile, shown md+ */}
-        <div className="hidden md:flex flex-col items-center">
+        <div className="hidden md:flex flex-col items-center md:rotate-1 transition-transform duration-300 hover:rotate-0">
           <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-4">Supervisor</p>
           <Phone>
             <AnimatePresence mode="wait">
@@ -198,7 +200,7 @@ function SLogScreen() {
           <InputRow label="Organization">Vancouver Food Bank</InputRow>
           <InputRow label="Activity">
             <span>{typed}</span>
-            {typed.length < full.length && <span className="inline-block w-0.5 h-3.5 bg-card ml-0.5 animate-pulse" />}
+            {typed.length < full.length && <span className="inline-block w-0.5 h-3.5 bg-foreground ml-0.5 animate-pulse" />}
           </InputRow>
           <div className="grid grid-cols-2 gap-2">
             <InputRow label="Date">Today</InputRow>
@@ -206,7 +208,7 @@ function SLogScreen() {
           </div>
           <InputRow label="Supervisor phone"><span className="text-muted-foreground text-sm">+1 (604) 555-0147</span></InputRow>
         </div>
-        <motion.button initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ ...SPB, delay: 0.9 }} className="w-full bg-card text-white font-semibold py-3 rounded-xl text-sm flex items-center justify-center gap-2">
+        <motion.button initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ ...SPB, delay: 0.9 }} className="w-full bg-merit-blue-600 text-white font-semibold py-3 rounded-xl text-sm flex items-center justify-center gap-2 shadow-md shadow-merit-blue-600/25">
           <Sparkles className="w-3.5 h-3.5" />
           Submit for verification
         </motion.button>
@@ -444,7 +446,13 @@ function SupDoneScreen() {
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function ScreenFade({ children }: { children: React.ReactNode }) {
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }} className="h-full">
+    <motion.div
+      initial={{ opacity: 0, y: 10, scale: 0.99 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -8, scale: 0.99 }}
+      transition={{ duration: 0.3, ease: APPLE }}
+      className="h-full"
+    >
       {children}
     </motion.div>
   );

@@ -64,7 +64,7 @@ export function OrgSection() {
         <div className="text-center max-w-3xl mx-auto mb-20">
           <motion.div
             variants={item}
-            className="inline-flex items-center gap-2 bg-card/5 border border-white/10 text-muted-foreground text-xs font-medium px-3 py-1.5 rounded-full mb-8"
+            className="inline-flex items-center gap-2 bg-white/5 border border-white/10 text-zinc-400 text-xs font-medium px-3 py-1.5 rounded-full mb-8"
           >
             <Building2 className="w-3.5 h-3.5" />
             Merit for organizations
@@ -76,12 +76,12 @@ export function OrgSection() {
           >
             Your volunteer program,
             <br />
-            <span className="text-muted-foreground">finally organized.</span>
+            <span className="text-zinc-400">finally organized.</span>
           </motion.h2>
 
           <motion.p
             variants={item}
-            className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed mb-10"
+            className="text-xl text-zinc-400 max-w-2xl mx-auto leading-relaxed mb-10"
           >
             Manage volunteers, run events, send announcements, and generate grant reports — all
             from one dashboard. Students log hours themselves. You just verify.
@@ -90,14 +90,14 @@ export function OrgSection() {
           <motion.div variants={item} className="flex items-center justify-center gap-3 flex-wrap">
             <Link
               href="/org/login"
-              className="bg-card text-foreground font-semibold px-7 py-3.5 rounded-full hover:bg-muted transition-colors flex items-center gap-2 shadow-sm"
+              className="bg-white text-zinc-900 font-semibold px-7 py-3.5 rounded-full hover:bg-zinc-200 transition-colors flex items-center gap-2 shadow-sm"
             >
               Sign in to your organization
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
               href="/org"
-              className="text-muted-foreground font-medium px-7 py-3.5 rounded-full hover:bg-card/5 transition-colors"
+              className="text-zinc-400 font-medium px-7 py-3.5 rounded-full hover:bg-white/5 transition-colors"
             >
               Learn more
             </Link>
@@ -121,13 +121,13 @@ export function OrgSection() {
               className="bg-[#131313] border border-white/5 rounded-2xl p-6 hover:border-white/10 transition-colors"
             >
               <div className="flex items-center gap-3 mb-4">
-                <span className="text-muted-foreground font-mono font-bold text-sm">{s.step}</span>
+                <span className="text-zinc-400 font-mono font-bold text-sm">{s.step}</span>
                 <div className={`w-8 h-8 rounded-xl ${s.bg} flex items-center justify-center`}>
                   <s.icon className={`w-4 h-4 ${s.color}`} />
                 </div>
               </div>
               <p className="font-bold text-white text-lg mb-2">{s.title}</p>
-              <p className="text-muted-foreground text-sm leading-relaxed">{s.desc}</p>
+              <p className="text-zinc-400 text-sm leading-relaxed">{s.desc}</p>
             </motion.div>
           ))}
         </motion.div>
@@ -141,19 +141,19 @@ export function OrgSection() {
         {/* Cross-promo: explain to students seeing the page */}
         <motion.div
           variants={item}
-          className="mt-32 bg-card/5 border border-white/10 rounded-2xl p-8 text-center max-w-2xl mx-auto"
+          className="mt-32 bg-white/5 border border-white/10 rounded-2xl p-8 text-center max-w-2xl mx-auto"
         >
-          <p className="text-muted-foreground text-sm mb-1">Already using Merit as a student?</p>
+          <p className="text-zinc-400 text-sm mb-1">Already using Merit as a student?</p>
           <p className="text-white font-semibold text-lg mb-2">
             This is what your supervisors see.
           </p>
-          <p className="text-muted-foreground text-sm mb-6">
+          <p className="text-zinc-400 text-sm mb-6">
             When you submit a session, it appears in your organization&apos;s dashboard. One tap from
             them and you&apos;re verified.
           </p>
           <Link
             href="/signup"
-            className="text-sm text-white font-medium underline hover:text-muted-foreground transition-colors"
+            className="text-sm text-white font-medium underline hover:text-zinc-400 transition-colors"
           >
             Start tracking your hours →
           </Link>
@@ -164,20 +164,20 @@ export function OrgSection() {
           <h3 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Ready to organize your volunteer program?
           </h3>
-          <p className="text-muted-foreground mb-8">
+          <p className="text-zinc-400 mb-8">
             Claim your org page in 2 minutes. Free for nonprofits.
           </p>
           <div className="flex items-center justify-center gap-4 flex-wrap">
             <Link
               href="/org/login"
-              className="inline-flex items-center gap-2 bg-card text-black font-semibold px-8 py-4 rounded-full hover:bg-muted transition-colors shadow-lg"
+              className="inline-flex items-center gap-2 bg-white text-zinc-900 font-semibold px-8 py-4 rounded-full hover:bg-zinc-200 transition-colors shadow-lg"
             >
               Sign in to your org
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
               href="/organizations"
-              className="text-muted-foreground hover:text-white text-sm transition-colors"
+              className="text-zinc-400 hover:text-white text-sm transition-colors"
             >
               Browse organizations
             </Link>

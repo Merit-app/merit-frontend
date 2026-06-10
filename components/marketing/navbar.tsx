@@ -4,7 +4,13 @@ import { useState, useEffect } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import Link from 'next/link';
 
-type Section = 'students' | 'organizations';
+type Section = 'students' | 'organizations' | 'schools';
+
+const TABS: { id: Section; label: string; short: string }[] = [
+  { id: 'students', label: 'For students', short: 'Students' },
+  { id: 'organizations', label: 'For organizations', short: 'Orgs' },
+  { id: 'schools', label: 'For schools', short: 'Schools' },
+];
 
 export function MarketingNavbar() {
   const [activeSection, setActiveSection] = useState<Section>('students');
@@ -24,10 +30,10 @@ export function MarketingNavbar() {
       { threshold: 0, rootMargin: '-35% 0px -55% 0px' },
     );
 
-    const studentEl = document.getElementById('students');
-    const orgEl = document.getElementById('organizations');
-    if (studentEl) observer.observe(studentEl);
-    if (orgEl) observer.observe(orgEl);
+    for (const tab of TABS) {
+      const el = document.getElementById(tab.id);
+      if (el) observer.observe(el);
+    }
 
     return () => observer.disconnect();
   }, []);
@@ -43,7 +49,7 @@ export function MarketingNavbar() {
     <nav
       data-tab={activeSection}
       className="sticky top-0 z-50 backdrop-blur-xl transition-colors duration-500 border-b
-        bg-card/70 border-border/60
+        bg-background/70 border-border/60
         data-[tab=organizations]:bg-black/70 data-[tab=organizations]:border-white/10"
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-2 sm:gap-4">
@@ -61,29 +67,30 @@ export function MarketingNavbar() {
         <div
           data-tab={activeSection}
           className="relative flex items-center p-1 rounded-full transition-colors duration-500
-            bg-muted data-[tab=organizations]:bg-card/10"
+            bg-muted data-[tab=organizations]:bg-white/10"
         >
-          {(['students', 'organizations'] as Section[]).map((t) => {
-            const active = activeSection === t;
+          {TABS.map((t) => {
+            const active = activeSection === t.id;
             return (
               <button
-                key={t}
-                onClick={() => scrollTo(t)}
-                className="relative px-2.5 sm:px-4 md:px-5 py-1.5 text-xs sm:text-sm font-medium rounded-full z-10 whitespace-nowrap"
+                key={t.id}
+                onClick={() => scrollTo(t.id)}
+                className="relative px-2.5 sm:px-3.5 md:px-4 py-1.5 text-xs sm:text-sm font-medium rounded-full z-10 whitespace-nowrap"
               >
                 <span
                   className={`relative z-10 transition-colors duration-300 ${
                     active
-                      ? isDark ? 'text-black' : 'text-white'
-                      : isDark ? 'text-muted-foreground' : 'text-muted-foreground'
+                      ? isDark ? 'text-zinc-900' : 'text-background'
+                      : isDark ? 'text-zinc-400' : 'text-muted-foreground'
                   }`}
                 >
-                  {t === 'students' ? 'For students' : 'For organizations'}
+                  <span className="sm:hidden">{t.short}</span>
+                  <span className="hidden sm:inline">{t.label}</span>
                 </span>
                 {active && (
                   <motion.div
                     layoutId="tab-indicator"
-                    className={`absolute inset-0 rounded-full ${isDark ? 'bg-card' : 'bg-black'}`}
+                    className={`absolute inset-0 rounded-full ${isDark ? 'bg-white' : 'bg-foreground'}`}
                     transition={
                       reducedMotion
                         ? { duration: 0 }
@@ -97,36 +104,53 @@ export function MarketingNavbar() {
         </div>
 
         {/* Right CTA — morphs with active section */}
-        {activeSection === 'students' ? (
+        {activeSection === 'students' && (
           <div className="flex items-center gap-3">
             <Link
               href="/login"
-              className="hidden sm:inline text-sm text-muted-foreground hover:text-black transition-colors"
+              className="hidden sm:inline text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               Sign in
             </Link>
             <Link
               href="/signup"
-              className="bg-black text-white text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 rounded-full hover:bg-muted transition-colors whitespace-nowrap"
+              className="bg-merit-blue-600 text-white text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 rounded-full hover:bg-merit-blue-700 transition-colors whitespace-nowrap shadow-sm"
             >
               Get started
             </Link>
           </div>
-        ) : (
+        )}
+        {activeSection === 'organizations' && (
           <div className="flex items-center gap-3">
             <Link
               href="/org/login"
-              className="hidden sm:inline text-sm text-muted-foreground hover:text-white transition-colors"
+              className="hidden sm:inline text-sm text-zinc-400 hover:text-white transition-colors"
             >
               Sign in
             </Link>
             <Link
               href="/org/create"
-              className="bg-card text-black text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 rounded-full hover:bg-muted transition-colors whitespace-nowrap"
+              className="bg-white text-zinc-900 text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 rounded-full hover:bg-zinc-200 transition-colors whitespace-nowrap"
             >
               <span className="sm:hidden">Get started</span>
               <span className="hidden sm:inline">Create your organization</span>
             </Link>
+          </div>
+        )}
+        {activeSection === 'schools' && (
+          <div className="flex items-center gap-3">
+            <Link
+              href="/login?redirect=/chapter/overview"
+              className="hidden sm:inline text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              School sign in
+            </Link>
+            <button
+              onClick={() => scrollTo('schools')}
+              className="bg-merit-blue-600 text-white text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 rounded-full hover:bg-merit-blue-700 transition-colors whitespace-nowrap shadow-sm"
+            >
+              Get early access
+            </button>
           </div>
         )}
       </div>

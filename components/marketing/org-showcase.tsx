@@ -87,11 +87,11 @@ export function OrgShowcase() {
     <div className="relative w-full max-w-6xl mx-auto" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
       {/* Header */}
       <div className="text-center mb-16">
-        <p className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-3">For organizations</p>
+        <p className="text-sm font-semibold text-zinc-400 uppercase tracking-widest mb-3">For organizations</p>
         <h2 className="text-4xl md:text-5xl font-bold text-white leading-tight">
           Your entire volunteer operation.
           <br />
-          <span className="text-muted-foreground">One dashboard.</span>
+          <span className="text-zinc-400">One dashboard.</span>
         </h2>
       </div>
 
@@ -106,19 +106,19 @@ export function OrgShowcase() {
                 key={f.id}
                 onClick={() => setActive(i)}
                 className={`w-full text-left rounded-2xl p-4 transition-all duration-300 group ${
-                  isActive ? 'bg-card/10 border border-white/10' : 'hover:bg-card/5 border border-transparent'
+                  isActive ? 'bg-white/10 border border-white/10' : 'hover:bg-white/5 border border-transparent'
                 }`}
               >
                 <div className="flex items-start gap-3">
-                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors ${isActive ? 'bg-card' : 'bg-card/10'}`}>
-                    <f.icon className={`w-4 h-4 transition-colors ${isActive ? 'text-foreground' : 'text-muted-foreground'}`} />
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors ${isActive ? 'bg-white' : 'bg-white/10'}`}>
+                    <f.icon className={`w-4 h-4 transition-colors ${isActive ? 'text-zinc-900' : 'text-zinc-400'}`} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className={`font-semibold text-sm transition-colors ${isActive ? 'text-white' : 'text-muted-foreground'}`}>{f.label}</p>
+                    <p className={`font-semibold text-sm transition-colors ${isActive ? 'text-white' : 'text-zinc-400'}`}>{f.label}</p>
                     <AnimatePresence>
                       {isActive && (
                         <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.3, ease: APPLE }}>
-                          <p className="text-muted-foreground text-sm mt-1.5 leading-relaxed">{f.description}</p>
+                          <p className="text-zinc-400 text-sm mt-1.5 leading-relaxed">{f.description}</p>
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -126,10 +126,10 @@ export function OrgShowcase() {
                 </div>
 
                 {isActive && (
-                  <div className="mt-3 h-px bg-card/20 rounded-full overflow-hidden">
+                  <div className="mt-3 h-px bg-white/20 rounded-full overflow-hidden">
                     <motion.div
                       key={`${active}-progress`}
-                      className="h-full bg-card origin-left"
+                      className="h-full bg-white origin-left"
                       initial={{ scaleX: 0 }}
                       animate={{ scaleX: rm ? 0 : 1 }}
                       transition={{ duration: TAB_MS / 1000, ease: 'linear' }}
@@ -141,7 +141,7 @@ export function OrgShowcase() {
           })}
           {/* Mobile-only: show feature description below tabs (no laptop on small screens) */}
           <div className="lg:hidden mt-2 px-1">
-            <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
+            <p className="text-sm text-zinc-400 leading-relaxed">{feature.description}</p>
           </div>
         </div>
 
@@ -151,9 +151,9 @@ export function OrgShowcase() {
             <div className="absolute top-[3px] left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-gray-500" />
             <div className="w-full h-full rounded-lg bg-[#0A0A0A] overflow-hidden border border-border">
               <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/5 shrink-0 bg-[#111]">
-                <div className="w-6 h-6 rounded bg-card/10 flex items-center justify-center text-[9px] font-bold text-white">VR</div>
+                <div className="w-6 h-6 rounded bg-white/10 flex items-center justify-center text-[9px] font-bold text-white">VR</div>
                 <span className="text-white text-[11px] font-semibold">Vancouver Rotary Foundation</span>
-                <span className="ml-auto text-muted-foreground text-[9px]">Org Dashboard</span>
+                <span className="ml-auto text-zinc-400 text-[9px]">Org Dashboard</span>
               </div>
               <div className="p-4 h-full overflow-hidden">
                 <AnimatePresence mode="wait">
@@ -189,11 +189,11 @@ function VolunteerScreen() {
       <div className="flex items-center justify-between mb-4">
         <div>
           <p className="text-[11px] font-bold text-white">All volunteers</p>
-          <p className="text-[9px] text-muted-foreground">47 total · 38 active in last 90 days</p>
+          <p className="text-[9px] text-zinc-400">47 total · 38 active in last 90 days</p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="bg-card/5 rounded-lg px-2 py-1 text-[9px] text-muted-foreground">Search...</div>
-          <div className="bg-card/10 rounded-lg px-2 py-1 text-[9px] text-white font-medium">↓ Export CSV</div>
+          <div className="bg-white/5 rounded-lg px-2 py-1 text-[9px] text-zinc-400">Search...</div>
+          <div className="bg-white/10 rounded-lg px-2 py-1 text-[9px] text-white font-medium">↓ Export CSV</div>
         </div>
       </div>
 
@@ -201,30 +201,30 @@ function VolunteerScreen() {
         {[
           { v: '47', l: 'Volunteers', icon: Users, c: 'text-blue-400' },
           { v: '316h', l: 'Verified hrs', icon: Clock, c: 'text-green-400' },
-          { v: '90', l: 'Sessions', icon: CheckCircle2, c: 'text-muted-foreground' },
+          { v: '90', l: 'Sessions', icon: CheckCircle2, c: 'text-zinc-400' },
         ].map((s, i) => (
-          <motion.div key={s.l} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ ...SP, delay: 0.05 + i * 0.04 }} className="bg-card/5 rounded-xl p-3">
+          <motion.div key={s.l} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ ...SP, delay: 0.05 + i * 0.04 }} className="bg-white/5 rounded-xl p-3">
             <s.icon className={`w-3.5 h-3.5 ${s.c} mb-1`} />
             <p className="font-bold text-sm text-white">{s.v}</p>
-            <p className="text-[9px] text-muted-foreground">{s.l}</p>
+            <p className="text-[9px] text-zinc-400">{s.l}</p>
           </motion.div>
         ))}
       </div>
 
       <div className="space-y-1">
         {volunteers.map((v, i) => (
-          <motion.div key={v.name} initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} transition={{ ...SP, delay: 0.1 + i * 0.04 }} className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-card/5 transition-colors cursor-pointer">
-            <div className="w-6 h-6 rounded-full bg-card/10 flex items-center justify-center text-[9px] font-bold text-white shrink-0">{v.name[0]}</div>
+          <motion.div key={v.name} initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} transition={{ ...SP, delay: 0.1 + i * 0.04 }} className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-white/5 transition-colors cursor-pointer">
+            <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-[9px] font-bold text-white shrink-0">{v.name[0]}</div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5">
                 <p className="text-[11px] font-semibold text-white truncate">{v.name}</p>
                 {v.active && <span className="w-1.5 h-1.5 rounded-full bg-green-500 shrink-0" />}
               </div>
-              <p className="text-[9px] text-muted-foreground truncate">{v.school}</p>
+              <p className="text-[9px] text-zinc-400 truncate">{v.school}</p>
             </div>
             <div className="text-right shrink-0">
               <p className="text-[11px] font-bold text-white">{v.hrs}h</p>
-              <p className="text-[9px] text-muted-foreground">{v.sessions} sessions</p>
+              <p className="text-[9px] text-zinc-400">{v.sessions} sessions</p>
             </div>
           </motion.div>
         ))}
@@ -238,21 +238,21 @@ function EventScreen() {
     <div className="text-white">
       <div className="flex items-center justify-between mb-4">
         <p className="text-[11px] font-bold text-white">Events</p>
-        <motion.button initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={SPB} className="bg-card text-foreground text-[9px] font-bold px-3 py-1.5 rounded-lg flex items-center gap-1">
+        <motion.button initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={SPB} className="bg-white text-zinc-900 text-[9px] font-bold px-3 py-1.5 rounded-lg flex items-center gap-1">
           + Create event
         </motion.button>
       </div>
 
-      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ ...SP, delay: 0.1 }} className="bg-card/5 border border-white/10 rounded-xl p-4 mb-3">
-        <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wide mb-3">Saturday Food Bank Shift</p>
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ ...SP, delay: 0.1 }} className="bg-white/5 border border-white/10 rounded-xl p-4 mb-3">
+        <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-wide mb-3">Saturday Food Bank Shift</p>
         <div className="grid grid-cols-3 gap-2 mb-3">
           {[
             { l: 'Date', v: 'June 7' },
             { l: 'Time', v: '9am–12pm' },
             { l: 'Spots', v: '15' },
           ].map((f) => (
-            <div key={f.l} className="bg-card/5 rounded-lg p-2">
-              <p className="text-[8px] text-muted-foreground">{f.l}</p>
+            <div key={f.l} className="bg-white/5 rounded-lg p-2">
+              <p className="text-[8px] text-zinc-400">{f.l}</p>
               <p className="text-[11px] font-semibold text-white">{f.v}</p>
             </div>
           ))}
@@ -269,16 +269,16 @@ function EventScreen() {
           { name: 'Youth Mentorship Day', date: 'Jun 14', count: '8/20', status: 'published' },
           { name: 'Animal Shelter Visit', date: 'Jun 21', count: '3/10', status: 'draft' },
         ].map((e, i) => (
-          <motion.div key={e.name} initial={{ opacity: 0, x: -4 }} animate={{ opacity: 1, x: 0 }} transition={{ ...SP, delay: 0.2 + i * 0.06 }} className="flex items-center gap-3 bg-card/5 rounded-lg px-3 py-2">
-            <div className="w-8 h-8 rounded-lg bg-card/10 flex flex-col items-center justify-center shrink-0">
-              <span className="text-[7px] text-muted-foreground">{e.date.split(' ')[0]}</span>
+          <motion.div key={e.name} initial={{ opacity: 0, x: -4 }} animate={{ opacity: 1, x: 0 }} transition={{ ...SP, delay: 0.2 + i * 0.06 }} className="flex items-center gap-3 bg-white/5 rounded-lg px-3 py-2">
+            <div className="w-8 h-8 rounded-lg bg-white/10 flex flex-col items-center justify-center shrink-0">
+              <span className="text-[7px] text-zinc-400">{e.date.split(' ')[0]}</span>
               <span className="text-[11px] font-bold text-white">{e.date.split(' ')[1]}</span>
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-[11px] font-medium text-white truncate">{e.name}</p>
-              <p className="text-[9px] text-muted-foreground">{e.count} signed up</p>
+              <p className="text-[9px] text-zinc-400">{e.count} signed up</p>
             </div>
-            <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold shrink-0 ${e.status === 'published' ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-muted-foreground'}`}>{e.status}</span>
+            <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold shrink-0 ${e.status === 'published' ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-zinc-400'}`}>{e.status}</span>
           </motion.div>
         ))}
       </div>
@@ -302,24 +302,24 @@ function SMSScreen() {
           { v: '30d', l: 'Active 30 days', active: false },
           { v: 'event', l: 'This event', active: false },
         ].map((opt) => (
-          <span key={opt.v} className={`text-[10px] px-3 py-1.5 rounded-lg font-medium ${opt.active ? 'bg-card text-foreground' : 'bg-card/10 text-muted-foreground'}`}>{opt.l}</span>
+          <span key={opt.v} className={`text-[10px] px-3 py-1.5 rounded-lg font-medium ${opt.active ? 'bg-white text-zinc-900' : 'bg-white/10 text-zinc-400'}`}>{opt.l}</span>
         ))}
       </div>
 
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="bg-card/5 border border-white/10 rounded-xl p-3 mb-3">
-        <p className="text-[10px] text-muted-foreground mb-2">Message</p>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="bg-white/5 border border-white/10 rounded-xl p-3 mb-3">
+        <p className="text-[10px] text-zinc-400 mb-2">Message</p>
         <p className="text-[12px] text-white leading-relaxed">
           Reminder: our Saturday Food Bank shift is June 7th at 9am, 123 Main St. Looking forward to seeing you there! 🙌
         </p>
         <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/10">
-          <p className="text-[9px] text-muted-foreground">Sending to 47 volunteers via SMS</p>
-          <p className="text-[9px] text-muted-foreground">142 / 300 chars</p>
+          <p className="text-[9px] text-zinc-400">Sending to 47 volunteers via SMS</p>
+          <p className="text-[9px] text-zinc-400">142 / 300 chars</p>
         </div>
       </motion.div>
 
       <AnimatePresence mode="wait">
         {!sent ? (
-          <motion.button key="send" exit={{ opacity: 0, scale: 0.95 }} className="w-full bg-card text-foreground font-bold py-2.5 rounded-xl text-[12px] flex items-center justify-center gap-2">
+          <motion.button key="send" exit={{ opacity: 0, scale: 0.95 }} className="w-full bg-white text-zinc-900 font-bold py-2.5 rounded-xl text-[12px] flex items-center justify-center gap-2">
             <Send className="w-3.5 h-3.5" />
             Send to 47 volunteers
           </motion.button>
@@ -332,14 +332,14 @@ function SMSScreen() {
       </AnimatePresence>
 
       <div className="mt-4 space-y-1.5">
-        <p className="text-[9px] text-muted-foreground uppercase tracking-wide font-bold">Recent messages</p>
+        <p className="text-[9px] text-zinc-400 uppercase tracking-wide font-bold">Recent messages</p>
         {[
           { msg: 'Food bank shift reminder — tomorrow 9am', n: 47, ago: 'Just now' },
           { msg: 'Thank you for 300 hours of service this year!', n: 43, ago: '2 weeks ago' },
         ].map((m) => (
-          <div key={m.msg} className="bg-card/5 rounded-lg px-3 py-2">
+          <div key={m.msg} className="bg-white/5 rounded-lg px-3 py-2">
             <p className="text-[10px] text-white truncate">{m.msg}</p>
-            <p className="text-[8px] text-muted-foreground mt-0.5">{m.n} recipients · {m.ago}</p>
+            <p className="text-[8px] text-zinc-400 mt-0.5">{m.n} recipients · {m.ago}</p>
           </div>
         ))}
       </div>
@@ -358,12 +358,12 @@ function ReportScreen() {
     <div className="text-white">
       <p className="text-[11px] font-bold text-white mb-4">Grant impact report</p>
       <div className="grid grid-cols-2 gap-2 mb-4">
-        <div className="bg-card/5 rounded-lg p-2">
-          <p className="text-[8px] text-muted-foreground">FROM</p>
+        <div className="bg-white/5 rounded-lg p-2">
+          <p className="text-[8px] text-zinc-400">FROM</p>
           <p className="text-[11px] font-semibold">Jan 1, 2026</p>
         </div>
-        <div className="bg-card/5 rounded-lg p-2">
-          <p className="text-[8px] text-muted-foreground">TO</p>
+        <div className="bg-white/5 rounded-lg p-2">
+          <p className="text-[8px] text-zinc-400">TO</p>
           <p className="text-[11px] font-semibold">May 31, 2026</p>
         </div>
       </div>
@@ -372,14 +372,14 @@ function ReportScreen() {
         {!generated ? (
           <motion.div key="gen" exit={{ opacity: 0 }} className="flex flex-col items-center gap-3 py-4">
             <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }} className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white" />
-            <p className="text-[11px] text-muted-foreground">Generating report...</p>
+            <p className="text-[11px] text-zinc-400">Generating report...</p>
           </motion.div>
         ) : (
           <motion.div key="pdf" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={SP}>
-            <div className="bg-card rounded-xl p-4 mb-3 shadow-lg">
-              <p className="text-[7px] text-muted-foreground tracking-widest font-bold">MERIT · VOLUNTEER IMPACT REPORT</p>
-              <p className="text-[12px] font-bold text-foreground mt-1">Vancouver Rotary Foundation</p>
-              <p className="text-[9px] text-muted-foreground">January – May 2026</p>
+            <div className="bg-white rounded-xl p-4 mb-3 shadow-lg">
+              <p className="text-[7px] text-zinc-400 tracking-widest font-bold">MERIT · VOLUNTEER IMPACT REPORT</p>
+              <p className="text-[12px] font-bold text-zinc-900 mt-1">Vancouver Rotary Foundation</p>
+              <p className="text-[9px] text-zinc-400">January – May 2026</p>
               <div className="grid grid-cols-3 gap-2 mt-3 mb-3">
                 {[
                   { v: '47', l: 'Volunteers' },
@@ -387,8 +387,8 @@ function ReportScreen() {
                   { v: '3', l: 'Programs' },
                 ].map((s) => (
                   <div key={s.l} className="text-center bg-muted rounded-lg py-2">
-                    <p className="font-bold text-foreground text-sm">{s.v}</p>
-                    <p className="text-muted-foreground text-[8px]">{s.l}</p>
+                    <p className="font-bold text-zinc-900 text-sm">{s.v}</p>
+                    <p className="text-zinc-400 text-[8px]">{s.l}</p>
                   </div>
                 ))}
               </div>
@@ -399,7 +399,7 @@ function ReportScreen() {
                   { p: 'Animal Welfare', pct: 27, hrs: '86h' },
                 ].map((p) => (
                   <div key={p.p}>
-                    <div className="flex justify-between text-[8px] text-muted-foreground mb-0.5">
+                    <div className="flex justify-between text-[8px] text-zinc-400 mb-0.5">
                       <span>{p.p}</span>
                       <span className="font-bold">{p.hrs}</span>
                     </div>
@@ -410,7 +410,7 @@ function ReportScreen() {
                 ))}
               </div>
             </div>
-            <motion.button initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="w-full bg-card text-foreground font-bold py-2 rounded-lg text-[11px] flex items-center justify-center gap-1.5">
+            <motion.button initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="w-full bg-white text-zinc-900 font-bold py-2 rounded-lg text-[11px] flex items-center justify-center gap-1.5">
               <FileDown className="w-3.5 h-3.5" />
               Download PDF for grant submission
             </motion.button>
@@ -447,15 +447,15 @@ function CertScreen() {
     <div className="text-white">
       <div className="flex items-center justify-between mb-4">
         <p className="text-[11px] font-bold text-white">Volunteer certificates</p>
-        <p className="text-[9px] text-muted-foreground">47 ready to generate</p>
+        <p className="text-[9px] text-zinc-400">47 ready to generate</p>
       </div>
 
       <AnimatePresence>
         {generated.length > 0 && (
           <motion.div initial={{ opacity: 0, scale: 0.95, height: 0 }} animate={{ opacity: 1, scale: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} transition={SP} className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-3 mb-4 overflow-hidden">
             <p className="text-[8px] text-amber-700 font-bold uppercase tracking-widest text-center">Certificate of Recognition</p>
-            <p className="text-center font-bold text-foreground mt-1 text-[13px]">Sarah Kim</p>
-            <p className="text-center text-[9px] text-muted-foreground mt-0.5">28 verified hours · Vancouver Rotary Foundation</p>
+            <p className="text-center font-bold text-zinc-900 mt-1 text-[13px]">Sarah Kim</p>
+            <p className="text-center text-[9px] text-zinc-400 mt-0.5">28 verified hours · Vancouver Rotary Foundation</p>
             <div className="flex items-center justify-between mt-2 pt-2 border-t border-amber-200 text-[8px] text-amber-700">
               <span>Jane Smith · Coordinator</span>
               <span>June 2026</span>
@@ -469,11 +469,11 @@ function CertScreen() {
           const isGenerating = generating === v.name;
           const isDone = generated.includes(v.name);
           return (
-            <motion.div key={v.name} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ ...SP, delay: 0.05 + i * 0.04 }} className="flex items-center gap-3 bg-card/5 rounded-xl px-3 py-2.5">
-              <div className="w-7 h-7 rounded-full bg-card/10 flex items-center justify-center text-[10px] font-bold text-white shrink-0">{v.name[0]}</div>
+            <motion.div key={v.name} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ ...SP, delay: 0.05 + i * 0.04 }} className="flex items-center gap-3 bg-white/5 rounded-xl px-3 py-2.5">
+              <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-bold text-white shrink-0">{v.name[0]}</div>
               <div className="flex-1 min-w-0">
                 <p className="text-[11px] font-semibold text-white truncate">{v.name}</p>
-                <p className="text-[9px] text-muted-foreground">{v.hrs}h · {v.school}</p>
+                <p className="text-[9px] text-zinc-400">{v.hrs}h · {v.school}</p>
               </div>
               {isDone ? (
                 <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={SPB} className="text-[9px] text-green-400 font-bold flex items-center gap-1 shrink-0">
@@ -483,7 +483,7 @@ function CertScreen() {
               ) : isGenerating ? (
                 <motion.div animate={{ rotate: 360 }} transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }} className="w-4 h-4 rounded-full border-2 border-white/20 border-t-white shrink-0" />
               ) : (
-                <span className="text-[9px] px-2.5 py-1 rounded-lg bg-card/10 text-muted-foreground font-medium cursor-pointer hover:bg-card/20 hover:text-white transition-colors shrink-0">Generate</span>
+                <span className="text-[9px] px-2.5 py-1 rounded-lg bg-white/10 text-zinc-400 font-medium cursor-pointer hover:bg-white/20 hover:text-white transition-colors shrink-0">Generate</span>
               )}
             </motion.div>
           );
