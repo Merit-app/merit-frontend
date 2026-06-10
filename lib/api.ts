@@ -585,8 +585,36 @@ export const chapterApi = {
   setCohortGoal: (graduationYear: number, requiredHours: number) =>
     request<{ data: any }>('PUT', '/chapter/cohort-goals', { graduationYear, requiredHours }),
 
-  updateSettings: (body: { requiredHours?: number; requirementDeadline?: string | null; riskWindowDays?: number }) =>
+  updateSettings: (body: { requiredHours?: number; requirementDeadline?: string | null; riskWindowDays?: number; remindersEnabled?: boolean }) =>
     request<{ data: any }>('PATCH', '/chapter/settings', body),
+
+  sendAnnouncement: (body: { title: string; body: string; audience: string }) =>
+    request<{ data: { sent: number } }>('POST', '/chapter/announcements', body),
+
+  remindBehind: () =>
+    request<{ data: { sent: number } }>('POST', '/chapter/remind-behind'),
+
+  myChapter: () => request<{ data: any | null }>('GET', '/my-chapter'),
+};
+
+// ── Notifications (in-app inbox) ──
+export interface NotificationItem {
+  id: string;
+  type: string;
+  title: string;
+  body: string;
+  action_url: string | null;
+  read: boolean;
+  created_at: string;
+}
+
+export const notificationsApi = {
+  list: (page = 1, perPage = 20) =>
+    request<{ data: NotificationItem[]; meta: any }>('GET', `/notifications?page=${page}&perPage=${perPage}`),
+  unreadCount: () => request<{ data: { count: number } }>('GET', '/notifications/unread-count'),
+  markRead: (id: string) => request<{ data: any }>('PATCH', `/notifications/${id}/read`),
+  markAllRead: () => request<{ data: any }>('PATCH', '/notifications/read-all'),
+  remove: (id: string) => request<{ data: any }>('DELETE', `/notifications/${id}`),
 };
 
 // ── Public: school early-access lead capture (no auth) ──

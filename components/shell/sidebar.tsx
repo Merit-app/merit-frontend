@@ -216,6 +216,22 @@ function ChapterNavLink({ active }: { active: boolean }) {
   return <NavItem href="/chapter" label="Chapter" icon={Users} active={active} />;
 }
 
+function MyChapterNavLink({ active }: { active: boolean }) {
+  // Shown to students who are a member of a chapter (probe /my-chapter once).
+  const [inChapter, setInChapter] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    import('@/lib/api')
+      .then(({ chapterApi }) => chapterApi.myChapter())
+      .then((r) => { if (!cancelled && r.data) setInChapter(true); })
+      .catch(() => { /* not in a chapter */ });
+    return () => { cancelled = true; };
+  }, []);
+
+  if (!inChapter) return null;
+  return <NavItem href="/my-chapter" label="My Chapter" icon={GraduationCap} active={active} />;
+}
+
 export function Sidebar() {
   const pathname = usePathname();
   const isOrgAdmin = useMeritStore((s) => s.isOrgAdmin);
@@ -264,6 +280,9 @@ export function Sidebar() {
         {primaryNav.map(({ href, label, icon: Icon }) => (
           <NavItem key={href} href={href} label={label} icon={Icon} active={isActive(href)} />
         ))}
+
+        {/* Student's own chapter membership */}
+        {hydrated && <MyChapterNavLink active={isActive('/my-chapter')} />}
 
         {/* Chapter (coordinator) link — only shown to chapter coordinators */}
         {hydrated && <ChapterNavLink active={isActive('/chapter')} />}

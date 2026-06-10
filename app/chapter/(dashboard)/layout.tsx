@@ -6,9 +6,11 @@ import Link from 'next/link';
 import { useMeritStore, useHydrationStore } from '@/lib/store';
 import { adminApi, authApi, ApiError } from '@/lib/api';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { NotificationBell } from '@/components/notifications/notification-bell';
 import {
   LayoutDashboard,
   Users,
+  MessageSquare,
   Settings,
   LogOut,
   GraduationCap,
@@ -18,6 +20,7 @@ import {
 const NAV_ITEMS = [
   { href: '/chapter/overview', label: 'Overview', icon: LayoutDashboard },
   { href: '/chapter/roster', label: 'Students', icon: Users },
+  { href: '/chapter/messages', label: 'Messages', icon: MessageSquare },
   { href: '/chapter/settings', label: 'Settings', icon: Settings },
 ] as const;
 
@@ -153,7 +156,10 @@ export default function ChapterDashboardLayout({ children }: { children: React.R
       <main className="flex-1 overflow-y-auto bg-background">
         <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b border-border px-8 h-14 flex items-center justify-between">
           <div />
-          <ThemeToggle />
+          <div className="flex items-center gap-3">
+            <NotificationBell />
+            <ThemeToggle />
+          </div>
         </div>
         <div className="p-8">{children}</div>
       </main>

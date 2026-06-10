@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
-import { Bell, Search, Menu, Plus, LayoutDashboard, Clock, Building2, FileDown, Settings, CircleHelp } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { Search, Menu, Plus, LayoutDashboard, Clock, Building2, FileDown, Settings, CircleHelp } from 'lucide-react';
+import { NotificationBell } from '@/components/notifications/notification-bell';
 import Link from 'next/link';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
@@ -45,7 +46,6 @@ const ALL_NAV = [
 
 export function Topbar() {
   const pathname = usePathname();
-  const router = useRouter();
   const { open } = useCommandPalette();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -94,20 +94,7 @@ export function Topbar() {
           <ThemeToggle variant="topbar" />
 
           {/* Notifications */}
-          <button
-            onClick={() => router.push('/settings/notifications')}
-            className={cn(
-              'relative flex h-8 w-8 items-center justify-center rounded-lg',
-              'text-muted-foreground hover:bg-muted hover:text-foreground',
-              'transition-colors duration-100 cursor-pointer',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merit-blue-600'
-            )}
-            aria-label="Notifications"
-            title="Notifications"
-          >
-            <Bell size={16} />
-            <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-merit-blue-600" />
-          </button>
+          <NotificationBell iconSize={16} />
         </div>
       </header>
 
