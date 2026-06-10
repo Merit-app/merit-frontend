@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { chapterApi } from '@/lib/api';
-import { GraduationCap, CheckCircle2, AlertTriangle, CalendarDays, Clock } from 'lucide-react';
+import { GraduationCap, CheckCircle2, AlertTriangle, CalendarDays, Clock, MapPin, Users } from 'lucide-react';
 
 export default function MyChapterPage() {
   const [data, setData] = useState<any>(null);
@@ -85,9 +85,64 @@ export default function MyChapterPage() {
         </div>
       )}
 
+      <Opportunities />
+
       <Link href="/log" className="block rounded-xl bg-merit-blue-600 px-5 py-3 text-center text-sm font-semibold text-white hover:bg-merit-blue-700">
         Log hours
       </Link>
+    </div>
+  );
+}
+
+function Opportunities() {
+  const [opps, setOpps] = useState<any[] | null>(null);
+
+  const load = () => chapterApi.myOpportunities().then((r) => setOpps(r.data)).catch(() => setOpps([]));
+  useEffect(() => { void load(); }, []);
+
+  async function toggle(o: any) {
+    if (o.mySignupStatus && o.mySignupStatus !== 'cancelled') {
+      await chapterApi.cancelOpportunity(o.id).catch(() => {});
+    } else {
+      await chapterApi.signupOpportunity(o.id).catch(() => {});
+    }
+    load();
+  }
+
+  if (!opps || opps.length === 0) return null;
+
+  return (
+    <div className="rounded-xl border border-border bg-card p-5">
+      <h3 className="mb-3 font-medium text-foreground">Opportunities from your chapter</h3>
+      <div className="space-y-3">
+        {opps.map((o) => {
+          const joined = o.mySignupStatus && o.mySignupStatus !== 'cancelled';
+          return (
+            <div key={o.id} className="rounded-lg border border-border p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="font-medium text-foreground">{o.title}</p>
+                  {o.orgName && <p className="text-sm text-muted-foreground">{o.orgName}</p>}
+                </div>
+                <button
+                  onClick={() => toggle(o)}
+                  className={`shrink-0 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+                    joined ? 'border border-border text-muted-foreground hover:text-foreground' : 'bg-merit-blue-600 text-white hover:bg-merit-blue-700'
+                  }`}
+                >
+                  {joined ? (o.mySignupStatus === 'waitlisted' ? 'Waitlisted ✓' : 'Signed up ✓') : 'Sign up'}
+                </button>
+              </div>
+              {o.description && <p className="mt-2 text-sm text-muted-foreground">{o.description}</p>}
+              <div className="mt-2 flex flex-wrap gap-4 text-xs text-muted-foreground">
+                {o.startsAt && <span className="inline-flex items-center gap-1"><CalendarDays className="h-3.5 w-3.5" /> {new Date(o.startsAt).toLocaleString()}</span>}
+                {o.location && <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> {o.location}</span>}
+                {o.slots != null && <span className="inline-flex items-center gap-1"><Users className="h-3.5 w-3.5" /> {o.signupCount}/{o.slots} signed up</span>}
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

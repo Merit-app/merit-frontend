@@ -11,6 +11,8 @@ import {
   LayoutDashboard,
   Users,
   MessageSquare,
+  Megaphone,
+  Handshake,
   Shield,
   Settings,
   LogOut,
@@ -21,6 +23,8 @@ import {
 const NAV_ITEMS = [
   { href: '/chapter/overview', label: 'Overview', icon: LayoutDashboard },
   { href: '/chapter/roster', label: 'Students', icon: Users },
+  { href: '/chapter/opportunities', label: 'Opportunities', icon: Megaphone },
+  { href: '/chapter/partners', label: 'Partners', icon: Handshake },
   { href: '/chapter/messages', label: 'Messages', icon: MessageSquare },
   { href: '/chapter/team', label: 'Team & roles', icon: Shield },
   { href: '/chapter/settings', label: 'Settings', icon: Settings },

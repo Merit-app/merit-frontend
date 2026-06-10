@@ -606,6 +606,28 @@ export const chapterApi = {
   createRole: (name: string, permissions: string[]) => request<{ data: { id: string } }>('POST', '/chapter/roles', { name, permissions }),
   updateRole: (roleId: string, body: { name?: string; permissions?: string[] }) => request<{ data: any }>('PATCH', `/chapter/roles/${roleId}`, body),
   deleteRole: (roleId: string) => request<{ data: any }>('DELETE', `/chapter/roles/${roleId}`),
+
+  // Partners
+  getPartners: () => request<{ data: any[] }>('GET', '/chapter/partners'),
+  createPartner: (orgName: string, contactEmail: string) => request<{ data: any }>('POST', '/chapter/partners', { orgName, contactEmail }),
+  revokePartner: (id: string) => request<{ data: any }>('DELETE', `/chapter/partners/${id}`),
+
+  // Opportunities (coordinator)
+  getOpportunities: () => request<{ data: any[] }>('GET', '/chapter/opportunities'),
+  createOpportunity: (body: { title: string; description?: string; orgName?: string; slots?: number | null; startsAt?: string | null; location?: string }) =>
+    request<{ data: any }>('POST', '/chapter/opportunities', body),
+  getOpportunitySignups: (id: string) => request<{ data: { title: string; signups: any[] } }>('GET', `/chapter/opportunities/${id}/signups`),
+
+  // Opportunities (student)
+  myOpportunities: () => request<{ data: any[] }>('GET', '/my-opportunities'),
+  signupOpportunity: (id: string) => request<{ data: { status: string } }>('POST', `/opportunities/${id}/signup`),
+  cancelOpportunity: (id: string) => request<{ data: any }>('DELETE', `/opportunities/${id}/signup`),
+};
+
+// ── Partner accept (org admin) ──
+export const partnerApi = {
+  getInvite: (token: string) => request<{ data: { id: string; orgName: string; status: string; chapterName: string } }>('GET', `/partners/${token}`),
+  accept: (token: string, orgId: string) => request<{ data: { ok: boolean; compPlan: string } }>('POST', '/partners/accept', { token, orgId }),
 };
 
 // ── Notifications (in-app inbox) ──
