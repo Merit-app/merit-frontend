@@ -20,7 +20,7 @@ export function SelfTrackedStat() {
     : selfReportedHours.toFixed(1);
 
   return (
-    <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 mb-6">
+    <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 mb-6">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-xs font-medium text-amber-700">Self-tracked hours</p>

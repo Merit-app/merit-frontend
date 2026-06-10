@@ -26,10 +26,10 @@ export function QuickActions() {
   const showAddOrg = organizations.length < 5;
 
   return (
-    <div className="grid grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {/* Card 1: Almost there / Log time suggestion */}
       {showAlmostThere ? (
-        <div className="bg-card rounded-xl border border-border p-5">
+        <div className="bg-card rounded-2xl border border-border p-5 transition-shadow duration-200 hover:shadow-[var(--shadow-elevated)]">
           <p className="text-micro text-muted-foreground mb-2">Almost there</p>
           <p className="text-h3 text-foreground mb-1">
             {remaining % 1 === 0 ? remaining : remaining.toFixed(1)} hrs left on your goal
@@ -46,7 +46,7 @@ export function QuickActions() {
           </Link>
         </div>
       ) : (
-        <div className="bg-card rounded-xl border border-border p-5">
+        <div className="bg-card rounded-2xl border border-border p-5 transition-shadow duration-200 hover:shadow-[var(--shadow-elevated)]">
           <p className="text-micro text-muted-foreground mb-2">Keep going</p>
           <p className="text-h3 text-foreground mb-1">Log a new session</p>
           <p className="text-small text-muted-foreground mb-4">
@@ -64,7 +64,7 @@ export function QuickActions() {
 
       {/* Card 2: Add org / coming up */}
       {showAddOrg ? (
-        <div className="bg-card rounded-xl border border-border p-5">
+        <div className="bg-card rounded-2xl border border-border p-5 transition-shadow duration-200 hover:shadow-[var(--shadow-elevated)]">
           <p className="text-micro text-muted-foreground mb-2">Expand your record</p>
           <p className="text-h3 text-foreground mb-1">Add another organization</p>
           <p className="text-small text-muted-foreground mb-4">
@@ -79,7 +79,7 @@ export function QuickActions() {
           </Link>
         </div>
       ) : (
-        <div className="bg-card rounded-xl border border-border p-5">
+        <div className="bg-card rounded-2xl border border-border p-5 transition-shadow duration-200 hover:shadow-[var(--shadow-elevated)]">
           <p className="text-micro text-muted-foreground mb-2">Stay on track</p>
           <p className="text-h3 text-foreground mb-1">Export your record</p>
           <p className="text-small text-muted-foreground mb-4">

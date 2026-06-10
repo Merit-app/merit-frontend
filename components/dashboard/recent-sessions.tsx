@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Clock, Plus } from 'lucide-react';
 import { useMeritStore, useHydrationStore } from '@/lib/store';
 import { Skeleton } from '@/components/ui/skeleton';
+import { EmptyState } from '@/components/ui/empty-state';
 import { formatSessionDate, formatRelativeTime } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 
@@ -21,7 +22,7 @@ const SELF_TRACKED_STYLE = {
 
 function RecentSessionsSkeleton() {
   return (
-    <div className="bg-card rounded-xl border border-border p-6 mb-6">
+    <div className="bg-card rounded-2xl border border-border p-6 mb-6">
       <div className="flex items-center justify-between mb-5">
         <Skeleton className="h-4 w-32" />
       </div>
@@ -55,28 +56,30 @@ export function RecentSessions() {
 
   if (recent.length === 0) {
     return (
-      <div className="bg-card rounded-xl border border-border p-6 mb-6">
-        <div className="flex items-center justify-between mb-5">
+      <div className="bg-card rounded-2xl border border-border p-6 mb-6">
+        <div className="flex items-center justify-between mb-2">
           <h3 className="text-h3 text-foreground">Recent sessions</h3>
         </div>
-        <div className="flex flex-col items-center py-10 text-center">
-          <Clock size={32} className="text-muted-foreground mb-3" />
-          <p className="text-[15px] font-semibold text-foreground mb-1">Nothing logged yet.</p>
-          <p className="text-small text-muted-foreground mb-4">Your first session is the hardest.</p>
-          <Link
-            href="/log"
-            className="flex items-center gap-1.5 bg-merit-blue-600 hover:bg-merit-blue-700 text-white text-[13px] font-medium px-4 py-2 rounded-lg transition-colors"
-          >
-            <Plus size={14} />
-            Log first session
-          </Link>
-        </div>
+        <EmptyState
+          icon={Clock}
+          title="Nothing logged yet"
+          description="Your first session is the hardest — it takes about 20 seconds."
+          action={
+            <Link
+              href="/log"
+              className="flex items-center gap-1.5 bg-merit-blue-600 hover:bg-merit-blue-700 text-white text-[13px] font-medium px-4 py-2 rounded-lg transition-all shadow-sm active:scale-[0.98]"
+            >
+              <Plus size={14} />
+              Log your first session
+            </Link>
+          }
+        />
       </div>
     );
   }
 
   return (
-    <div className="bg-card rounded-xl border border-border p-6 mb-6">
+    <div className="bg-card rounded-2xl border border-border p-6 mb-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-h3 text-foreground">Recent sessions</h3>
         <Link

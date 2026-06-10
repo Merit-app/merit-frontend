@@ -1,12 +1,14 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { useMeritStore } from '@/lib/store';
+import { ConfettiBurst } from '@/components/motion';
 
 export function MilestoneCheckerClient() {
   const user = useMeritStore((s) => s.user);
   const sessions = useMeritStore((s) => s.sessions);
+  const [celebrate, setCelebrate] = useState(false);
 
   useEffect(() => {
     const verified = sessions.filter((s) => s.status === 'verified');
@@ -20,6 +22,7 @@ export function MilestoneCheckerClient() {
 
       if (percent >= 100 && !alreadyShown) {
         toast.success('🎉🎉🎉 You hit your goal!');
+        setCelebrate(true);
         window.localStorage.setItem(shownKey, 'true');
       } else if (percent >= 75 && percent < 100) {
         const key75 = 'milestone-75';
@@ -43,5 +46,6 @@ export function MilestoneCheckerClient() {
     }
   }, [user.nhsGoalHours, sessions]);
 
-  return null;
+  if (!celebrate) return null;
+  return <ConfettiBurst onDone={() => setCelebrate(false)} />;
 }

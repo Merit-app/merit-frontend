@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ProgressRing, CountUp } from '@/components/motion';
 import { useMeritStore } from '@/lib/store';
 import { usersApi, mapUser } from '@/lib/api';
 import { formatLongDate } from '@/lib/utils';
@@ -41,7 +42,7 @@ function GoalSetupCard() {
   }
 
   return (
-    <div className="bg-card rounded-xl border border-border p-6 mb-6">
+    <div className="bg-card rounded-2xl border border-border p-6 mb-6">
       <h3 className="text-h3 text-foreground mb-1">Set your service goal</h3>
       <p className="text-small text-muted-foreground mb-5">
         Choose a program to start tracking your progress.
@@ -53,7 +54,7 @@ function GoalSetupCard() {
             key={p.program}
             disabled={saving}
             onClick={() => { setShowCustom(false); saveGoal(p.program, p.hours); }}
-            className="flex flex-col items-start rounded-lg border border-border px-4 py-3 text-left hover:border-merit-blue-300 hover:bg-merit-blue-50 transition-colors disabled:opacity-50"
+            className="flex flex-col items-start rounded-xl border border-border px-4 py-3 text-left transition-all hover:border-merit-blue-300 hover:bg-merit-blue-50 active:scale-[0.98] disabled:opacity-50"
           >
             <span className="text-[13px] font-semibold text-foreground">{p.label}</span>
             <span className="text-[12px] text-muted-foreground">{p.sub}</span>
@@ -90,7 +91,7 @@ function GoalSetupCard() {
           </Button>
           <button
             onClick={() => { setShowCustom(false); setCustomHours(''); }}
-            className="text-[13px] text-muted-foreground hover:text-muted-foreground transition-colors"
+            className="text-[13px] text-muted-foreground hover:text-foreground transition-colors"
           >
             Cancel
           </button>
@@ -132,70 +133,75 @@ interface InnerProps {
 function GoalProgressInner({ totalHours, goal, pct, remaining }: InnerProps) {
   const user = useMeritStore((s) => s.user);
 
-  // Animate progress bar from 0 → pct on mount
-  const [displayPct, setDisplayPct] = useState(0);
-  const rafRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    const start = performance.now();
-    const duration = 400;
-
-    function step(now: number) {
-      const elapsed = now - start;
-      const progress = Math.min(elapsed / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setDisplayPct(eased * pct);
-      if (progress < 1) rafRef.current = requestAnimationFrame(step);
-    }
-
-    rafRef.current = requestAnimationFrame(step);
-    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
-  }, [pct]);
-
-  const displayHours = totalHours % 1 === 0 ? totalHours.toString() : totalHours.toFixed(1);
+  const complete = remaining <= 0;
+  const decimals = totalHours % 1 === 0 ? 0 : 1;
   const programLabel = user.goalProgram
     ? `${user.goalProgram} requirement`
     : 'Service goal';
+  const remainingStr = remaining % 1 === 0 ? remaining.toString() : remaining.toFixed(1);
 
   return (
-    <div className="bg-card rounded-xl border border-border p-6 mb-6">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-h3 text-foreground">{programLabel}</h3>
-        <span className="text-[12px] font-medium text-muted-foreground bg-muted px-2.5 py-1 rounded-full">
-          {goal} hrs
-        </span>
-      </div>
-
-      {/* Big number */}
-      <div className="flex items-baseline gap-1.5 mb-4">
-        <span className="text-[32px] font-medium text-foreground leading-none tabular-nums">
-          {displayHours}
-        </span>
-        <span className="text-[16px] text-muted-foreground">/ {goal} hrs</span>
-      </div>
-
-      {/* Progress bar */}
-      <div className="h-1.5 bg-muted rounded-full overflow-hidden mb-4">
+    <div className="relative overflow-hidden bg-card rounded-2xl border border-border p-6 mb-6">
+      {/* Soft celebratory wash when the goal is met */}
+      {complete && (
         <div
-          className="h-full bg-merit-blue-600 rounded-full transition-none"
-          style={{ width: `${displayPct}%` }}
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-gradient-to-br from-merit-blue-50/80 via-transparent to-violet-500/[0.06]"
         />
-      </div>
+      )}
 
-      {/* Footer */}
-      <div className="flex items-center justify-between">
-        <span className="text-small text-muted-foreground">
-          {user.nhsGoalStartDate
-            ? `Started ${formatLongDate(user.nhsGoalStartDate)}`
-            : `${remaining > 0 ? `${remaining % 1 === 0 ? remaining : remaining.toFixed(1)} hrs remaining` : 'Goal complete 🎉'}`}
-        </span>
-        <Link
-          href="/hours"
-          className="text-[13px] font-medium text-merit-blue-600 hover:text-merit-blue-700 transition-colors"
-        >
-          View all sessions →
-        </Link>
+      <div className="relative flex flex-col items-center gap-6 sm:flex-row sm:items-center">
+        {/* Goal ring — the hero moment */}
+        <ProgressRing value={pct} size={120} strokeWidth={11}>
+          <div className="text-center">
+            <p className="text-[22px] font-semibold leading-none tabular-nums text-foreground">
+              <CountUp value={pct} decimals={0} suffix="%" duration={1.1} />
+            </p>
+            <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+              {complete ? 'done!' : 'of goal'}
+            </p>
+          </div>
+        </ProgressRing>
+
+        {/* Numbers + meta */}
+        <div className="min-w-0 flex-1 text-center sm:text-left">
+          <div className="mb-1.5 flex items-center justify-center gap-2 sm:justify-start">
+            <h3 className="text-h3 text-foreground">{programLabel}</h3>
+            <span className="rounded-full bg-muted px-2.5 py-0.5 text-[12px] font-medium text-muted-foreground">
+              {goal} hrs
+            </span>
+          </div>
+
+          <div className="flex items-baseline justify-center gap-1.5 sm:justify-start">
+            <span className="text-[36px] font-semibold leading-none tabular-nums text-foreground">
+              <CountUp value={totalHours} decimals={decimals} duration={1.1} />
+            </span>
+            <span className="text-[16px] text-muted-foreground">/ {goal} hrs verified</span>
+          </div>
+
+          <p className="mt-2 text-small text-muted-foreground">
+            {complete ? (
+              <span className="inline-flex items-center gap-1.5 font-medium text-merit-blue-600 dark:text-merit-blue-400">
+                <Sparkles className="h-3.5 w-3.5" />
+                Goal complete — incredible work!
+              </span>
+            ) : (
+              <>
+                <span className="font-medium text-foreground">{remainingStr} hrs to go</span>
+                {user.nhsGoalStartDate && (
+                  <span> · started {formatLongDate(user.nhsGoalStartDate)}</span>
+                )}
+              </>
+            )}
+          </p>
+
+          <Link
+            href="/hours"
+            className="mt-3 inline-block text-[13px] font-medium text-merit-blue-600 transition-colors hover:text-merit-blue-700 dark:text-merit-blue-400 dark:hover:text-merit-blue-200"
+          >
+            View all sessions →
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { useMeritStore, useHydrationStore } from '@/lib/store';
 import { Skeleton } from '@/components/ui/skeleton';
+import { CountUp } from '@/components/motion';
 import { parseISO, isWithinInterval, startOfWeek, endOfWeek, subWeeks, format, subDays } from 'date-fns';
 
 // SSR-safe dynamic import for the sparkline
@@ -14,7 +15,7 @@ const SparklineChart = dynamic(() => import('./sparkline-chart'), {
 
 interface StatCardProps {
   label: string;
-  value: string;
+  value: React.ReactNode;
   sub: string;
   subPositive?: boolean;
   sparkData: { v: number }[];
@@ -22,7 +23,7 @@ interface StatCardProps {
 
 function StatCard({ label, value, sub, subPositive, sparkData }: StatCardProps) {
   return (
-    <div className="bg-card rounded-xl border border-border p-5 flex flex-col gap-3">
+    <div className="bg-card rounded-2xl border border-border p-5 flex flex-col gap-3 transition-shadow duration-200 hover:shadow-[var(--shadow-elevated)]">
       <p className="text-micro text-muted-foreground">{label}</p>
       <div>
         <p className="text-[28px] font-medium text-foreground leading-none tabular-nums">{value}</p>
@@ -58,8 +59,8 @@ export function StatsRow() {
   const hydrated = useHydrationStore((s) => s.hydrated);
   const sessions = useMeritStore((s) => s.sessions);
 
-  if (!hydrated) return <StatsRowSkeleton />;
-
+  // NOTE: hooks must run unconditionally — the hydration early-return lives
+  // below this memo.
   const stats = useMemo(() => {
     // "Verified" = org-verified only. Self-tracked sessions are stored as status
     // 'verified' but are excluded here so the headline matches the Self-tracked
@@ -129,7 +130,8 @@ export function StatsRow() {
     return { weekHours, weekDelta, verifiedRate, activeOrgs, weeklySparkData, verifiedRateSparkData, orgSparkData };
   }, [sessions]);
 
-  const weekHoursStr = stats.weekHours % 1 === 0 ? stats.weekHours.toString() : stats.weekHours.toFixed(1);
+  if (!hydrated) return <StatsRowSkeleton />;
+
   const deltaStr = stats.weekDelta === 0
     ? 'same as last week'
     : `${stats.weekDelta > 0 ? '+' : ''}${stats.weekDelta % 1 === 0 ? stats.weekDelta : stats.weekDelta.toFixed(1)} hrs vs last week`;
@@ -138,20 +140,20 @@ export function StatsRow() {
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
       <StatCard
         label="This week"
-        value={`${weekHoursStr} hrs`}
+        value={<><CountUp value={stats.weekHours} decimals={stats.weekHours % 1 === 0 ? 0 : 1} duration={0.9} /> hrs</>}
         sub={deltaStr}
         subPositive={stats.weekDelta > 0 ? true : stats.weekDelta < 0 ? false : undefined}
         sparkData={stats.weeklySparkData()}
       />
       <StatCard
         label="Verified rate"
-        value={`${stats.verifiedRate}%`}
+        value={<CountUp value={stats.verifiedRate} duration={0.9} suffix="%" />}
         sub="of submissions"
         sparkData={stats.verifiedRateSparkData()}
       />
       <StatCard
         label="Active orgs"
-        value={String(stats.activeOrgs)}
+        value={<CountUp value={stats.activeOrgs} duration={0.9} />}
         sub="this year"
         sparkData={stats.orgSparkData()}
       />
