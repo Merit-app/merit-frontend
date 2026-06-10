@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { chapterApi, ApiError } from '@/lib/api';
-import { UserPlus, Shield, Trash2, Plus, X, Crown, Check } from 'lucide-react';
+import { UserPlus, Shield, Trash2, Plus, X, Crown, Check, History } from 'lucide-react';
 
 interface Member { userId: string; name: string; email: string; roleName: string; roleId: string | null; isOwner: boolean }
 interface Role { id: string; name: string; permissions: string[]; is_default: boolean }
@@ -48,7 +48,45 @@ export default function TeamPage() {
 
       <Members members={members} roles={roles} canManage={canManage} onChange={load} />
       <Roles roles={roles} catalogue={catalogue} canManage={canManage} onChange={load} />
+      {canManage && <ActivityLog />}
     </div>
+  );
+}
+
+const ACTION_LABELS: Record<string, string> = {
+  adjust_hours: 'adjusted hours for',
+  set_student_goal: 'set a goal for',
+  update_settings: 'updated settings',
+  invite_partner: 'invited partner',
+  post_opportunity: 'posted opportunity',
+};
+
+function ActivityLog() {
+  const [log, setLog] = useState<any[] | null>(null);
+  useEffect(() => { chapterApi.getAuditLog().then((r) => setLog(r.data)).catch(() => setLog([])); }, []);
+  if (!log) return null;
+
+  return (
+    <section className="rounded-xl border border-border bg-card p-6">
+      <h2 className="mb-4 flex items-center gap-1.5 font-medium text-foreground"><History className="h-4 w-4" /> Activity log</h2>
+      {log.length === 0 ? (
+        <p className="text-sm text-muted-foreground">No activity yet.</p>
+      ) : (
+        <ul className="space-y-2 text-sm">
+          {log.map((e) => (
+            <li key={e.id} className="flex items-start justify-between gap-3 border-b border-border/50 pb-2 last:border-0">
+              <span className="text-muted-foreground">
+                <span className="font-medium text-foreground">{e.actor_name ?? 'Someone'}</span>{' '}
+                {ACTION_LABELS[e.action] ?? e.action}
+                {e.target_name ? <span className="font-medium text-foreground"> {e.target_name}</span> : ''}
+                {e.detail ? <span className="text-muted-foreground"> — {e.detail}</span> : ''}
+              </span>
+              <span className="shrink-0 text-xs text-muted-foreground">{new Date(e.created_at).toLocaleDateString()}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }
 

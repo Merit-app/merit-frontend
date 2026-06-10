@@ -595,6 +595,9 @@ export const chapterApi = {
     request<{ data: { sent: number } }>('POST', '/chapter/remind-behind'),
 
   myChapter: () => request<{ data: any | null }>('GET', '/my-chapter'),
+  acknowledgeConsent: () => request<{ data: any }>('POST', '/my-chapter/consent'),
+  leaveChapter: () => request<{ data: any }>('POST', '/my-chapter/leave'),
+  getAuditLog: () => request<{ data: { id: string; actor_name: string | null; action: string; target_name: string | null; detail: string | null; created_at: string }[] }>('GET', '/chapter/audit'),
 
   // Team & roles
   myPermissions: () => request<{ data: { isOwner: boolean; permissions: string[]; catalogue: { key: string; label: string }[] } }>('GET', '/chapter/me/permissions'),
