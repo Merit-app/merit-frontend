@@ -595,6 +595,17 @@ export const chapterApi = {
     request<{ data: { sent: number } }>('POST', '/chapter/remind-behind'),
 
   myChapter: () => request<{ data: any | null }>('GET', '/my-chapter'),
+
+  // Team & roles
+  myPermissions: () => request<{ data: { isOwner: boolean; permissions: string[]; catalogue: { key: string; label: string }[] } }>('GET', '/chapter/me/permissions'),
+  getTeam: () => request<{ data: { members: any[] } }>('GET', '/chapter/team'),
+  addCoordinator: (email: string, roleId: string | null) => request<{ data: any }>('POST', '/chapter/team', { email, roleId }),
+  setCoordinatorRole: (userId: string, roleId: string | null) => request<{ data: any }>('PATCH', `/chapter/team/${userId}/role`, { roleId }),
+  removeCoordinator: (userId: string) => request<{ data: any }>('DELETE', `/chapter/team/${userId}`),
+  getRoles: () => request<{ data: { id: string; name: string; permissions: string[]; is_default: boolean }[] }>('GET', '/chapter/roles'),
+  createRole: (name: string, permissions: string[]) => request<{ data: { id: string } }>('POST', '/chapter/roles', { name, permissions }),
+  updateRole: (roleId: string, body: { name?: string; permissions?: string[] }) => request<{ data: any }>('PATCH', `/chapter/roles/${roleId}`, body),
+  deleteRole: (roleId: string) => request<{ data: any }>('DELETE', `/chapter/roles/${roleId}`),
 };
 
 // ── Notifications (in-app inbox) ──

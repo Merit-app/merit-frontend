@@ -11,6 +11,7 @@ import {
   LayoutDashboard,
   Users,
   MessageSquare,
+  Shield,
   Settings,
   LogOut,
   GraduationCap,
@@ -21,6 +22,7 @@ const NAV_ITEMS = [
   { href: '/chapter/overview', label: 'Overview', icon: LayoutDashboard },
   { href: '/chapter/roster', label: 'Students', icon: Users },
   { href: '/chapter/messages', label: 'Messages', icon: MessageSquare },
+  { href: '/chapter/team', label: 'Team & roles', icon: Shield },
   { href: '/chapter/settings', label: 'Settings', icon: Settings },
 ] as const;
 
