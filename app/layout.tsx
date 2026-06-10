@@ -63,6 +63,7 @@ export default function RootLayout({
           </Providers>
           <Toaster
             position="bottom-right"
+            closeButton
             toastOptions={{
               style: {
                 background: 'var(--popover)',
@@ -70,6 +71,7 @@ export default function RootLayout({
                 borderRadius: '12px',
                 fontSize: '14px',
                 color: 'var(--popover-foreground)',
+                boxShadow: 'var(--shadow-elevated)',
               },
               duration: 4000,
             }}

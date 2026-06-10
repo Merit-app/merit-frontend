@@ -181,9 +181,27 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
-  font-size: 14px;
-  line-height: 1.55;
+  font-size: 15px;
+  line-height: 1.6;
   font-weight: 400;
+}
+
+/* ─── Motion ───────────────────────────────────────────────────────────────── */
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* ─── Typography scale ─────────────────────────────────────────────────────── */
@@ -239,10 +257,14 @@ body {
   outline-offset: 2px;
 }
 
-/* Remove browser default outline on inputs — styled focus is handled by
+/* Remove browser default outline on form fields — styled focus is handled by
    Tailwind's focus-visible:ring-* classes on each component */
 input:focus,
-input:focus-visible {
+input:focus-visible,
+textarea:focus,
+textarea:focus-visible,
+select:focus,
+select:focus-visible {
   outline: none;
 }
 
