@@ -530,6 +530,65 @@ export const adminApi = {
     request<{ data: { chapterId: string; name: string } }>('POST', '/chapter/claim', { token }),
 };
 
+// ── Chapter platform (coordinator dashboard) ──
+export interface ChapterOverview {
+  chapterName: string;
+  requiredHours: number;
+  deadline: string | null;
+  daysToDeadline: number | null;
+  totalStudents: number;
+  metCount: number;
+  atRiskCount: number;
+  incompleteCount: number;
+  avgHours: number;
+}
+
+export type ChapterStudentStatus = 'met' | 'on_track' | 'at_risk' | 'overdue' | 'no_goal';
+
+export interface RosterStudent {
+  id: string;
+  name: string;
+  email: string;
+  graduationYear: number | null;
+  verifiedHours: number;
+  goal: number;
+  remaining: number;
+  met: boolean;
+  status: ChapterStudentStatus;
+}
+
+export const chapterApi = {
+  getOverview: () => request<{ data: ChapterOverview }>('GET', '/chapter/overview'),
+
+  getRoster: (params: { search?: string; filter?: string } = {}) => {
+    const qs = new URLSearchParams();
+    if (params.search) qs.set('search', params.search);
+    if (params.filter && params.filter !== 'all') qs.set('filter', params.filter);
+    const q = qs.toString();
+    return request<{ data: { students: RosterStudent[]; total: number } }>(
+      'GET',
+      `/chapter/roster${q ? `?${q}` : ''}`,
+    );
+  },
+
+  getStudent: (id: string) => request<{ data: any }>('GET', `/chapter/students/${id}`),
+
+  setStudentGoal: (id: string, hours: number | null) =>
+    request<{ data: any }>('PATCH', `/chapter/students/${id}/goal`, { hours }),
+
+  adjustHours: (id: string, body: { hours: number; reason?: string }) =>
+    request<{ data: any }>('POST', `/chapter/students/${id}/adjust`, body),
+
+  getCohortGoals: () =>
+    request<{ data: { graduationYear: number; requiredHours: number }[] }>('GET', '/chapter/cohort-goals'),
+
+  setCohortGoal: (graduationYear: number, requiredHours: number) =>
+    request<{ data: any }>('PUT', '/chapter/cohort-goals', { graduationYear, requiredHours }),
+
+  updateSettings: (body: { requiredHours?: number; requirementDeadline?: string | null; riskWindowDays?: number }) =>
+    request<{ data: any }>('PATCH', '/chapter/settings', body),
+};
+
 // ── Public: school early-access lead capture (no auth) ──
 export const schoolApi = {
   submitLead: (body: {
