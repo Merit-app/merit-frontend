@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { schoolApi, ApiError } from '@/lib/api';
-import { Users, ClipboardCheck, FileDown, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { Users, ClipboardCheck, FileDown, ShieldCheck, CheckCircle2, ArrowRight } from 'lucide-react';
 
 const OUTCOMES = [
   { icon: Users, title: 'Provision your whole roster', body: 'Upload a CSV and invite every student at once — no one-by-one signups.' },
@@ -83,6 +83,17 @@ export function SchoolSection() {
               <ShieldCheck className="h-4 w-4 shrink-0 text-gray-500" />
               Admin-controlled accounts · Google sign-in · your students’ data stays yours.
             </div>
+
+            <p className="mt-6 text-sm text-gray-600">
+              Already have a chapter?{' '}
+              <a
+                href="/login?redirect=/chapter/overview"
+                className="inline-flex items-center gap-1 font-semibold text-merit-blue-600 hover:text-merit-blue-700"
+              >
+                Sign in to your school dashboard
+                <ArrowRight className="h-3.5 w-3.5" />
+              </a>
+            </p>
           </div>
 
           {/* Right: lead form */}
