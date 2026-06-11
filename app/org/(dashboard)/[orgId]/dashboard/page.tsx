@@ -9,6 +9,7 @@ import {
   Calendar, ArrowRight, Download, Plus,
 } from 'lucide-react';
 import Link from 'next/link';
+import { CountUp } from '@/components/motion';
 
 function fmtDate(iso: string) {
   try { return new Date(iso).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' }); }
@@ -80,14 +81,14 @@ export default function OrgOverviewPage() {
         <div className="flex gap-3">
           <button
             onClick={handleGrantReport}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted hover:text-foreground transition-colors"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-border bg-card text-muted-foreground text-sm font-medium hover:bg-muted hover:text-foreground transition-colors active:scale-[0.98]"
           >
             <Download className="w-4 h-4" />
             Grant report
           </button>
           <Link
             href={`/org/${orgId}/events/new`}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-foreground text-background text-sm font-semibold hover:bg-muted transition-colors"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-foreground text-background text-sm font-semibold hover:opacity-90 transition-all active:scale-[0.98]"
           >
             <Plus className="w-4 h-4" />
             New event
@@ -98,10 +99,10 @@ export default function OrgOverviewPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Total volunteers', value: stats?.totalStudents ?? 0, Icon: Users, color: 'text-primary', highlight: false },
-          { label: 'Verified hours', value: `${stats?.totalHours ?? 0}h`, Icon: Clock, color: 'text-success', highlight: false },
-          { label: 'Verified sessions', value: stats?.verifiedSessions ?? 0, Icon: CheckCircle2, color: 'text-success', highlight: false },
-          { label: 'Pending sessions', value: stats?.pendingSessions ?? 0, Icon: AlertCircle, color: 'text-warning', highlight: (stats?.pendingSessions ?? 0) > 0 },
+          { label: 'Total volunteers', value: Number(stats?.totalStudents ?? 0), suffix: '', Icon: Users, color: 'text-primary', highlight: false },
+          { label: 'Verified hours', value: Number(stats?.totalHours ?? 0), suffix: 'h', Icon: Clock, color: 'text-success', highlight: false },
+          { label: 'Verified sessions', value: Number(stats?.verifiedSessions ?? 0), suffix: '', Icon: CheckCircle2, color: 'text-success', highlight: false },
+          { label: 'Pending sessions', value: Number(stats?.pendingSessions ?? 0), suffix: '', Icon: AlertCircle, color: 'text-warning', highlight: (stats?.pendingSessions ?? 0) > 0 },
         ].map((stat) => (
           <div
             key={stat.label}
@@ -113,7 +114,9 @@ export default function OrgOverviewPage() {
               <stat.Icon className={`w-4 h-4 ${stat.color}`} />
               <span className="text-muted-foreground text-xs">{stat.label}</span>
             </div>
-            <p className="text-3xl font-bold text-foreground">{stat.value}</p>
+            <p className="text-3xl font-bold text-foreground tabular-nums">
+              <CountUp value={stat.value} duration={0.7} suffix={stat.suffix} />
+            </p>
           </div>
         ))}
       </div>

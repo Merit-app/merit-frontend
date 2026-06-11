@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { chapterApi, ApiError } from '@/lib/api';
 import { Building2, Plus, Trash2, CheckCircle2, Clock, Gift } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { EmptyState } from '@/components/ui/empty-state';
 
 export default function PartnersPage() {
   const [partners, setPartners] = useState<any[]>([]);
@@ -62,9 +64,24 @@ export default function PartnersPage() {
       <section className="rounded-xl border border-border bg-card p-6">
         <h2 className="mb-4 font-medium text-foreground">Your partners</h2>
         {loading ? (
-          <p className="text-sm text-muted-foreground">Loading…</p>
+          <div className="space-y-2">
+            {[0, 1].map((i) => (
+              <div key={i} className="flex items-center gap-3 rounded-lg border border-border px-3 py-2.5">
+                <Skeleton className="h-8 w-8 rounded-lg shrink-0" />
+                <div className="flex-1 space-y-1.5">
+                  <Skeleton className="h-3.5 w-40" />
+                  <Skeleton className="h-3 w-52" />
+                </div>
+              </div>
+            ))}
+          </div>
         ) : partners.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No partners yet.</p>
+          <EmptyState
+            icon={Building2}
+            title="No partners yet"
+            description="Invite a local organization — they get free Merit Pro and your students get verified faster."
+            className="py-8"
+          />
         ) : (
           <div className="space-y-2">
             {partners.map((p) => (

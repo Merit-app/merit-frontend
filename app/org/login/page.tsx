@@ -112,7 +112,7 @@ export default function OrgLoginPage() {
               placeholder="you@organization.org"
               autoFocus
               required
-              className="w-full bg-muted border border-border text-foreground rounded-xl px-4 py-3 text-sm placeholder-gray-600 focus:outline-none focus:border-ring transition-colors"
+              className="w-full bg-muted border border-border text-foreground rounded-xl px-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:border-ring transition-colors"
             />
           </div>
 
@@ -130,7 +130,7 @@ export default function OrgLoginPage() {
               <button
                 type="button"
                 onClick={() => setShowPw(!showPw)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 tabIndex={-1}
               >
                 {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -141,7 +141,7 @@ export default function OrgLoginPage() {
           <button
             type="submit"
             disabled={isLoading || !email || !password}
-            className="w-full bg-foreground text-background font-semibold py-3 rounded-xl text-sm hover:bg-muted disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+            className="w-full bg-foreground text-background font-semibold py-3 rounded-xl text-sm hover:opacity-90 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
           >
             {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
             {isLoading ? 'Signing in...' : 'Sign in →'}
@@ -156,12 +156,12 @@ export default function OrgLoginPage() {
             </Link>
           </p>
           <p className="text-muted-foreground">
-            <Link href="/login" className="hover:text-muted-foreground">
+            <Link href="/login" className="hover:text-foreground">
               Student sign in →
             </Link>
           </p>
           <p className="text-muted-foreground">
-            <Link href="/org/forgot-password" className="hover:text-muted-foreground">
+            <Link href="/org/forgot-password" className="hover:text-foreground">
               Forgot password?
             </Link>
           </p>

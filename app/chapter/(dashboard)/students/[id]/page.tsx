@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { chapterApi, ApiError } from '@/lib/api';
 import { ArrowLeft, CheckCircle2, AlertTriangle, Plus, Target } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function StudentDetailPage() {
   const params = useParams();
@@ -24,7 +25,22 @@ export default function StudentDetailPage() {
 
   useEffect(() => { void load(); }, [load]);
 
-  if (loading) return <div className="text-muted-foreground">Loading…</div>;
+  if (loading) {
+    return (
+      <div className="max-w-3xl space-y-6">
+        <Skeleton className="h-4 w-32" />
+        <div className="space-y-2">
+          <Skeleton className="h-7 w-52" />
+          <Skeleton className="h-4 w-64" />
+        </div>
+        <div className="rounded-xl border border-border bg-card p-6 space-y-4">
+          <Skeleton className="h-4 w-40" />
+          <Skeleton className="h-2.5 w-full rounded-full" />
+          <Skeleton className="h-3 w-48" />
+        </div>
+      </div>
+    );
+  }
   if (!data) return <div className="text-muted-foreground">Student not found.</div>;
 
   const s = data.student;

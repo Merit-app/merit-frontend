@@ -8,7 +8,7 @@ import { Loader2, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
 const inputClass =
-  'w-full bg-muted border border-border text-foreground rounded-xl px-4 py-3 text-sm placeholder-gray-600 focus:outline-none focus:border-border transition-colors';
+  'w-full bg-muted border border-border text-foreground rounded-xl px-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/25 transition-[border-color,box-shadow]';
 const labelClass = 'block text-sm font-medium text-muted-foreground mb-1.5';
 
 export default function CreateEventPage() {
@@ -172,10 +172,10 @@ export default function CreateEventPage() {
             type="button"
             onClick={() => update('autoLogHours', !form.autoLogHours)}
             className={`relative w-10 h-6 rounded-full transition-colors ${
-              form.autoLogHours ? 'bg-card' : 'bg-gray-600'
+              form.autoLogHours ? 'bg-merit-blue-600' : 'bg-ink-300 dark:bg-secondary'
             }`}
           >
-            <span className={`absolute top-1 w-4 h-4 rounded-full bg-card transition-transform ${
+            <span className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${
               form.autoLogHours ? 'translate-x-5' : 'translate-x-1'
             }`} />
           </button>
@@ -192,7 +192,7 @@ export default function CreateEventPage() {
             type="button"
             onClick={(e) => handleSubmit(e, false)}
             disabled={isLoading}
-            className="flex-1 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted hover:text-foreground disabled:opacity-50 transition-colors"
+            className="flex-1 py-3 rounded-xl border border-border bg-card text-muted-foreground text-sm font-medium hover:bg-muted hover:text-foreground disabled:opacity-50 transition-colors"
           >
             Save as draft
           </button>
@@ -200,7 +200,7 @@ export default function CreateEventPage() {
             type="button"
             onClick={(e) => handleSubmit(e, true)}
             disabled={isLoading}
-            className="flex-1 py-3 rounded-xl bg-foreground text-background text-sm font-semibold hover:bg-muted disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+            className="flex-1 py-3 rounded-xl bg-foreground text-background text-sm font-semibold hover:opacity-90 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
           >
             {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
             {isLoading ? 'Creating...' : 'Publish + notify volunteers'}

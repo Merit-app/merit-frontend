@@ -353,7 +353,7 @@ export function OrgOnboardingModal({ orgId, orgName: _orgName, onComplete }: Org
             <button
               onClick={handleNext}
               disabled={isCompleting}
-              className="flex items-center gap-2 bg-foreground text-background font-semibold px-5 py-2.5 rounded-xl text-sm hover:bg-muted disabled:opacity-50 transition-colors"
+              className="flex items-center gap-2 bg-foreground text-background font-semibold px-5 py-2.5 rounded-xl text-sm hover:opacity-90 disabled:opacity-50 transition-colors"
             >
               {isLast ? (
                 isCompleting ? 'Setting up...' : "Let's go →"

@@ -233,7 +233,7 @@ export default function OrgDashboardLayout({ children }: { children: React.React
               </p>
               <Link
                 href={`${orgBase}/settings?tab=billing`}
-                className="block w-full text-center text-[11px] font-semibold bg-foreground text-background rounded-lg py-1.5 hover:bg-muted transition-colors"
+                className="block w-full text-center text-[11px] font-semibold bg-foreground text-background rounded-lg py-1.5 hover:opacity-90 transition-colors"
               >
                 Upgrade · $29/mo
               </Link>

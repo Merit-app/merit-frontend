@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { chapterApi } from '@/lib/api';
 import { GraduationCap, CheckCircle2, AlertTriangle, CalendarDays, Clock, MapPin, Users, Eye, ShieldCheck, LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { Skeleton } from '@/components/ui/skeleton';
+import { AnimatedProgress, CountUp } from '@/components/motion';
 
 export default function MyChapterPage() {
   const router = useRouter();
@@ -26,7 +28,24 @@ export default function MyChapterPage() {
     router.push('/dashboard');
   }
 
-  if (loading) return <div className="p-8 text-muted-foreground">Loading…</div>;
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-2xl space-y-6 p-2">
+        <div className="flex items-center gap-3">
+          <Skeleton className="h-11 w-11 rounded-xl shrink-0" />
+          <div className="space-y-2">
+            <Skeleton className="h-6 w-48" />
+            <Skeleton className="h-4 w-32" />
+          </div>
+        </div>
+        <div className="rounded-xl border border-border bg-card p-6 space-y-4">
+          <Skeleton className="h-4 w-56" />
+          <Skeleton className="h-10 w-32" />
+          <Skeleton className="h-3 w-full rounded-full" />
+        </div>
+      </div>
+    );
+  }
 
   if (!data) {
     return (
@@ -90,16 +109,15 @@ export default function MyChapterPage() {
           <div>
             <p className="text-sm text-muted-foreground">Verified hours toward requirement</p>
             <p className="text-4xl font-semibold tabular-nums text-foreground">
-              {data.verifiedHours}<span className="text-xl text-muted-foreground"> / {data.goal || '—'}</span>
+              <CountUp value={data.verifiedHours} decimals={data.verifiedHours % 1 === 0 ? 0 : 1} />
+              <span className="text-xl text-muted-foreground"> / {data.goal || '—'}</span>
             </p>
           </div>
           {data.remaining > 0 && data.goal > 0 && (
             <p className="text-sm text-muted-foreground">{data.remaining} to go</p>
           )}
         </div>
-        <div className="h-3 w-full overflow-hidden rounded-full bg-muted">
-          <div className="h-full rounded-full bg-merit-blue-600 transition-all" style={{ width: `${pct}%` }} />
-        </div>
+        <AnimatedProgress value={pct} className="h-3" aria-label="Progress toward requirement" />
       </div>
 
       {/* Deadline */}

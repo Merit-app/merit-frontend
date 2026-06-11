@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { chapterApi, ApiError } from '@/lib/api';
 import { Megaphone, Plus, Users, MapPin, Calendar, X } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { EmptyState } from '@/components/ui/empty-state';
 
 export default function OpportunitiesPage() {
   const [opps, setOpps] = useState<any[]>([]);
@@ -30,10 +32,22 @@ export default function OpportunitiesPage() {
       </div>
 
       {loading ? (
-        <p className="text-sm text-muted-foreground">Loading…</p>
+        <div className="space-y-3">
+          {[0, 1].map((i) => (
+            <div key={i} className="rounded-xl border border-border bg-card p-5 space-y-3">
+              <Skeleton className="h-4 w-48" />
+              <Skeleton className="h-3 w-full max-w-md" />
+              <Skeleton className="h-3 w-40" />
+            </div>
+          ))}
+        </div>
       ) : opps.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
-          No opportunities yet. Post one to notify your students.
+        <div className="rounded-xl border border-dashed border-border">
+          <EmptyState
+            icon={Megaphone}
+            title="No opportunities yet"
+            description="Post one and every student in your chapter gets notified instantly."
+          />
         </div>
       ) : (
         <div className="space-y-3">

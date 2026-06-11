@@ -112,7 +112,7 @@ export default function OrgScholarshipsPage() {
         </div>
         <button
           onClick={() => setShowForm(true)}
-          className="flex items-center gap-2 bg-foreground text-background text-sm font-semibold px-4 py-2 rounded-xl hover:bg-muted transition-colors"
+          className="flex items-center gap-2 bg-foreground text-background text-sm font-semibold px-4 py-2 rounded-xl hover:opacity-90 transition-colors"
         >
           <Plus className="w-4 h-4" />
           Post scholarship
@@ -133,7 +133,7 @@ export default function OrgScholarshipsPage() {
           </p>
           <button
             onClick={() => setShowForm(true)}
-            className="inline-flex items-center gap-2 bg-foreground text-background text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-muted transition-colors"
+            className="inline-flex items-center gap-2 bg-foreground text-background text-sm font-semibold px-5 py-2.5 rounded-xl hover:opacity-90 transition-colors"
           >
             <Plus className="w-4 h-4" />
             Post your first scholarship
@@ -259,7 +259,7 @@ export default function OrgScholarshipsPage() {
               <button
                 onClick={() => create.mutate()}
                 disabled={!canSubmit || create.isPending}
-                className="flex-1 px-5 py-2.5 rounded-xl text-sm font-semibold bg-foreground text-background hover:bg-muted disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+                className="flex-1 px-5 py-2.5 rounded-xl text-sm font-semibold bg-foreground text-background hover:opacity-90 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
               >
                 {create.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
                 {create.isPending ? 'Posting...' : 'Post scholarship'}

@@ -118,7 +118,7 @@ export default function MessagesPage() {
           <select
             value={selectedEvent}
             onChange={(e) => setSelectedEvent(e.target.value)}
-            className="w-full bg-muted border border-border text-foreground rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-border"
+            className="w-full bg-muted border border-border text-foreground rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-ring"
           >
             <option value="">Select event...</option>
             {events.map((e: any) => (
@@ -134,7 +134,7 @@ export default function MessagesPage() {
             placeholder="Type your announcement..."
             rows={4}
             maxLength={300}
-            className="w-full bg-muted border border-border text-foreground rounded-xl px-4 py-3 text-sm resize-none placeholder-gray-600 focus:outline-none focus:border-border transition-colors"
+            className="w-full bg-muted border border-border text-foreground rounded-xl px-4 py-3 text-sm resize-none placeholder:text-muted-foreground focus:outline-none focus:border-ring transition-colors"
           />
           <div className="flex justify-between mt-1">
             <p className="text-xs text-muted-foreground">Sent via SMS to volunteers&apos; phones</p>
@@ -145,7 +145,7 @@ export default function MessagesPage() {
         <button
           onClick={handleSend}
           disabled={isSending || !message.trim()}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-foreground text-background font-semibold text-sm hover:bg-muted disabled:opacity-50 transition-colors"
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-foreground text-background font-semibold text-sm hover:opacity-90 disabled:opacity-50 transition-colors"
         >
           {isSending ? (
             <><Loader2 className="w-4 h-4 animate-spin" />Sending...</>

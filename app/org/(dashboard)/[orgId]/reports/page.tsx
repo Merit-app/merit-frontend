@@ -104,7 +104,7 @@ export default function ReportsPage() {
               type="date"
               value={from}
               onChange={(e) => setFrom(e.target.value)}
-              className="w-full bg-muted border border-border text-foreground rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-border"
+              className="w-full bg-muted border border-border text-foreground rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-ring"
             />
           </div>
           <div>
@@ -113,7 +113,7 @@ export default function ReportsPage() {
               type="date"
               value={to}
               onChange={(e) => setTo(e.target.value)}
-              className="w-full bg-muted border border-border text-foreground rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-border"
+              className="w-full bg-muted border border-border text-foreground rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-ring"
             />
           </div>
         </div>
@@ -133,7 +133,7 @@ export default function ReportsPage() {
         <button
           onClick={handleGrantReport}
           disabled={isGenerating}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-foreground text-background font-semibold text-sm hover:bg-muted disabled:opacity-50 transition-colors"
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-foreground text-background font-semibold text-sm hover:opacity-90 disabled:opacity-50 transition-colors"
         >
           {isGenerating ? (
             <><Loader2 className="w-4 h-4 animate-spin" />Generating...</>

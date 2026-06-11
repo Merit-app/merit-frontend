@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { chapterApi, ApiError } from '@/lib/api';
 import { UserPlus, Shield, Trash2, Plus, X, Crown, Check, History } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface Member { userId: string; name: string; email: string; roleName: string; roleId: string | null; isOwner: boolean }
 interface Role { id: string; name: string; permissions: string[]; is_default: boolean }
@@ -31,7 +32,28 @@ export default function TeamPage() {
 
   useEffect(() => { void load(); }, [load]);
 
-  if (loading) return <div className="text-muted-foreground">Loading team…</div>;
+  if (loading) {
+    return (
+      <div className="max-w-3xl space-y-8">
+        <div className="space-y-2">
+          <Skeleton className="h-7 w-44" />
+          <Skeleton className="h-4 w-72" />
+        </div>
+        <div className="rounded-xl border border-border bg-card p-6 space-y-4">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="flex items-center gap-3">
+              <Skeleton className="h-9 w-9 rounded-full shrink-0" />
+              <div className="flex-1 space-y-1.5">
+                <Skeleton className="h-4 w-40" />
+                <Skeleton className="h-3 w-56" />
+              </div>
+              <Skeleton className="h-7 w-24 rounded-lg shrink-0" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-3xl space-y-8">

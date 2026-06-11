@@ -74,7 +74,7 @@ export default function OrgLandingPage() {
           </a>
           <Link
             href="/org/login"
-            className="bg-foreground text-background text-sm font-semibold px-4 py-2 rounded-lg hover:bg-muted transition-colors"
+            className="bg-foreground text-background text-sm font-semibold px-4 py-2 rounded-lg hover:opacity-90 transition-colors"
           >
             Sign in
           </Link>
@@ -98,7 +98,7 @@ export default function OrgLandingPage() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
             href="/org/create"
-            className="bg-foreground text-background font-semibold px-8 py-4 rounded-xl text-lg hover:bg-muted transition-colors flex items-center gap-2"
+            className="bg-foreground text-background font-semibold px-8 py-4 rounded-xl text-lg hover:opacity-90 transition-colors flex items-center gap-2"
           >
             Create your organization
             <ArrowRight className="w-5 h-5" />
@@ -158,9 +158,9 @@ export default function OrgLandingPage() {
       <footer className="border-t border-border py-8 px-8 flex items-center justify-between">
         <p className="text-muted-foreground text-sm">merit. for organizations</p>
         <div className="flex gap-6 text-sm text-muted-foreground">
-          <a href="/" className="hover:text-muted-foreground">Student app</a>
-          <a href="/terms" className="hover:text-muted-foreground">Terms</a>
-          <a href="/privacy" className="hover:text-muted-foreground">Privacy</a>
+          <a href="/" className="hover:text-foreground">Student app</a>
+          <a href="/terms" className="hover:text-foreground">Terms</a>
+          <a href="/privacy" className="hover:text-foreground">Privacy</a>
         </div>
       </footer>
     </div>

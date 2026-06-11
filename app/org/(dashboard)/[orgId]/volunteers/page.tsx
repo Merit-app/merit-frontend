@@ -5,7 +5,9 @@ import { useParams } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { orgVolunteersApi } from '@/lib/api';
 import { toast } from 'sonner';
-import { Search, Download, CheckCircle2, ChevronDown, ChevronRight, ExternalLink, Mail, Phone, GraduationCap } from 'lucide-react';
+import { Search, Download, CheckCircle2, ChevronDown, ChevronRight, ExternalLink, Mail, Phone, GraduationCap, Users } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { EmptyState } from '@/components/ui/empty-state';
 
 function fmtDate(iso: string) {
   try { return new Date(iso).toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' }); }
@@ -67,7 +69,7 @@ export default function VolunteersPage() {
         </div>
         <button
           onClick={handleExport}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted hover:text-foreground transition-colors"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl border border-border bg-card text-muted-foreground text-sm font-medium hover:bg-muted hover:text-foreground transition-colors active:scale-[0.98]"
         >
           <Download className="w-4 h-4" />
           Export CSV
@@ -81,18 +83,33 @@ export default function VolunteersPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search volunteers..."
-          className="w-full bg-card border border-border text-foreground rounded-xl pl-10 pr-4 py-3 text-sm placeholder-gray-600 focus:outline-none focus:border-gray-600 transition-colors"
+          className="w-full bg-card border border-border text-foreground rounded-xl pl-10 pr-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/25 transition-colors"
         />
       </div>
 
       <div className="space-y-2">
         {isLoading ? (
           Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="h-20 bg-card rounded-2xl animate-pulse" />
+            <div key={i} className="flex items-center gap-4 rounded-2xl border border-border bg-card p-4">
+              <Skeleton className="h-10 w-10 rounded-full shrink-0" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-4 w-40" />
+                <Skeleton className="h-3 w-28" />
+              </div>
+              <Skeleton className="h-4 w-20 shrink-0" />
+            </div>
           ))
         ) : filtered.length === 0 ? (
-          <div className="bg-card border border-border rounded-2xl p-12 text-center">
-            <p className="text-muted-foreground">{search ? 'No matching volunteers.' : 'No volunteers yet.'}</p>
+          <div className="bg-card border border-border rounded-2xl">
+            <EmptyState
+              icon={Users}
+              title={search ? 'No matching volunteers' : 'No volunteers yet'}
+              description={
+                search
+                  ? 'Try a different name.'
+                  : 'When students log hours at your organization, they show up here for you to verify.'
+              }
+            />
           </div>
         ) : (
           filtered.map((v: any) => (
@@ -113,7 +130,7 @@ export default function VolunteersPage() {
                         target="_blank"
                         rel="noreferrer"
                         onClick={(e) => e.stopPropagation()}
-                        className="text-muted-foreground hover:text-muted-foreground"
+                        className="text-muted-foreground hover:text-foreground transition-colors"
                       >
                         <ExternalLink className="w-3 h-3" />
                       </a>
@@ -135,7 +152,7 @@ export default function VolunteersPage() {
               {expanded === v.student.id && (
                 <div className="border-t border-border">
                   {/* Contact info */}
-                  <div className="px-4 py-3 bg-card/30 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs">
+                  <div className="px-4 py-3 bg-muted/30 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs">
                     {v.student.email ? (
                       <a href={`mailto:${v.student.email}`} className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
                         <Mail className="w-3.5 h-3.5 text-muted-foreground" />

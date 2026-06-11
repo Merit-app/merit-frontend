@@ -9,7 +9,7 @@ import { useMeritStore } from '@/lib/store';
 import { orgSignupApi, mapUser, ApiError } from '@/lib/api';
 
 const inputClass =
-  'w-full bg-muted border border-border text-foreground rounded-xl px-4 py-3 text-sm placeholder-gray-600 focus:outline-none focus:border-ring transition-colors';
+  'w-full bg-muted border border-border text-foreground rounded-xl px-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:border-ring transition-colors';
 const labelClass = 'block text-sm font-medium text-muted-foreground mb-1.5';
 
 function SetupForm() {
@@ -186,7 +186,7 @@ function SetupForm() {
                 type="button"
                 onClick={() => setShowPw(!showPw)}
                 tabIndex={-1}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
               >
                 {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -210,7 +210,7 @@ function SetupForm() {
                 type="button"
                 onClick={() => setShowConfirmPw(!showConfirmPw)}
                 tabIndex={-1}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
               >
                 {showConfirmPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -242,7 +242,7 @@ function SetupForm() {
               !form.password ||
               form.password !== form.confirmPassword
             }
-            className="w-full bg-foreground text-background font-semibold py-3 rounded-xl text-sm hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 mt-2"
+            className="w-full bg-foreground text-background font-semibold py-3 rounded-xl text-sm hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 mt-2"
           >
             {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
             {isLoading ? 'Creating account...' : 'Create account →'}

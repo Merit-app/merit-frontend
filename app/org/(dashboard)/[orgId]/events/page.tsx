@@ -96,7 +96,7 @@ export default function EventsPage() {
         </div>
         <Link
           href={`/org/${orgId}/events/new`}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-foreground text-background text-sm font-semibold hover:bg-muted transition-colors"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-foreground text-background text-sm font-semibold hover:opacity-90 transition-colors"
         >
           <Plus className="w-4 h-4" />
           Create event

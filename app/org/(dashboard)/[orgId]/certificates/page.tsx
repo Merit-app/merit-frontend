@@ -84,7 +84,7 @@ export default function CertificatesPage() {
           value={coordinatorName}
           onChange={(e) => setCoordinatorName(e.target.value)}
           placeholder="e.g. Jane Smith"
-          className="w-full bg-muted border border-border text-foreground rounded-xl px-4 py-3 text-sm placeholder-gray-600 focus:outline-none focus:border-border transition-colors"
+          className="w-full bg-muted border border-border text-foreground rounded-xl px-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:border-ring transition-colors"
         />
       </div>
 
@@ -94,7 +94,7 @@ export default function CertificatesPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search volunteers..."
-          className="w-full bg-card border border-border text-foreground rounded-xl pl-10 pr-4 py-3 text-sm placeholder-gray-600 focus:outline-none focus:border-gray-600 transition-colors"
+          className="w-full bg-card border border-border text-foreground rounded-xl pl-10 pr-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/25 transition-colors"
         />
       </div>
 
@@ -122,7 +122,7 @@ export default function CertificatesPage() {
               <button
                 onClick={() => handleCertificate(v.student.id, v.student.name)}
                 disabled={generating === v.student.id}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted hover:text-foreground disabled:opacity-50 transition-colors shrink-0"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl border border-border bg-card text-muted-foreground text-sm font-medium hover:bg-muted hover:text-foreground disabled:opacity-50 transition-colors shrink-0"
               >
                 {generating === v.student.id ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />

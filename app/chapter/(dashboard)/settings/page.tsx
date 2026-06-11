@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { chapterApi, adminApi, ApiError } from '@/lib/api';
 import { Plus } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function ChapterSettingsPage() {
   const [requiredHours, setRequiredHours] = useState('0');
@@ -44,7 +45,20 @@ export default function ChapterSettingsPage() {
     } finally { setSaving(false); }
   }
 
-  if (loading) return <div className="text-muted-foreground">Loading settings…</div>;
+  if (loading) {
+    return (
+      <div className="max-w-2xl space-y-6">
+        <Skeleton className="h-7 w-32" />
+        {[0, 1].map((i) => (
+          <div key={i} className="rounded-xl border border-border bg-card p-6 space-y-3">
+            <Skeleton className="h-4 w-44" />
+            <Skeleton className="h-3 w-64" />
+            <Skeleton className="h-10 w-full max-w-xs rounded-lg" />
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-2xl space-y-6">

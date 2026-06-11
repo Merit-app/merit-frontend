@@ -122,7 +122,7 @@ export default function EventDetailPage() {
             <button
               onClick={() => publishEvent.mutate()}
               disabled={publishEvent.isPending}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-foreground text-background text-sm font-semibold hover:bg-muted disabled:opacity-50 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-foreground text-background text-sm font-semibold hover:opacity-90 disabled:opacity-50 transition-colors"
             >
               {publishEvent.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
               Publish + notify volunteers
@@ -184,7 +184,7 @@ export default function EventDetailPage() {
                     <button
                       onClick={() => checkIn.mutate(u?.id)}
                       disabled={checkIn.isPending}
-                      className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-foreground text-background font-medium hover:bg-muted disabled:opacity-50 transition-colors shrink-0"
+                      className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-foreground text-background font-medium hover:opacity-90 disabled:opacity-50 transition-colors shrink-0"
                     >
                       <UserCheck className="w-3.5 h-3.5" />
                       Check in

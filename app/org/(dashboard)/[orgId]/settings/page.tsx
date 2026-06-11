@@ -27,7 +27,7 @@ const ROLE_ICONS: Record<Role, React.ElementType> = { owner: Crown, admin: Shiel
 const ROLE_COLORS: Record<Role, string> = { owner: 'text-warning', admin: 'text-primary', coordinator: 'text-muted-foreground' };
 
 const INPUT_CLASS =
-  'bg-muted border border-border text-foreground rounded-xl px-4 py-3 text-sm placeholder-gray-600 focus:outline-none focus:border-border transition-colors';
+  'bg-muted border border-border text-foreground rounded-xl px-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/25 transition-[border-color,box-shadow]';
 
 // ── Main page (inner — needs useSearchParams) ─────────────────────────────────
 function OrgSettingsInner() {
@@ -114,7 +114,7 @@ function OrgSettingsInner() {
               className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition-colors shrink-0 ${
                 activeTab === tab.id
                   ? 'border-foreground text-foreground'
-                  : 'border-transparent text-muted-foreground hover:text-muted-foreground'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
             >
               <tab.icon className="w-4 h-4" />
@@ -285,7 +285,7 @@ function OrganizationTab({ orgId, org, canEdit, isOwner }: { orgId: string; org:
               <Toggle label="Currently accepting volunteers" description="Shows a 'Recruiting' badge on your public page" value={form.is_recruiting} onChange={(v) => setForm((f) => ({ ...f, is_recruiting: v }))} />
               <div className="flex gap-3 pt-2">
                 <button onClick={() => setEditing(false)} className="px-5 py-2.5 rounded-xl text-sm text-muted-foreground hover:text-foreground border border-border transition-colors">Cancel</button>
-                <button onClick={handleSave} disabled={saving} className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-foreground text-background hover:bg-muted disabled:opacity-50 transition-colors flex items-center gap-2">
+                <button onClick={handleSave} disabled={saving} className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-foreground text-background hover:opacity-90 disabled:opacity-50 transition-colors flex items-center gap-2">
                   {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                   {saving ? 'Saving...' : 'Save changes'}
                 </button>
@@ -400,7 +400,7 @@ function DangerZone({ orgId, orgName }: { orgId: string; orgName: string }) {
                 onChange={(e) => setConfirmText(e.target.value)}
                 placeholder={orgName}
                 autoFocus
-                className="w-full bg-muted border border-border text-foreground rounded-xl px-4 py-2.5 text-sm placeholder-gray-600 focus:outline-none focus:border-red-500/50"
+                className="w-full bg-muted border border-border text-foreground rounded-xl px-4 py-2.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:border-red-500/50"
               />
             </div>
             <div className="flex gap-3 justify-end pt-2">
@@ -484,7 +484,7 @@ function TeamTab({ orgId, admins, userRole, currentUserId }: {
               <option value="admin">Admin</option>
             </select>
             <button onClick={invite} disabled={inviting || !email}
-              className="px-5 py-2.5 rounded-xl bg-foreground text-background text-sm font-semibold hover:bg-muted disabled:opacity-50 transition-colors flex items-center gap-2">
+              className="px-5 py-2.5 rounded-xl bg-foreground text-background text-sm font-semibold hover:opacity-90 disabled:opacity-50 transition-colors flex items-center gap-2">
               {inviting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Invite'}
             </button>
           </div>
@@ -630,7 +630,7 @@ function AccountTab() {
         </FormField>
         <div className="flex justify-end pt-2 border-t border-border">
           <button onClick={save} disabled={!hasChanges || saving || !name || !email}
-            className="px-5 py-2.5 rounded-xl bg-foreground text-background text-sm font-semibold hover:bg-muted disabled:opacity-50 transition-colors flex items-center gap-2">
+            className="px-5 py-2.5 rounded-xl bg-foreground text-background text-sm font-semibold hover:opacity-90 disabled:opacity-50 transition-colors flex items-center gap-2">
             {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
             {saving ? 'Saving...' : 'Save changes'}
           </button>
@@ -683,7 +683,7 @@ function PasswordTab() {
         <PwField label="Confirm new password" value={confirm} onChange={setConfirm} show={showConfirm} setShow={setShowConfirm} placeholder="Re-enter new password" error={mismatch ? 'Passwords do not match' : undefined} />
         <div className="flex justify-end pt-2 border-t border-border">
           <button type="submit" disabled={!canSave || saving}
-            className="px-5 py-2.5 rounded-xl bg-foreground text-background text-sm font-semibold hover:bg-muted disabled:opacity-50 transition-colors flex items-center gap-2">
+            className="px-5 py-2.5 rounded-xl bg-foreground text-background text-sm font-semibold hover:opacity-90 disabled:opacity-50 transition-colors flex items-center gap-2">
             {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
             {saving ? 'Updating...' : 'Update password'}
           </button>
@@ -838,7 +838,7 @@ function BillingTab({ orgId, currentPlan }: { orgId: string; currentPlan?: strin
               ) : (
                 <button onClick={() => checkout(p.id as 'pro' | 'enterprise')} disabled={loading === p.id}
                   className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2 disabled:opacity-50 ${
-                    p.id === 'pro' ? 'bg-foreground text-background hover:bg-muted' : 'bg-muted text-foreground hover:bg-muted'
+                    p.id === 'pro' ? 'bg-foreground text-background hover:opacity-90' : 'bg-muted text-foreground hover:bg-muted'
                   }`}>
                   {loading === p.id && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                   {loading === p.id ? 'Loading...' : `Upgrade to ${p.name}`}
@@ -889,8 +889,8 @@ function Toggle({ label, description, value, onChange }: {
   return (
     <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-xl border border-border">
       <button type="button" onClick={() => onChange(!value)}
-        className={`relative w-10 h-6 rounded-full transition-colors shrink-0 ${value ? 'bg-card' : 'bg-gray-600'}`}>
-        <span className={`absolute top-1 w-4 h-4 rounded-full bg-card transition-transform ${value ? 'translate-x-5' : 'translate-x-1'}`} />
+        className={`relative w-10 h-6 rounded-full transition-colors shrink-0 ${value ? 'bg-merit-blue-600' : 'bg-ink-300 dark:bg-secondary'}`}>
+        <span className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${value ? 'translate-x-5' : 'translate-x-1'}`} />
       </button>
       <div>
         <p className="text-foreground text-sm font-medium">{label}</p>
@@ -911,7 +911,7 @@ function PwField({ label, value, onChange, show, setShow, placeholder, error }: 
           onChange={(e) => onChange(e.target.value)}
           className={`${INPUT_CLASS} w-full pr-10 ${error ? 'border-red-500' : ''}`} />
         <button type="button" onClick={() => setShow(!show)}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground">
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
           {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
         </button>
       </div>

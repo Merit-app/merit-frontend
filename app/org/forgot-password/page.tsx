@@ -83,13 +83,13 @@ export default function OrgForgotPasswordPage() {
                   placeholder="you@organization.org"
                   autoFocus
                   required
-                  className="w-full bg-muted border border-border text-foreground rounded-xl px-4 py-3 text-sm placeholder-gray-600 focus:outline-none focus:border-ring transition-colors"
+                  className="w-full bg-muted border border-border text-foreground rounded-xl px-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:border-ring transition-colors"
                 />
               </div>
               <button
                 type="submit"
                 disabled={loading || !email.trim()}
-                className="w-full bg-foreground text-background font-semibold py-3 rounded-xl text-sm hover:bg-muted disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+                className="w-full bg-foreground text-background font-semibold py-3 rounded-xl text-sm hover:opacity-90 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
               >
                 {loading && <Loader2 className="w-4 h-4 animate-spin" />}
                 {loading ? 'Sending...' : 'Send reset link'}
@@ -97,7 +97,7 @@ export default function OrgForgotPasswordPage() {
             </form>
 
             <div className="mt-6 pt-6 border-t border-border text-center">
-              <Link href="/org/login" className="text-sm text-muted-foreground hover:text-muted-foreground">
+              <Link href="/org/login" className="text-sm text-muted-foreground hover:text-foreground">
                 Back to org sign in
               </Link>
             </div>

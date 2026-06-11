@@ -16,7 +16,7 @@ const CATEGORIES = [
 ];
 
 const input =
-  'w-full bg-muted border border-border text-foreground rounded-xl px-4 py-3 text-sm placeholder-gray-600 focus:outline-none focus:border-ring transition-colors';
+  'w-full bg-muted border border-border text-foreground rounded-xl px-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:border-ring transition-colors';
 const label = 'block text-sm font-medium text-muted-foreground mb-1.5';
 
 type AuthMode = 'new' | 'existing';
@@ -199,7 +199,7 @@ export default function OrgCreatePage() {
                 <div className="relative">
                   <input type={showPw ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)}
                     placeholder={mode === 'new' ? 'At least 8 characters' : 'Your password'} className={`${input} pr-10`} required />
-                  <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground">
+                  <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                     {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
@@ -290,7 +290,7 @@ export default function OrgCreatePage() {
         </div>
 
         <button type="submit" disabled={!canSubmit}
-          className="w-full bg-foreground text-background font-semibold py-3 rounded-xl text-sm hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2">
+          className="w-full bg-foreground text-background font-semibold py-3 rounded-xl text-sm hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2">
           {loading && <Loader2 className="w-4 h-4 animate-spin" />}
           {loading ? 'Creating…' : 'Create organization'}
         </button>

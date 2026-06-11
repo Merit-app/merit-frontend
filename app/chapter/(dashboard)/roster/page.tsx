@@ -3,7 +3,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { chapterApi, adminApi, ApiError, type RosterStudent, type RosterImportRow, type RosterImportResult } from '@/lib/api';
-import { Search, Upload, ChevronRight, CheckCircle2, AlertTriangle, X } from 'lucide-react';
+import { Search, Upload, ChevronRight, CheckCircle2, AlertTriangle, X, Users } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { EmptyState } from '@/components/ui/empty-state';
 
 const FILTERS = [
   { key: 'all', label: 'All' },
@@ -97,9 +99,32 @@ export default function RosterPage() {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">Loading…</td></tr>
+              Array.from({ length: 5 }).map((_, i) => (
+                <tr key={i} className="border-t border-border">
+                  <td className="px-4 py-3.5">
+                    <Skeleton className="mb-1.5 h-4 w-36" />
+                    <Skeleton className="h-3 w-44" />
+                  </td>
+                  <td className="px-4 py-3.5"><Skeleton className="h-4 w-10" /></td>
+                  <td className="px-4 py-3.5"><Skeleton className="h-4 w-14" /></td>
+                  <td className="px-4 py-3.5"><Skeleton className="h-5 w-20 rounded-full" /></td>
+                  <td />
+                </tr>
+              ))
             ) : students.length === 0 ? (
-              <tr><td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">No students match.</td></tr>
+              <tr>
+                <td colSpan={5}>
+                  <EmptyState
+                    icon={Users}
+                    title={search || filter !== 'all' ? 'No students match' : 'No students yet'}
+                    description={
+                      search || filter !== 'all'
+                        ? 'Try a different search or filter.'
+                        : 'Import your roster to invite students — they pair automatically when they sign up with their school email.'
+                    }
+                  />
+                </td>
+              </tr>
             ) : students.map((s) => {
               const badge = STATUS_BADGE[s.status] ?? STATUS_BADGE.no_goal;
               return (

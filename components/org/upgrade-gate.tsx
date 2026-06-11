@@ -25,7 +25,7 @@ export function UpgradeGate({ orgId, feature, description, plan = 'pro' }: Upgra
       </div>
       <Link
         href={`/org/${orgId}/settings?tab=billing`}
-        className="bg-foreground text-background font-semibold px-6 py-3 rounded-xl text-sm hover:bg-muted transition-colors"
+        className="bg-foreground text-background font-semibold px-6 py-3 rounded-xl text-sm hover:opacity-90 transition-colors"
       >
         Upgrade to {planLabel} · ${price}/mo
       </Link>

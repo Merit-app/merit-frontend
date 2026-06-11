@@ -107,7 +107,7 @@ function JoinForm() {
             <p className="font-semibold text-foreground">Already accepted</p>
             <Link
               href="/org/login"
-              className="bg-foreground text-background font-semibold px-6 py-2.5 rounded-xl text-sm hover:bg-muted transition-colors"
+              className="bg-foreground text-background font-semibold px-6 py-2.5 rounded-xl text-sm hover:opacity-90 transition-colors"
             >
               Sign in →
             </Link>
@@ -140,7 +140,7 @@ function JoinForm() {
               <button
                 onClick={handleAccept}
                 disabled={isAccepting}
-                className="w-full bg-foreground text-background font-semibold py-3 rounded-xl text-sm hover:bg-muted disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+                className="w-full bg-foreground text-background font-semibold py-3 rounded-xl text-sm hover:opacity-90 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
               >
                 {isAccepting && <Loader2 className="w-4 h-4 animate-spin" />}
                 {isAccepting ? 'Accepting...' : 'Accept invitation →'}
@@ -150,7 +150,7 @@ function JoinForm() {
                 <p className="text-muted-foreground text-sm">Sign in or create an account to accept</p>
                 <Link
                   href={`/login?redirect=${encodeURIComponent(`/org/join?token=${token}`)}`}
-                  className="block w-full bg-foreground text-background font-semibold py-3 rounded-xl text-sm text-center hover:bg-muted transition-colors"
+                  className="block w-full bg-foreground text-background font-semibold py-3 rounded-xl text-sm text-center hover:opacity-90 transition-colors"
                 >
                   Sign in to Merit
                 </Link>
