@@ -92,7 +92,7 @@ export function ChapterMockup() {
 
           {/* Roster rows */}
           <div className="overflow-hidden rounded-lg border border-border">
-            <div className="grid grid-cols-[1fr_48px_1fr_82px] items-center gap-3 border-b border-border bg-muted/50 px-3 py-2 text-[10px] font-medium uppercase tracking-wide text-muted-foreground sm:grid-cols-[1.2fr_60px_1fr_90px]">
+            <div className="grid grid-cols-[1fr_34px_1fr_70px] items-center gap-2 border-b border-border bg-muted/50 px-3 py-2 text-[10px] font-medium uppercase tracking-wide text-muted-foreground sm:grid-cols-[1.2fr_60px_1fr_90px] sm:gap-3">
               <span className="flex items-center gap-1"><Users className="h-3 w-3" /> Student</span>
               <span>Year</span>
               <span>Progress</span>
@@ -108,7 +108,7 @@ export function ChapterMockup() {
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: 0.3 + i * 0.07, ease: EASE }}
-                  className="grid grid-cols-[1fr_48px_1fr_82px] items-center gap-3 border-b border-border px-3 py-2.5 text-xs last:border-0 sm:grid-cols-[1.2fr_60px_1fr_90px]"
+                  className="grid grid-cols-[1fr_34px_1fr_70px] items-center gap-2 border-b border-border px-3 py-2.5 text-xs last:border-0 sm:grid-cols-[1.2fr_60px_1fr_90px] sm:gap-3"
                 >
                   <span className="truncate font-medium text-foreground">{r.name}</span>
                   <span className="tabular-nums text-muted-foreground">{r.year}</span>
@@ -122,7 +122,7 @@ export function ChapterMockup() {
                         transition={{ duration: 0.8, delay: 0.5 + i * 0.07, ease: EASE }}
                       />
                     </span>
-                    <span className="w-12 shrink-0 tabular-nums text-muted-foreground">{r.hours}/{r.goal}h</span>
+                    <span className="hidden w-12 shrink-0 tabular-nums text-muted-foreground sm:inline">{r.hours}/{r.goal}h</span>
                   </span>
                   <span className={`inline-flex w-fit items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${st.cls}`}>
                     <st.icon className="h-2.5 w-2.5" />

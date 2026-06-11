@@ -22,6 +22,7 @@ import {
   ExternalLink,
   Bell,
   GraduationCap,
+  Menu,
 } from 'lucide-react';
 
 // Settings is NOT in this list — it lives in the bottom section
@@ -51,6 +52,12 @@ export default function OrgDashboardLayout({ children }: { children: React.React
   const [showOrgPicker, setShowOrgPicker] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardingChecked, setOnboardingChecked] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Close the mobile drawer on navigation
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
 
   // One unified Merit session. The refresh token is persisted, so a hard refresh,
   // idle period, or hop between the student and org dashboards keeps the user signed
@@ -144,13 +151,10 @@ export default function OrgDashboardLayout({ children }: { children: React.React
 
   const orgBase = `/org/${currentOrg.id}`;
 
-  return (
-    <div className="flex h-screen bg-background overflow-hidden">
-      {/* ── Sidebar ─────────────────────────────────────────────────────── */}
-      <aside className="w-64 bg-card border-r border-border flex flex-col shrink-0">
-
+  const sidebarContent = (
+    <>
         {/* Logo — links to dashboard */}
-        <div className="px-5 h-14 border-b border-border flex items-center">
+        <div className="px-5 h-14 border-b border-border flex items-center shrink-0">
           <Link
             href={`${orgBase}/dashboard`}
             className="font-bold text-xl text-foreground hover:opacity-80 transition-opacity"
@@ -292,12 +296,41 @@ export default function OrgDashboardLayout({ children }: { children: React.React
             </div>
           </div>
         </div>
+    </>
+  );
+
+  return (
+    <div className="flex h-screen bg-background overflow-hidden">
+      {/* ── Sidebar (desktop) ───────────────────────────────────────────── */}
+      <aside className="hidden lg:flex w-64 bg-card border-r border-border flex-col shrink-0">
+        {sidebarContent}
       </aside>
+
+      {/* ── Sidebar (mobile drawer) ─────────────────────────────────────── */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setMobileOpen(false)}
+            aria-hidden
+          />
+          <aside className="absolute left-0 top-0 flex h-full w-72 max-w-[85%] flex-col border-r border-border bg-card shadow-xl">
+            {sidebarContent}
+          </aside>
+        </div>
+      )}
 
       {/* ── Main ────────────────────────────────────────────────────────── */}
       <main className="flex-1 overflow-y-auto bg-background">
-        <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b border-border px-8 h-14 flex items-center justify-between">
-          <div />
+        <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b border-border px-4 lg:px-8 h-14 flex items-center justify-between">
+          <button
+            onClick={() => setMobileOpen(true)}
+            className="lg:hidden text-muted-foreground hover:text-foreground transition-colors"
+            aria-label="Open menu"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+          <div className="hidden lg:block" />
           <div className="flex items-center gap-2">
             <ThemeToggle />
             <button className="text-muted-foreground hover:text-foreground transition-colors">
@@ -305,7 +338,7 @@ export default function OrgDashboardLayout({ children }: { children: React.React
             </button>
           </div>
         </div>
-        <div className="p-8">{children}</div>
+        <div className="p-4 sm:p-6 lg:p-8">{children}</div>
       </main>
 
       {/* Onboarding walkthrough */}

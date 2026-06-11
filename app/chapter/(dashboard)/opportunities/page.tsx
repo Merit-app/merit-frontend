@@ -21,12 +21,12 @@ export default function OpportunitiesPage() {
 
   return (
     <div className="max-w-3xl space-y-5">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold text-foreground">Opportunities</h1>
           <p className="text-sm text-muted-foreground">Post volunteering opportunities — students get notified instantly.</p>
         </div>
-        <button onClick={() => setShowForm(true)} className="inline-flex items-center gap-2 rounded-lg bg-merit-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-merit-blue-700">
+        <button onClick={() => setShowForm(true)} className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-merit-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-merit-blue-700">
           <Plus className="h-4 w-4" /> Post opportunity
         </button>
       </div>

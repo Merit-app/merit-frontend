@@ -86,8 +86,8 @@ export default function RosterPage() {
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-xl border border-border">
-        <table className="w-full text-sm">
+      <div className="overflow-x-auto rounded-xl border border-border">
+        <table className="w-full min-w-[560px] text-sm">
           <thead className="bg-muted/40 text-left text-xs uppercase tracking-wide text-muted-foreground">
             <tr>
               <th className="px-4 py-3 font-medium">Student</th>
