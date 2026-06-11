@@ -55,7 +55,7 @@ export function StudentSection() {
           >
             Service hours
             <br />
-            <span className="bg-gradient-to-r from-merit-blue-600 via-violet-500 to-merit-blue-500 bg-clip-text text-transparent">
+            <span className="text-merit-blue-600">
               you can actually prove.
             </span>
           </motion.h1>
