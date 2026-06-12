@@ -37,13 +37,13 @@ export function StudentSection() {
         variants={container}
         initial="hidden"
         animate="visible"
-        className="relative max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-32"
+        className="relative max-w-6xl mx-auto px-4 sm:px-6 pt-14 pb-24"
       >
         {/* Hero */}
-        <div className="text-center max-w-3xl mx-auto mb-20">
+        <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-14">
           <motion.div
             variants={item}
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground shadow-sm mb-8"
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground shadow-sm mb-6"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
             Trusted by students across BC
@@ -62,7 +62,7 @@ export function StudentSection() {
 
           <motion.p
             variants={item}
-            className="text-xl text-muted-foreground max-w-xl mx-auto mb-10 leading-relaxed"
+            className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8 leading-relaxed"
           >
             Log volunteer hours, get them verified by SMS, and export beautiful signed PDFs for
             college applications and graduation requirements.
@@ -95,7 +95,7 @@ export function StudentSection() {
         </motion.div>
 
         {/* Stats strip */}
-        <RevealGroup className="mt-32 grid grid-cols-2 md:grid-cols-4 gap-8 text-center max-w-4xl mx-auto">
+        <RevealGroup className="mt-24 grid grid-cols-2 md:grid-cols-4 gap-8 text-center max-w-4xl mx-auto">
           {[
             { value: '2 min', label: 'Average time to log a session' },
             { value: '< 30s', label: 'Average supervisor response' },
@@ -110,7 +110,7 @@ export function StudentSection() {
         </RevealGroup>
 
         {/* Testimonials */}
-        <div className="mt-32 max-w-4xl mx-auto">
+        <div className="mt-24 max-w-4xl mx-auto">
           <Reveal>
             <p className="text-xs font-semibold tracking-widest text-muted-foreground uppercase text-center mb-12">
               From students who&apos;ve used it
@@ -162,7 +162,7 @@ export function StudentSection() {
         </div>
 
         {/* Final CTA */}
-        <Reveal className="mt-32 text-center max-w-2xl mx-auto">
+        <Reveal className="mt-24 text-center max-w-2xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-semibold tracking-tight text-foreground mb-4">
             Your advisor will notice the difference.
           </h2>
