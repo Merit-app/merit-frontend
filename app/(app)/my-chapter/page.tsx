@@ -7,11 +7,13 @@ import { GraduationCap, CheckCircle2, AlertTriangle, CalendarDays, Clock, MapPin
 import { useRouter } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AnimatedProgress, CountUp } from '@/components/motion';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 
 export default function MyChapterPage() {
   const router = useRouter();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [confirmLeaveOpen, setConfirmLeaveOpen] = useState(false);
 
   const load = () => chapterApi.myChapter().then((r) => setData(r.data));
   useEffect(() => {
@@ -23,7 +25,6 @@ export default function MyChapterPage() {
     load();
   }
   async function leave() {
-    if (!confirm('Leave this chapter? Your coordinator will no longer see your hours. You can be re-added later.')) return;
     await chapterApi.leaveChapter().catch(() => {});
     router.push('/dashboard');
   }
@@ -154,10 +155,20 @@ export default function MyChapterPage() {
           <li>• Whether you’ve met your requirement</li>
         </ul>
         <p className="mt-2 text-xs text-muted-foreground">They cannot see your password, log in as you, or edit your account.</p>
-        <button onClick={leave} className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-red-600 hover:text-red-700">
+        <button onClick={() => setConfirmLeaveOpen(true)} className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-red-600 hover:text-red-700">
           <LogOut className="h-4 w-4" /> Leave this chapter
         </button>
       </div>
+
+      <ConfirmDialog
+        open={confirmLeaveOpen}
+        onOpenChange={setConfirmLeaveOpen}
+        title="Leave this chapter?"
+        description="Your coordinator will no longer see your hours or progress. You can be re-added later."
+        confirmLabel="Leave chapter"
+        destructive
+        onConfirm={leave}
+      />
     </div>
   );
 }

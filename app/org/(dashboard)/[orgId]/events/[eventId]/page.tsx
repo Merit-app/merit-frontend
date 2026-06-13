@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { orgEventsApi, ApiError } from '@/lib/api';
@@ -9,10 +10,12 @@ import {
   ArrowLeft, Send, UserCheck, Loader2,
 } from 'lucide-react';
 import Link from 'next/link';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 
 export default function EventDetailPage() {
   const { orgId, eventId } = useParams<{ orgId: string; eventId: string }>();
   const qc = useQueryClient();
+  const [confirmCompleteOpen, setConfirmCompleteOpen] = useState(false);
 
   const { data: res, isLoading } = useQuery({
     queryKey: ['org-event', orgId, eventId],
@@ -130,11 +133,7 @@ export default function EventDetailPage() {
           )}
           {event.status === 'published' && (isToday || !isUpcoming) && (
             <button
-              onClick={() => {
-                if (confirm(`Complete event? ${checkedIn.length} sessions will be auto-logged.`)) {
-                  completeEvent.mutate();
-                }
-              }}
+              onClick={() => setConfirmCompleteOpen(true)}
               disabled={completeEvent.isPending}
               className="flex items-center gap-2 px-4 py-2 rounded-xl bg-green-500/10 text-success border border-green-500/20 text-sm font-semibold hover:bg-green-500/20 disabled:opacity-50 transition-colors"
             >
@@ -213,6 +212,15 @@ export default function EventDetailPage() {
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        open={confirmCompleteOpen}
+        onOpenChange={setConfirmCompleteOpen}
+        title="Complete this event?"
+        description={`${checkedIn.length} checked-in volunteer${checkedIn.length === 1 ? '' : 's'} will have their hours auto-logged. This can't be undone.`}
+        confirmLabel="Complete + log hours"
+        onConfirm={() => completeEvent.mutateAsync()}
+      />
     </div>
   );
 }

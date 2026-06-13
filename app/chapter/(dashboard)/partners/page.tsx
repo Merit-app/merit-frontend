@@ -47,11 +47,17 @@ export default function PartnersPage() {
           <Gift className="h-4 w-4 text-merit-blue-600" />
           <h2 className="font-medium text-foreground">Invite a partner</h2>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <input value={orgName} onChange={(e) => setOrgName(e.target.value)} placeholder="Organization name"
-            className="flex-1 min-w-[180px] rounded-lg border border-border bg-background px-3 py-2 text-sm" />
-          <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="contact@org.com"
-            className="flex-1 min-w-[180px] rounded-lg border border-border bg-background px-3 py-2 text-sm" />
+        <div className="flex flex-wrap items-end gap-2">
+          <label className="flex-1 min-w-[180px] text-sm">
+            <span className="mb-1 block text-xs font-medium text-foreground">Organization name</span>
+            <input value={orgName} onChange={(e) => setOrgName(e.target.value)} placeholder="e.g. Vancouver Food Bank"
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm" />
+          </label>
+          <label className="flex-1 min-w-[180px] text-sm">
+            <span className="mb-1 block text-xs font-medium text-foreground">Contact email</span>
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="contact@org.com"
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm" />
+          </label>
           <button onClick={invite} disabled={busy} className="inline-flex items-center gap-1.5 rounded-lg bg-merit-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-merit-blue-700 disabled:opacity-60">
             <Plus className="h-4 w-4" /> {busy ? 'Sending…' : 'Send invite'}
           </button>

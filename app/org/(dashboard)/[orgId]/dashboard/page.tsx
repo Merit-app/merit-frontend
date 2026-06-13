@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { CountUp } from '@/components/motion';
+import { ErrorState } from '@/components/ui/error-state';
 
 function fmtDate(iso: string) {
   try { return new Date(iso).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' }); }
@@ -20,7 +21,7 @@ export default function OrgOverviewPage() {
   const { orgId } = useParams<{ orgId: string }>();
   const qc = useQueryClient();
 
-  const { data: dashboard } = useQuery({
+  const { data: dashboard, isError, refetch } = useQuery({
     queryKey: ['org-dashboard', orgId],
     queryFn: () => orgsApi.dashboard(orgId),
   });
@@ -70,6 +71,14 @@ export default function OrgOverviewPage() {
   const recentSessions: any[] = dash?.recentSessions ?? [];
   const pendingSessions = recentSessions.filter((s) => s.status === 'pending');
   const events: any[] = (eventsRes as any)?.data ?? [];
+
+  if (isError) {
+    return (
+      <div className="py-12">
+        <ErrorState message="Couldn't load your dashboard." onRetry={() => refetch()} />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">

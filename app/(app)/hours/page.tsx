@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { StatusBadge } from '@/components/hours/status-badge';
 import { TierBadge } from '@/components/hours/tier-badge';
 import { SessionDetailSheet } from '@/components/hours/session-detail-sheet';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { useMeritStore } from '@/lib/store';
 import { sessionsApi, ApiError } from '@/lib/api';
 import { formatSessionDate } from '@/lib/utils';
@@ -54,6 +55,7 @@ export default function HoursPage() {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkDeleting, setBulkDeleting] = useState(false);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
   // Persist sort/filter prefs
   useEffect(() => {
@@ -118,7 +120,6 @@ export default function HoursPage() {
 
   async function handleBulkDelete() {
     const ids = [...selected];
-    if (!confirm(`Delete ${ids.length} session${ids.length === 1 ? '' : 's'}? This can't be undone.`)) return;
     setBulkDeleting(true);
     const failed: string[] = [];
     await Promise.all(
@@ -201,7 +202,7 @@ export default function HoursPage() {
           </button>
           <div className="flex-1" />
           <button
-            onClick={handleBulkDelete}
+            onClick={() => setConfirmDeleteOpen(true)}
             disabled={bulkDeleting}
             className="flex items-center gap-1.5 text-[13px] font-medium text-white bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
           >
@@ -319,6 +320,16 @@ export default function HoursPage() {
         session={selectedSession}
         open={sheetOpen}
         onClose={() => { setSheetOpen(false); setSelectedSession(null); }}
+      />
+
+      <ConfirmDialog
+        open={confirmDeleteOpen}
+        onOpenChange={setConfirmDeleteOpen}
+        title={`Delete ${selected.size} session${selected.size === 1 ? '' : 's'}?`}
+        description="This permanently removes the selected sessions and can't be undone."
+        confirmLabel="Delete"
+        destructive
+        onConfirm={handleBulkDelete}
       />
     </div>
   );

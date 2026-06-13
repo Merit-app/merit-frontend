@@ -8,6 +8,7 @@ import { useMeritStore, useHydrationStore } from '@/lib/store';
 import { authApi, orgOnboardingApi, orgBillingApi, orgsApi } from '@/lib/api';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { OrgOnboardingModal } from '@/components/org/onboarding-modal';
+import { NotificationBell } from '@/components/notifications/notification-bell';
 import {
   LayoutDashboard,
   Users,
@@ -20,7 +21,6 @@ import {
   ChevronDown,
   Building2,
   ExternalLink,
-  Bell,
   GraduationCap,
   Menu,
 } from 'lucide-react';
@@ -331,11 +331,9 @@ export default function OrgDashboardLayout({ children }: { children: React.React
             <Menu className="w-5 h-5" />
           </button>
           <div className="hidden lg:block" />
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
+            <NotificationBell />
             <ThemeToggle />
-            <button className="text-muted-foreground hover:text-foreground transition-colors">
-              <Bell className="w-5 h-5" />
-            </button>
           </div>
         </div>
         <div className="p-4 sm:p-6 lg:p-8">{children}</div>

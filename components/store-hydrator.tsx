@@ -3,8 +3,33 @@
 import { useEffect } from 'react';
 import { useMeritStore } from '@/lib/store';
 import { useHydrationStore } from '@/lib/store';
+import { usersApi, mapUser } from '@/lib/api';
 
 const BASE = (process.env.NEXT_PUBLIC_API_URL ?? '').trim().replace(/\/+$/, '');
+
+// Throttle how often we re-pull the canonical user (plan, role, etc.) so a
+// background tab regaining focus doesn't spam /users/me.
+const USER_REFRESH_THROTTLE_MS = 60_000;
+let lastUserRefresh = 0;
+
+/**
+ * Pull the fresh user from the server and merge it into the store. This is what
+ * keeps `plan` (and other server-owned fields) from going stale after, e.g., an
+ * upgrade in another session — previously the persisted plan only updated on a
+ * full logout/login.
+ */
+async function refreshUser(force = false) {
+  const { isAuthed, accessToken, updateUser } = useMeritStore.getState();
+  if (!isAuthed || !accessToken) return;
+  if (!force && Date.now() - lastUserRefresh < USER_REFRESH_THROTTLE_MS) return;
+  lastUserRefresh = Date.now();
+  try {
+    const res = await usersApi.me();
+    if (res?.data?.user) updateUser(mapUser(res.data.user));
+  } catch {
+    // Non-fatal — keep the cached user.
+  }
+}
 
 /**
  * Rehydrates the Zustand persist store from localStorage on the client, then
@@ -52,9 +77,20 @@ export function StoreHydrator() {
       }
 
       if (!cancelled) setHydrated();
+
+      // After the session is settled, pull the canonical user so a plan/role
+      // change made elsewhere is reflected without a logout/login.
+      if (!cancelled) void refreshUser(true);
     })();
 
-    return () => { cancelled = true; };
+    // Re-sync the user when the tab regains focus (throttled).
+    const onFocus = () => void refreshUser();
+    window.addEventListener('focus', onFocus);
+
+    return () => {
+      cancelled = true;
+      window.removeEventListener('focus', onFocus);
+    };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return null;
