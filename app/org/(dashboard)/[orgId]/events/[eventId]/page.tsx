@@ -1,21 +1,26 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { orgEventsApi, ApiError } from '@/lib/api';
 import { toast } from 'sonner';
 import {
   Calendar, MapPin, Users, Clock, CheckCircle2,
-  ArrowLeft, Send, UserCheck, Loader2,
+  ArrowLeft, Send, UserCheck, Loader2, Pencil,
 } from 'lucide-react';
 import Link from 'next/link';
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 
 export default function EventDetailPage() {
   const { orgId, eventId } = useParams<{ orgId: string; eventId: string }>();
   const qc = useQueryClient();
   const [confirmCompleteOpen, setConfirmCompleteOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
 
   const { data: res, isLoading } = useQuery({
     queryKey: ['org-event', orgId, eventId],
@@ -50,6 +55,17 @@ export default function EventDetailPage() {
       qc.invalidateQueries({ queryKey: ['org-events', orgId] });
     },
     onError: () => toast.error('Failed to complete event'),
+  });
+
+  const updateEvent = useMutation({
+    mutationFn: (patch: Record<string, unknown>) => orgEventsApi.update(orgId, eventId, patch),
+    onSuccess: () => {
+      toast.success('Event updated');
+      setEditOpen(false);
+      qc.invalidateQueries({ queryKey: ['org-event', orgId, eventId] });
+      qc.invalidateQueries({ queryKey: ['org-events', orgId] });
+    },
+    onError: (err) => toast.error(err instanceof ApiError ? err.message : 'Failed to update event'),
   });
 
   if (isLoading) {
@@ -141,6 +157,15 @@ export default function EventDetailPage() {
               Complete event + log hours
             </button>
           )}
+          {(event.status === 'draft' || event.status === 'published') && (
+            <button
+              onClick={() => setEditOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl border border-border bg-card text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            >
+              <Pencil className="w-4 h-4" />
+              Edit
+            </button>
+          )}
         </div>
       </div>
 
@@ -221,6 +246,119 @@ export default function EventDetailPage() {
         confirmLabel="Complete + log hours"
         onConfirm={() => completeEvent.mutateAsync()}
       />
+
+      <EditEventModal
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        event={event}
+        saving={updateEvent.isPending}
+        onSave={(patch) => updateEvent.mutate(patch)}
+      />
     </div>
+  );
+}
+
+// Pre-fill a datetime-local input from an ISO string (local timezone).
+function toLocalInput(iso?: string) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  const off = d.getTimezoneOffset();
+  return new Date(d.getTime() - off * 60000).toISOString().slice(0, 16);
+}
+
+function EditEventModal({
+  open, onOpenChange, event, saving, onSave,
+}: {
+  open: boolean;
+  onOpenChange: (o: boolean) => void;
+  event: any;
+  saving: boolean;
+  onSave: (patch: Record<string, unknown>) => void;
+}) {
+  const [form, setForm] = useState({
+    title: '', description: '', location: '', startTime: '', endTime: '', maxVolunteers: '', hoursValue: '',
+  });
+
+  // Re-seed the form whenever the modal opens for the current event.
+  useEffect(() => {
+    if (open && event) {
+      setForm({
+        title: event.title ?? '',
+        description: event.description ?? '',
+        location: event.location ?? '',
+        startTime: toLocalInput(event.start_time),
+        endTime: toLocalInput(event.end_time),
+        maxVolunteers: event.max_volunteers != null ? String(event.max_volunteers) : '',
+        hoursValue: event.hours_value != null ? String(event.hours_value) : '',
+      });
+    }
+  }, [open, event]);
+
+  const upd = (k: keyof typeof form, v: string) => setForm((f) => ({ ...f, [k]: v }));
+
+  function submit() {
+    if (!form.title.trim() || !form.startTime || !form.endTime) {
+      toast.error('Title, start, and end time are required');
+      return;
+    }
+    onSave({
+      title: form.title.trim(),
+      description: form.description.trim() || undefined,
+      location: form.location.trim() || undefined,
+      startTime: new Date(form.startTime).toISOString(),
+      endTime: new Date(form.endTime).toISOString(),
+      maxVolunteers: form.maxVolunteers ? Number(form.maxVolunteers) : undefined,
+      hoursValue: form.hoursValue ? Number(form.hoursValue) : undefined,
+    });
+  }
+
+  const inputCls = 'w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/25';
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => !saving && onOpenChange(o)}>
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>Edit event</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-3">
+          <label className="block text-sm">
+            <span className="mb-1 block text-xs font-medium text-foreground">Title</span>
+            <input value={form.title} onChange={(e) => upd('title', e.target.value)} className={inputCls} />
+          </label>
+          <label className="block text-sm">
+            <span className="mb-1 block text-xs font-medium text-foreground">Description</span>
+            <textarea value={form.description} onChange={(e) => upd('description', e.target.value)} rows={2} className={`${inputCls} resize-none`} />
+          </label>
+          <div className="grid grid-cols-2 gap-3">
+            <label className="block text-sm">
+              <span className="mb-1 block text-xs font-medium text-foreground">Start</span>
+              <input type="datetime-local" value={form.startTime} onChange={(e) => upd('startTime', e.target.value)} className={inputCls} />
+            </label>
+            <label className="block text-sm">
+              <span className="mb-1 block text-xs font-medium text-foreground">End</span>
+              <input type="datetime-local" value={form.endTime} onChange={(e) => upd('endTime', e.target.value)} className={inputCls} />
+            </label>
+          </div>
+          <label className="block text-sm">
+            <span className="mb-1 block text-xs font-medium text-foreground">Location</span>
+            <input value={form.location} onChange={(e) => upd('location', e.target.value)} className={inputCls} />
+          </label>
+          <div className="grid grid-cols-2 gap-3">
+            <label className="block text-sm">
+              <span className="mb-1 block text-xs font-medium text-foreground">Max volunteers</span>
+              <input type="number" min={1} value={form.maxVolunteers} onChange={(e) => upd('maxVolunteers', e.target.value)} placeholder="No limit" className={inputCls} />
+            </label>
+            <label className="block text-sm">
+              <span className="mb-1 block text-xs font-medium text-foreground">Hours value</span>
+              <input type="number" min={0} step={0.5} value={form.hoursValue} onChange={(e) => upd('hoursValue', e.target.value)} placeholder="From duration" className={inputCls} />
+            </label>
+          </div>
+        </div>
+        <DialogFooter className="gap-2 sm:gap-2">
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={saving}>Cancel</Button>
+          <Button onClick={submit} loading={saving}>Save changes</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

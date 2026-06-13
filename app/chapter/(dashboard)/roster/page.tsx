@@ -3,9 +3,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { chapterApi, adminApi, ApiError, type RosterStudent, type RosterImportRow, type RosterImportResult } from '@/lib/api';
-import { Search, Upload, ChevronRight, CheckCircle2, AlertTriangle, X, Users } from 'lucide-react';
+import { Search, Upload, Download, ChevronRight, CheckCircle2, AlertTriangle, X, Users, Mail, Send } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/ui/empty-state';
+import { toast } from 'sonner';
 
 const FILTERS = [
   { key: 'all', label: 'All' },
@@ -29,6 +30,9 @@ export default function RosterPage() {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<string>('all');
   const [showImport, setShowImport] = useState(false);
+  const [invites, setInvites] = useState<any[]>([]);
+  const [exporting, setExporting] = useState(false);
+  const [resendingId, setResendingId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -41,22 +45,73 @@ export default function RosterPage() {
     }
   }, [search, filter]);
 
+  const loadInvites = useCallback(async () => {
+    try {
+      const res = await adminApi.getInvites();
+      setInvites((res.data ?? []).filter((i: any) => !i.accepted_at));
+    } catch {
+      setInvites([]);
+    }
+  }, []);
+
   // Debounce search
   useEffect(() => {
     const t = setTimeout(load, 250);
     return () => clearTimeout(t);
   }, [load]);
 
+  useEffect(() => { void loadInvites(); }, [loadInvites]);
+
+  async function handleExport() {
+    setExporting(true);
+    try {
+      const blob = await adminApi.exportComplianceCsv();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `chapter-roster-${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success('Roster exported');
+    } catch {
+      toast.error('Export failed');
+    } finally {
+      setExporting(false);
+    }
+  }
+
+  async function handleResend(inviteId: string) {
+    setResendingId(inviteId);
+    try {
+      await adminApi.resendInvite(inviteId);
+      toast.success('Invite re-sent');
+      void loadInvites();
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : 'Could not resend invite');
+    } finally {
+      setResendingId(null);
+    }
+  }
+
   return (
     <div className="max-w-5xl space-y-5">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold text-foreground">Students</h1>
           <p className="text-sm text-muted-foreground">{total} in your chapter</p>
         </div>
-        <button onClick={() => setShowImport(true)} className="inline-flex items-center gap-2 rounded-lg bg-merit-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-merit-blue-700">
-          <Upload className="h-4 w-4" /> Import roster
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={handleExport}
+            disabled={exporting}
+            className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors active:scale-[0.98] disabled:opacity-60"
+          >
+            <Download className="h-4 w-4" /> {exporting ? 'Exporting…' : 'Export CSV'}
+          </button>
+          <button onClick={() => setShowImport(true)} className="inline-flex items-center gap-2 rounded-lg bg-merit-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-merit-blue-700">
+            <Upload className="h-4 w-4" /> Import roster
+          </button>
+        </div>
       </div>
 
       {/* Search */}
@@ -156,7 +211,35 @@ export default function RosterPage() {
         </table>
       </div>
 
-      {showImport && <ImportModal onClose={() => setShowImport(false)} onDone={load} />}
+      {/* Pending invites */}
+      {invites.length > 0 && (
+        <div className="rounded-xl border border-border bg-card">
+          <div className="flex items-center gap-2 border-b border-border px-4 py-3">
+            <Mail className="h-4 w-4 text-muted-foreground" />
+            <h2 className="text-sm font-medium text-foreground">Pending invites</h2>
+            <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">{invites.length}</span>
+          </div>
+          <ul className="divide-y divide-border">
+            {invites.map((inv) => (
+              <li key={inv.id} className="flex items-center justify-between gap-3 px-4 py-3">
+                <div className="min-w-0">
+                  <p className="truncate text-sm text-foreground">{inv.email}</p>
+                  <p className="text-xs text-muted-foreground">Hasn&apos;t signed up yet</p>
+                </div>
+                <button
+                  onClick={() => handleResend(inv.id)}
+                  disabled={resendingId === inv.id}
+                  className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors disabled:opacity-60"
+                >
+                  <Send className="h-3.5 w-3.5" /> {resendingId === inv.id ? 'Sending…' : 'Resend'}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {showImport && <ImportModal onClose={() => setShowImport(false)} onDone={() => { load(); loadInvites(); }} />}
     </div>
   );
 }

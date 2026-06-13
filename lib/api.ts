@@ -499,6 +499,9 @@ export const adminApi = {
 
   getInvites: () => request<{ data: any[] }>('GET', '/admin/invites'),
 
+  resendInvite: (inviteId: string) =>
+    request<{ data: { resent: boolean } }>('POST', `/admin/invites/${inviteId}/resend`),
+
   /** Download the cohort compliance report as a CSV blob. */
   exportComplianceCsv: (): Promise<Blob> =>
     fetch(`${BASE}/admin/compliance/export`, {
@@ -578,6 +581,9 @@ export const chapterApi = {
 
   adjustHours: (id: string, body: { hours: number; reason?: string }) =>
     request<{ data: any }>('POST', `/chapter/students/${id}/adjust`, body),
+
+  removeStudent: (id: string) =>
+    request<{ data: { removed: boolean } }>('DELETE', `/chapter/students/${id}`),
 
   getCohortGoals: () =>
     request<{ data: { graduationYear: number; requiredHours: number }[] }>('GET', '/chapter/cohort-goals'),
@@ -703,6 +709,11 @@ export const orgEventsApi = {
   }) => orgRequest<{ data: any }>('POST', `/org/${orgId}/events`, data),
   get: (orgId: string, eventId: string) =>
     orgRequest<{ data: any }>('GET', `/org/${orgId}/events/${eventId}`),
+  update: (orgId: string, eventId: string, data: {
+    title?: string; description?: string; location?: string; locationUrl?: string;
+    program?: string; startTime?: string; endTime?: string;
+    maxVolunteers?: number; hoursValue?: number; autoLogHours?: boolean;
+  }) => orgRequest<{ data: any }>('PATCH', `/org/${orgId}/events/${eventId}`, data),
   publish: (orgId: string, eventId: string) =>
     orgRequest<{ data: any }>('POST', `/org/${orgId}/events/${eventId}/publish`, {}),
   checkIn: (orgId: string, eventId: string, userId: string) =>

@@ -1,17 +1,32 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { chapterApi, ApiError } from '@/lib/api';
-import { ArrowLeft, CheckCircle2, AlertTriangle, Plus, Target } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, AlertTriangle, Plus, Target, UserMinus } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { toast } from 'sonner';
 
 export default function StudentDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const id = params.id as string;
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [confirmRemoveOpen, setConfirmRemoveOpen] = useState(false);
+
+  async function handleRemove() {
+    try {
+      await chapterApi.removeStudent(id);
+      toast.success('Student removed from chapter');
+      router.push('/chapter/roster');
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : 'Could not remove student');
+      throw err; // keep the dialog open on failure
+    }
+  }
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -138,6 +153,35 @@ export default function StudentDetailPage() {
           </div>
         )}
       </div>
+
+      {/* Danger zone */}
+      <div className="rounded-xl border border-red-200 bg-red-50/40 p-5 dark:border-red-900/40 dark:bg-red-950/10">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-sm font-medium text-foreground">Remove from chapter</p>
+            <p className="text-sm text-muted-foreground">
+              Unlinks {s.name?.split(' ')[0] ?? 'this student'} from your chapter. Their hours stay on
+              their own account; you can re-invite them later.
+            </p>
+          </div>
+          <button
+            onClick={() => setConfirmRemoveOpen(true)}
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-red-300 bg-card px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 dark:border-red-900/50 dark:hover:bg-red-950/30"
+          >
+            <UserMinus className="h-4 w-4" /> Remove
+          </button>
+        </div>
+      </div>
+
+      <ConfirmDialog
+        open={confirmRemoveOpen}
+        onOpenChange={setConfirmRemoveOpen}
+        title={`Remove ${s.name ?? 'this student'} from your chapter?`}
+        description="They'll no longer appear in your roster or count toward your cohort. Their own account and hours are untouched, and you can re-invite them anytime."
+        confirmLabel="Remove student"
+        destructive
+        onConfirm={handleRemove}
+      />
     </div>
   );
 }
