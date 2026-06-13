@@ -13,10 +13,15 @@ const TABS: { id: Section; label: string; short: string }[] = [
 ];
 
 export function MarketingNavbar() {
+  // Which audience tab is active (drives the sliding indicator + CTA).
   const [activeSection, setActiveSection] = useState<Section>('students');
+  // Whether the band currently under the navbar is dark — decoupled from the
+  // tab, because the dark hero and the light student-proof band share the
+  // 'students' tab.
+  const [dark, setDark] = useState(true);
   const reducedMotion = useReducedMotion();
 
-  // Track which section is in view via IntersectionObserver
+  // Track which audience section is in view for the tab indicator.
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -26,7 +31,6 @@ export function MarketingNavbar() {
           }
         }
       },
-      // 35% rootMargin from top so the tab flips slightly before the section reaches the navbar
       { threshold: 0, rootMargin: '-35% 0px -55% 0px' },
     );
 
@@ -38,36 +42,54 @@ export function MarketingNavbar() {
     return () => observer.disconnect();
   }, []);
 
+  // Track the theme of the band sitting directly under the navbar. A thin
+  // detection strip just below the navbar decides which band is "under" it.
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setDark(entry.target.getAttribute('data-theme') === 'dark');
+          }
+        }
+      },
+      { threshold: 0, rootMargin: '-64px 0px -80% 0px' },
+    );
+
+    const bands = document.querySelectorAll('[data-theme]');
+    bands.forEach((b) => observer.observe(b));
+
+    return () => observer.disconnect();
+  }, []);
+
   const scrollTo = (id: Section) => {
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
-  const isDark = activeSection === 'organizations';
-
   return (
     <nav
-      data-tab={activeSection}
-      className="sticky top-0 z-50 backdrop-blur-xl transition-colors duration-500 border-b
-        bg-background/70 border-border/60
-        data-[tab=organizations]:bg-black/70 data-[tab=organizations]:border-white/10"
+      data-dark={dark}
+      className="sticky top-0 z-50 border-b backdrop-blur-xl transition-colors duration-500
+        data-[dark=false]:border-border/60 data-[dark=false]:bg-background/70
+        data-[dark=true]:border-white/10 data-[dark=true]:bg-black/70"
     >
-      <div className="max-w-6xl mx-auto px-3 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-1.5 sm:gap-4">
+      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-1.5 px-3 sm:h-16 sm:gap-4 sm:px-6">
         {/* Logo */}
         <Link
           href="/"
-          data-tab={activeSection}
-          className="font-bold text-lg sm:text-xl transition-colors duration-500
-            text-foreground data-[tab=organizations]:text-white"
+          className={`text-lg font-bold transition-colors duration-500 sm:text-xl ${
+            dark ? 'text-white' : 'text-foreground'
+          }`}
         >
           merit.
         </Link>
 
         {/* Tab switcher (scroll anchors) */}
         <div
-          data-tab={activeSection}
-          className="relative flex items-center p-1 rounded-full transition-colors duration-500
-            bg-muted data-[tab=organizations]:bg-white/10"
+          className={`relative flex items-center rounded-full p-1 transition-colors duration-500 ${
+            dark ? 'bg-white/10' : 'bg-muted'
+          }`}
         >
           {TABS.map((t) => {
             const active = activeSection === t.id;
@@ -75,13 +97,13 @@ export function MarketingNavbar() {
               <button
                 key={t.id}
                 onClick={() => scrollTo(t.id)}
-                className="relative px-2 sm:px-3.5 md:px-4 py-1.5 text-xs sm:text-sm font-medium rounded-full z-10 whitespace-nowrap"
+                className="relative z-10 whitespace-nowrap rounded-full px-2 py-1.5 text-xs font-medium sm:px-3.5 sm:text-sm md:px-4"
               >
                 <span
                   className={`relative z-10 transition-colors duration-300 ${
                     active
-                      ? isDark ? 'text-zinc-900' : 'text-background'
-                      : isDark ? 'text-zinc-400' : 'text-muted-foreground'
+                      ? dark ? 'text-zinc-900' : 'text-background'
+                      : dark ? 'text-zinc-400' : 'text-muted-foreground'
                   }`}
                 >
                   <span className="sm:hidden">{t.short}</span>
@@ -90,11 +112,9 @@ export function MarketingNavbar() {
                 {active && (
                   <motion.div
                     layoutId="tab-indicator"
-                    className={`absolute inset-0 rounded-full ${isDark ? 'bg-white' : 'bg-foreground'}`}
+                    className={`absolute inset-0 rounded-full ${dark ? 'bg-white' : 'bg-foreground'}`}
                     transition={
-                      reducedMotion
-                        ? { duration: 0 }
-                        : { type: 'spring', stiffness: 300, damping: 30 }
+                      reducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 300, damping: 30 }
                     }
                   />
                 )}
@@ -103,18 +123,20 @@ export function MarketingNavbar() {
           })}
         </div>
 
-        {/* Right CTA — morphs with active section */}
+        {/* Right CTA — morphs with active section; colors follow the band theme */}
         {activeSection === 'students' && (
           <div className="flex items-center gap-3">
             <Link
               href="/login"
-              className="hidden sm:inline text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className={`hidden text-sm transition-colors sm:inline ${
+                dark ? 'text-zinc-400 hover:text-white' : 'text-muted-foreground hover:text-foreground'
+              }`}
             >
               Sign in
             </Link>
             <Link
               href="/signup"
-              className="bg-merit-blue-600 text-white text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 rounded-full hover:bg-merit-blue-700 transition-colors whitespace-nowrap shadow-sm"
+              className="whitespace-nowrap rounded-full bg-merit-blue-600 px-3 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-merit-blue-700 sm:px-4 sm:text-sm"
             >
               Get started
             </Link>
@@ -124,13 +146,15 @@ export function MarketingNavbar() {
           <div className="flex items-center gap-3">
             <Link
               href="/org/login"
-              className="hidden sm:inline text-sm text-zinc-400 hover:text-white transition-colors"
+              className={`hidden text-sm transition-colors sm:inline ${
+                dark ? 'text-zinc-400 hover:text-white' : 'text-muted-foreground hover:text-foreground'
+              }`}
             >
               Sign in
             </Link>
             <Link
               href="/org/create"
-              className="bg-white text-zinc-900 text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 rounded-full hover:bg-zinc-200 transition-colors whitespace-nowrap"
+              className="whitespace-nowrap rounded-full bg-white px-3 py-2 text-xs font-semibold text-zinc-900 transition-colors hover:bg-zinc-200 sm:px-4 sm:text-sm"
             >
               <span className="sm:hidden">Get started</span>
               <span className="hidden sm:inline">Create your organization</span>
@@ -141,13 +165,15 @@ export function MarketingNavbar() {
           <div className="flex items-center gap-3">
             <Link
               href="/login?redirect=/chapter/overview"
-              className="hidden sm:inline text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className={`hidden text-sm transition-colors sm:inline ${
+                dark ? 'text-zinc-400 hover:text-white' : 'text-muted-foreground hover:text-foreground'
+              }`}
             >
               School sign in
             </Link>
             <button
               onClick={() => scrollTo('schools')}
-              className="bg-merit-blue-600 text-white text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 rounded-full hover:bg-merit-blue-700 transition-colors whitespace-nowrap shadow-sm"
+              className="whitespace-nowrap rounded-full bg-merit-blue-600 px-3 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-merit-blue-700 sm:px-4 sm:text-sm"
             >
               Get early access
             </button>

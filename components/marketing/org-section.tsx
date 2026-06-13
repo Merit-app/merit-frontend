@@ -2,9 +2,10 @@
 
 import { motion, type Variants } from 'framer-motion';
 import Link from 'next/link';
-import { ArrowRight, Users, BarChart3, CheckCircle2, Building2 } from 'lucide-react';
+import { ArrowRight, Users, BarChart3, CheckCircle2 } from 'lucide-react';
 import { OrgShowcase } from './org-showcase';
 import { OrgLaptopMockup } from './org-laptop-mockup';
+import { Section, Eyebrow, SectionHeading, Lead, MarketingCard, IconChip, cardTitleCls, cardBodyCls } from './_primitives';
 
 const container: Variants = {
   hidden: { opacity: 0 },
@@ -23,81 +24,126 @@ const item: Variants = {
   },
 };
 
+/* Each step pairs copy with a small static slice of the real product UI
+   (Stripe-style) — the inset slices use real status colors (verified=green,
+   pending=amber) because those are genuine product states, while all decorative
+   accent stays merit-blue only. */
 const STEPS = [
   {
     step: '01',
     title: 'Volunteers log their own hours',
-    desc: 'Students use the Merit app to log sessions. You see every pending session in your dashboard — no chasing spreadsheets.',
+    desc: 'Students log sessions in the Merit app. Every pending session lands in your dashboard — no chasing spreadsheets.',
     icon: Users,
-    color: 'text-blue-400',
-    bg: 'bg-blue-500/10',
+    slice: 'logged',
   },
   {
     step: '02',
     title: 'You verify in one click',
-    desc: 'See every pending session. Click Verify. The student gets notified instantly and their PDF updates. No emails. No paper.',
+    desc: 'See every pending session. Click Verify. The student is notified instantly and their PDF updates. No emails, no paper.',
     icon: CheckCircle2,
-    color: 'text-green-400',
-    bg: 'bg-green-500/10',
+    slice: 'verify',
   },
   {
     step: '03',
     title: 'Run events, get grant reports',
-    desc: 'Create volunteer shifts, check in arrivals, send bulk SMS, and generate professional grant impact reports in one click.',
+    desc: 'Create shifts, check in arrivals, send bulk SMS, and generate professional grant impact reports in one click.',
     icon: BarChart3,
-    color: 'text-amber-400',
-    bg: 'bg-amber-500/10',
+    slice: 'report',
   },
-];
+] as const;
+
+function StepSlice({ kind }: { kind: (typeof STEPS)[number]['slice'] }) {
+  if (kind === 'logged') {
+    return (
+      <div className="mt-6 rounded-xl border border-white/10 bg-white/[0.03] p-3">
+        <div className="flex items-center justify-between gap-2">
+          <div className="min-w-0">
+            <p className="truncate text-xs font-medium text-white">Sorted food donations</p>
+            <p className="truncate text-[11px] text-zinc-500">Vancouver Food Bank · 4.0h</p>
+          </div>
+          <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-medium text-amber-300">
+            <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+            Pending
+          </span>
+        </div>
+      </div>
+    );
+  }
+  if (kind === 'verify') {
+    return (
+      <div className="mt-6 rounded-xl border border-white/10 bg-white/[0.03] p-3">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-merit-blue-500/15 text-[11px] font-bold text-merit-blue-300">
+              SK
+            </span>
+            <div className="min-w-0">
+              <p className="truncate text-xs font-medium text-white">Sarah Kim</p>
+              <p className="truncate text-[11px] text-zinc-500">4.0h · Food Bank</p>
+            </div>
+          </div>
+          <span className="shrink-0 rounded-lg bg-merit-blue-600 px-2.5 py-1 text-[11px] font-semibold text-white">
+            Verify
+          </span>
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div className="mt-6 grid grid-cols-2 gap-2">
+      <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2">
+        <p className="font-mono text-sm font-semibold tabular-nums text-white">1,240</p>
+        <p className="text-[10px] text-zinc-500">Verified hours</p>
+      </div>
+      <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2">
+        <p className="font-mono text-sm font-semibold tabular-nums text-white">86</p>
+        <p className="text-[10px] text-zinc-500">Volunteers</p>
+      </div>
+    </div>
+  );
+}
 
 export function OrgSection() {
   return (
-    <div className="bg-[#0A0A0A] text-white">
-      <motion.section
+    <Section id="organizations" theme="dark" className="scroll-mt-16 border-t border-white/5">
+      <motion.div
         variants={container}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.1 }}
-        className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 sm:pt-32 pb-24 sm:pb-32"
       >
         {/* Section hero */}
-        <div className="text-center max-w-3xl mx-auto mb-20">
-          <motion.div
-            variants={item}
-            className="inline-flex items-center gap-2 bg-white/5 border border-white/10 text-zinc-400 text-xs font-medium px-3 py-1.5 rounded-full mb-8"
-          >
-            <Building2 className="w-3.5 h-3.5" />
-            Merit for organizations
+        <div className="mx-auto mb-14 max-w-3xl text-center sm:mb-16">
+          <motion.div variants={item}>
+            <Eyebrow className="mb-4">For organizations</Eyebrow>
           </motion.div>
 
-          <motion.h2
-            variants={item}
-            className="text-5xl md:text-6xl font-bold tracking-tight text-white leading-[1.05] mb-6"
-          >
-            Your volunteer program,
-            <br />
-            <span className="text-zinc-400">finally organized.</span>
-          </motion.h2>
+          <motion.div variants={item}>
+            <SectionHeading variant="display" className="mb-6">
+              Your volunteer program,
+              <br />
+              <span className="text-zinc-500">finally organized.</span>
+            </SectionHeading>
+          </motion.div>
 
-          <motion.p
-            variants={item}
-            className="text-xl text-zinc-400 max-w-2xl mx-auto leading-relaxed mb-10"
-          >
-            Manage volunteers, run events, send announcements, and generate grant reports — all
-            from one dashboard. Students log hours themselves. You just verify.
-          </motion.p>
+          <motion.div variants={item}>
+            <Lead className="mx-auto mb-10 max-w-2xl">
+              Manage volunteers, run events, send announcements, and generate grant reports — all
+              from one dashboard. Students log hours themselves. You just verify.
+            </Lead>
+          </motion.div>
 
-          <motion.div variants={item} className="flex items-center justify-center gap-3 flex-wrap">
+          <motion.div variants={item} className="flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/org/login"
-              className="bg-white text-zinc-900 font-semibold px-7 py-3.5 rounded-full hover:bg-zinc-200 transition-colors flex items-center gap-2 shadow-sm"
+              className="flex items-center gap-2 rounded-full bg-white px-7 py-3.5 font-semibold text-zinc-900 shadow-sm transition-colors hover:bg-zinc-200"
             >
               Sign in to your organization
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
               href="/org"
-              className="text-zinc-400 font-medium px-7 py-3.5 rounded-full hover:bg-white/5 transition-colors"
+              className="rounded-full px-7 py-3.5 font-medium text-zinc-400 transition-colors hover:bg-white/5 hover:text-white"
             >
               Learn more
             </Link>
@@ -109,81 +155,72 @@ export function OrgSection() {
           <OrgShowcase />
         </motion.div>
 
-        {/* 3-step user journey cards */}
-        <motion.div
-          variants={container}
-          className="mt-32 grid grid-cols-1 md:grid-cols-3 gap-4"
-        >
+        {/* 3-step journey cards — unified card system + embedded UI slices */}
+        <motion.div variants={container} className="mt-20 grid grid-cols-1 gap-5 sm:mt-28 sm:gap-6 md:grid-cols-3">
           {STEPS.map((s) => (
-            <motion.div
-              key={s.step}
-              variants={item}
-              className="bg-[#131313] border border-white/5 rounded-2xl p-6 hover:border-white/10 transition-colors"
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <span className="text-zinc-400 font-mono font-bold text-sm">{s.step}</span>
-                <div className={`w-8 h-8 rounded-xl ${s.bg} flex items-center justify-center`}>
-                  <s.icon className={`w-4 h-4 ${s.color}`} />
+            <motion.div key={s.step} variants={item}>
+              <MarketingCard interactive className="flex h-full flex-col">
+                <div className="mb-4 flex items-center gap-3">
+                  <span className="font-mono text-sm font-semibold text-zinc-500">{s.step}</span>
+                  <IconChip>
+                    <s.icon className="h-4 w-4" />
+                  </IconChip>
                 </div>
-              </div>
-              <p className="font-bold text-white text-lg mb-2">{s.title}</p>
-              <p className="text-zinc-400 text-sm leading-relaxed">{s.desc}</p>
+                <p className={cardTitleCls(true)}>{s.title}</p>
+                <p className={cardBodyCls(true)}>{s.desc}</p>
+                <div className="mt-auto">
+                  <StepSlice kind={s.slice} />
+                </div>
+              </MarketingCard>
             </motion.div>
           ))}
         </motion.div>
 
         {/* Laptop dashboard mockup — shown on mobile/tablet (desktop has the rich
             interactive showcase above) so the org section always has a laptop. */}
-        <motion.div variants={item} className="mt-20 lg:hidden">
+        <motion.div variants={item} className="mt-20 sm:mt-28 lg:hidden">
           <OrgLaptopMockup />
         </motion.div>
 
         {/* Cross-promo: explain to students seeing the page */}
-        <motion.div
-          variants={item}
-          className="mt-32 bg-white/5 border border-white/10 rounded-2xl p-8 text-center max-w-2xl mx-auto"
-        >
-          <p className="text-zinc-400 text-sm mb-1">Already using Merit as a student?</p>
-          <p className="text-white font-semibold text-lg mb-2">
-            This is what your supervisors see.
-          </p>
-          <p className="text-zinc-400 text-sm mb-6">
-            When you submit a session, it appears in your organization&apos;s dashboard. One tap from
-            them and you&apos;re verified.
-          </p>
-          <Link
-            href="/signup"
-            className="text-sm text-white font-medium underline hover:text-zinc-400 transition-colors"
-          >
-            Start tracking your hours →
-          </Link>
+        <motion.div variants={item} className="mx-auto mt-20 max-w-2xl sm:mt-28">
+          <MarketingCard className="text-center">
+            <p className="text-sm text-zinc-400">Already using Merit as a student?</p>
+            <p className="mt-1 text-lg font-semibold text-white">This is what your supervisors see.</p>
+            <p className="mx-auto mt-2 max-w-md text-sm text-zinc-400">
+              When you submit a session, it appears in your organization&apos;s dashboard. One tap
+              from them and you&apos;re verified.
+            </p>
+            <Link
+              href="/signup"
+              className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-merit-blue-400 transition-colors hover:text-merit-blue-300"
+            >
+              Start tracking your hours
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </MarketingCard>
         </motion.div>
 
         {/* CTA */}
-        <motion.div variants={item} className="mt-24 text-center max-w-2xl mx-auto">
-          <h3 className="text-3xl md:text-4xl font-bold text-white mb-4">
+        <motion.div variants={item} className="mx-auto mt-20 max-w-2xl text-center sm:mt-28">
+          <h3 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
             Ready to organize your volunteer program?
           </h3>
-          <p className="text-zinc-400 mb-8">
-            Claim your org page in 2 minutes. Free for nonprofits.
-          </p>
-          <div className="flex items-center justify-center gap-4 flex-wrap">
+          <p className="mb-8 mt-4 text-zinc-400">Claim your org page in 2 minutes. Free for nonprofits.</p>
+          <div className="flex flex-wrap items-center justify-center gap-4">
             <Link
               href="/org/login"
-              className="inline-flex items-center gap-2 bg-white text-zinc-900 font-semibold px-8 py-4 rounded-full hover:bg-zinc-200 transition-colors shadow-lg"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 font-semibold text-zinc-900 shadow-lg transition-colors hover:bg-zinc-200"
             >
               Sign in to your org
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="h-4 w-4" />
             </Link>
-            <Link
-              href="/organizations"
-              className="text-zinc-400 hover:text-white text-sm transition-colors"
-            >
+            <Link href="/organizations" className="text-sm text-zinc-400 transition-colors hover:text-white">
               Browse organizations
             </Link>
           </div>
         </motion.div>
-      </motion.section>
-    </div>
+      </motion.div>
+    </Section>
   );
 }

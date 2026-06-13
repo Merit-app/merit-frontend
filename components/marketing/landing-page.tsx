@@ -2,32 +2,26 @@
 
 import Link from 'next/link';
 import { MarketingNavbar } from './navbar';
-import { StudentSection } from './student-section';
+import { HeroSection, StudentProofSection } from './student-section';
 import { OrgSection } from './org-section';
 import { SchoolSection } from './school-section';
+import { DARK_BAND } from './_primitives';
 
 export function LandingPage() {
   return (
-    <div className="min-h-screen bg-background overflow-x-hidden">
+    <div className="min-h-screen overflow-x-hidden bg-background">
       <MarketingNavbar />
 
-      {/* Student section — light theme */}
-      <section id="students" className="scroll-mt-16">
-        <StudentSection />
-      </section>
+      {/* Band rhythm — dark → light → dark → light → dark (Stripe-style). Each
+          band carries its own id + data-theme (set by <Section>) so the navbar
+          can track which band sits under it. */}
+      <HeroSection />
+      <StudentProofSection />
+      <OrgSection />
+      <SchoolSection />
 
-      {/* Org section — dark theme (wraps inside) */}
-      <section id="organizations" className="scroll-mt-16">
-        <OrgSection />
-      </section>
-
-      {/* School / chapter section — light band with lead capture */}
-      <section id="schools" className="scroll-mt-16">
-        <SchoolSection />
-      </section>
-
-      {/* Shared footer — always dark */}
-      <footer className="bg-[#0A0A0A] border-t border-white/5 px-6 py-12">
+      {/* Shared footer — always dark; data-theme keeps the navbar dark over it */}
+      <footer data-theme="dark" className="border-t border-white/5 px-6 py-12" style={{ backgroundColor: DARK_BAND }}>
         <div className="mx-auto flex max-w-6xl flex-col gap-8 md:flex-row md:items-start md:justify-between">
           <div>
             <p className="text-lg font-bold text-white">merit.</p>

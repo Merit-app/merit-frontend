@@ -77,6 +77,13 @@ Model: **Notion's homepage** — a guided, scroll-driven walkthrough that *shows
 section by section, with live/animated demos. We already have `student-demo.tsx` (phone) and
 `org-laptop-mockup.tsx` (laptop) — **elevate these into the centerpieces.**
 
+> **Update (Jun 2026):** the landing hero is intentionally a **dark** band (near-black `#0A0A0A`
+> + a single deep-blue spotlight, Stripe/Notion-marketing voice) — this overrides the "student =
+> light" rule **for the marketing hero only**. The page now runs a deliberate dark→light→dark→light
+> →dark band rhythm. The in-app student surfaces stay warm/light. Marketing primitives live in
+> `components/marketing/_primitives.tsx` (`Section`, `Eyebrow`, `SectionHeading`, `Lead`,
+> `MarketingCard`, `IconChip`) — build landing changes from these, don't re-roll.
+
 Section flow (evolve the current `landing-page.tsx`):
 1. **Hero** — big confident headline, one-line value prop, primary CTA + secondary. A subtle animated backdrop (gradient mesh or soft grid, *very* restrained). Maybe a small live demo peek.
 2. **Student showcase** — scroll-driven walkthrough of the student experience: logging hours → SMS verification → dashboard → leaderboard → scholarships. Each step animates the phone demo to the relevant screen. **Make the phone demo cleaner, with crisp transitions and "pop."** This is the warm, student-appealing section.

@@ -29,11 +29,19 @@ const STEPS: {
   { id: 'export', label: 'You export your PDF', sub: 'Signed, QR-verified, accepted everywhere.', studentScreen: 'export', supervisorScreen: 'done' },
 ];
 
-export function StudentDemo() {
+/**
+ * @param tone  'auto' uses semantic tokens (light band). 'dark' switches the
+ *              CHROME around the phones (step tabs, divider, caption) to
+ *              explicit light-on-dark classes for the dark hero band. The phone
+ *              screens themselves are intentionally left on tokens — they read
+ *              as real (white/light) device screens in either case.
+ */
+export function StudentDemo({ tone = 'auto' }: { tone?: 'auto' | 'dark' } = {}) {
   const [step, setStep] = useState(0);
   const [paused, setPaused] = useState(false);
   const progress = useMotionValue(0);
   const rm = useReducedMotion();
+  const dark = tone === 'dark';
 
   useEffect(() => {
     if (paused || rm) return;
@@ -58,14 +66,18 @@ export function StudentDemo() {
       <div className="flex gap-1 mb-10 md:mb-12 w-full max-w-xl mx-auto px-2 md:px-0">
         {STEPS.map((st, i) => (
           <button key={st.id} onClick={() => { setStep(i); progress.set(0); }} className="flex-1 py-2 text-left group">
-            <p className={`text-[11px] font-semibold mb-2 transition-colors ${i === step ? 'text-foreground' : 'text-muted-foreground group-hover:text-muted-foreground'}`}>
+            <p className={`text-[11px] font-semibold mb-2 transition-colors ${
+              i === step
+                ? dark ? 'text-white' : 'text-foreground'
+                : dark ? 'text-zinc-500 group-hover:text-zinc-300' : 'text-muted-foreground group-hover:text-muted-foreground'
+            }`}>
               {st.label}
             </p>
-            <div className="h-0.5 bg-muted rounded-full overflow-hidden">
+            <div className={`h-0.5 rounded-full overflow-hidden ${dark ? 'bg-white/10' : 'bg-muted'}`}>
               {i < step ? (
-                <div className="h-full w-full bg-foreground/30" />
+                <div className={`h-full w-full ${dark ? 'bg-white/25' : 'bg-foreground/30'}`} />
               ) : i === step ? (
-                <motion.div className="h-full bg-merit-blue-600 origin-left" style={{ scaleX: progress }} />
+                <motion.div className={`h-full origin-left ${dark ? 'bg-merit-blue-500' : 'bg-merit-blue-600'}`} style={{ scaleX: progress }} />
               ) : null}
             </div>
           </button>
@@ -74,11 +86,11 @@ export function StudentDemo() {
 
       {/* Two phones */}
       <div className="relative flex flex-col md:flex-row items-center justify-center gap-8 md:gap-10 lg:gap-16">
-        {/* Ambient glow behind the phones */}
-        <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[420px] w-[90%] max-w-3xl -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-tr from-merit-blue-500/10 via-violet-500/[0.07] to-cyan-400/10 blur-3xl" />
+        {/* Ambient glow behind the phones — single blue, one accent */}
+        <div aria-hidden className={`pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[420px] w-[90%] max-w-3xl -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl ${dark ? 'bg-merit-blue-500/[0.14]' : 'bg-merit-blue-500/10'}`} />
         {/* Student phone */}
         <div className="relative flex flex-col items-center md:-rotate-1 transition-transform duration-300 hover:rotate-0">
-          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-4">Student</p>
+          <p className={`text-[10px] font-bold uppercase tracking-widest mb-4 ${dark ? 'text-zinc-500' : 'text-muted-foreground'}`}>Student</p>
           <Phone>
             <AnimatePresence mode="wait">
               {s.studentScreen === 'log' && <SLogScreen key="log" />}
@@ -95,16 +107,16 @@ export function StudentDemo() {
 
         {/* Divider */}
         <div className="hidden md:flex flex-col items-center gap-3 shrink-0">
-          <div className="w-px h-16 bg-muted" />
-          <div className="w-8 h-8 rounded-full bg-muted grid place-items-center">
-            <Send className="w-3.5 h-3.5 text-muted-foreground" />
+          <div className={`w-px h-16 ${dark ? 'bg-white/10' : 'bg-muted'}`} />
+          <div className={`w-8 h-8 rounded-full grid place-items-center ${dark ? 'bg-white/10' : 'bg-muted'}`}>
+            <Send className={`w-3.5 h-3.5 ${dark ? 'text-zinc-400' : 'text-muted-foreground'}`} />
           </div>
-          <div className="w-px h-16 bg-muted" />
+          <div className={`w-px h-16 ${dark ? 'bg-white/10' : 'bg-muted'}`} />
         </div>
 
         {/* Supervisor phone — hidden on mobile, shown md+ */}
         <div className="hidden md:flex flex-col items-center md:rotate-1 transition-transform duration-300 hover:rotate-0">
-          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-4">Supervisor</p>
+          <p className={`text-[10px] font-bold uppercase tracking-widest mb-4 ${dark ? 'text-zinc-500' : 'text-muted-foreground'}`}>Supervisor</p>
           <Phone>
             <AnimatePresence mode="wait">
               {s.supervisorScreen === 'idle' && <SupIdleScreen key="idle" />}
@@ -119,8 +131,8 @@ export function StudentDemo() {
       {/* Step description */}
       <AnimatePresence mode="wait">
         <motion.div key={step} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.35, ease: APPLE }} className="text-center mt-12 max-w-md mx-auto">
-          <p className="text-xl font-bold text-foreground mb-1">{s.label}</p>
-          <p className="text-sm text-muted-foreground">{s.sub}</p>
+          <p className={`text-xl font-bold mb-1 ${dark ? 'text-white' : 'text-foreground'}`}>{s.label}</p>
+          <p className={`text-sm ${dark ? 'text-zinc-400' : 'text-muted-foreground'}`}>{s.sub}</p>
         </motion.div>
       </AnimatePresence>
     </div>
