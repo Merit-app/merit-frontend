@@ -52,6 +52,10 @@ export default function EventDetailPage() {
       setSelected(new Set());
       qc.invalidateQueries({ queryKey: ['org-event', orgId, eventId] });
       qc.invalidateQueries({ queryKey: ['org-events', orgId] });
+      // Logged hours create verified sessions — refresh the volunteers list and
+      // overview stats too (they cache for 2 min and would otherwise show stale 0s).
+      qc.invalidateQueries({ queryKey: ['org-volunteers', orgId] });
+      qc.invalidateQueries({ queryKey: ['org-dashboard', orgId] });
     },
     onError: (err) => toast.error(err instanceof ApiError ? err.message : 'Failed to log hours'),
   });
@@ -62,6 +66,8 @@ export default function EventDetailPage() {
       toast.success(`Event completed! ${(r as any)?.data?.sessionsCreated ?? 0} sessions auto-logged.`);
       qc.invalidateQueries({ queryKey: ['org-event', orgId, eventId] });
       qc.invalidateQueries({ queryKey: ['org-events', orgId] });
+      qc.invalidateQueries({ queryKey: ['org-volunteers', orgId] });
+      qc.invalidateQueries({ queryKey: ['org-dashboard', orgId] });
     },
     onError: () => toast.error('Failed to complete event'),
   });
