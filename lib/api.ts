@@ -74,7 +74,7 @@ async function request<T>(method: string, path: string, body?: unknown, isPublic
   if (!res.ok) {
     let payload: any = {};
     try { payload = await res.json(); } catch { /* ignore */ }
-    throw new ApiError(res.status, payload?.code, payload?.message ?? res.statusText);
+    throw new ApiError(res.status, payload?.code, payload?.message ?? payload?.error ?? res.statusText);
   }
   return res.json() as Promise<T>;
 }
@@ -722,6 +722,15 @@ export const orgEventsApi = {
     orgRequest<{ data: any }>('POST', `/org/${orgId}/events/${eventId}/complete`, {}),
   signup: (orgId: string, eventId: string) =>
     orgRequest<{ data: any }>('POST', `/org/${orgId}/events/${eventId}/signup`, {}),
+};
+
+// Student-facing event participation (by event id only — used by the
+// "click here to participate" link from SMS / email / in-app notifications).
+export const studentEventsApi = {
+  get: (eventId: string) =>
+    request<{ data: any }>('GET', `/events/${eventId}`),
+  signup: (eventId: string) =>
+    request<{ data: any }>('POST', `/events/${eventId}/signup`, {}),
 };
 
 export const orgReportsApi = {

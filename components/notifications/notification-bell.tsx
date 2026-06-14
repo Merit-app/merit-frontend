@@ -123,6 +123,12 @@ export function NotificationBell({ iconSize = 18 }: { iconSize?: number }) {
               ))
             )}
           </div>
+          <button
+            onClick={() => { setOpen(false); router.push('/inbox'); }}
+            className="w-full border-t border-border px-4 py-2.5 text-center text-xs font-medium text-merit-blue-600 hover:bg-muted/50 hover:text-merit-blue-700 transition-colors"
+          >
+            View all in inbox
+          </button>
         </div>
       )}
     </div>

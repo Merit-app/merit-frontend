@@ -9,6 +9,7 @@ import { WelcomeBanner } from '@/components/dashboard/welcome-banner';
 import { BadgeStrip } from '@/components/dashboard/badge-strip';
 import { SelfTrackedStat } from '@/components/dashboard/self-tracked-stat';
 import { StreakDisplay } from '@/components/dashboard/streak-display';
+import { InboxPreview } from '@/components/dashboard/inbox-preview';
 import { MilestoneCheckerClient } from '@/components/dashboard/milestone-checker-client';
 import { buildMetadata } from '@/lib/seo';
 
@@ -21,6 +22,7 @@ export default function DashboardPage() {
       <GreetingHeader />
       <StreakDisplay />
       <WelcomeBanner />
+      <InboxPreview />
       <GoalProgressCard />
       <StatsRow />
       <SelfTrackedStat />

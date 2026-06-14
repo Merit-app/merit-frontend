@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { orgEventsApi } from '@/lib/api';
+import { orgEventsApi, ApiError } from '@/lib/api';
 import { toast } from 'sonner';
 import { Loader2, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
@@ -36,6 +36,14 @@ export default function CreateEventPage() {
       toast.error('Please fill in required fields');
       return;
     }
+    if (form.title.trim().length < 2) {
+      toast.error('Event title must be at least 2 characters');
+      return;
+    }
+    if (new Date(form.endTime) <= new Date(form.startTime)) {
+      toast.error('End time must be after the start time');
+      return;
+    }
     setIsLoading(true);
     try {
       const res = await orgEventsApi.create(orgId, {
@@ -57,8 +65,8 @@ export default function CreateEventPage() {
         toast.success('Event saved as draft');
       }
       router.push(`/org/${orgId}/events/${eventId}`);
-    } catch {
-      toast.error('Failed to create event');
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : 'Failed to create event');
     } finally {
       setIsLoading(false);
     }
@@ -170,16 +178,18 @@ export default function CreateEventPage() {
         <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-xl border border-border">
           <button
             type="button"
+            role="switch"
+            aria-checked={form.autoLogHours}
             onClick={() => update('autoLogHours', !form.autoLogHours)}
-            className={`relative w-10 h-6 rounded-full transition-colors ${
+            className={`relative w-11 h-6 rounded-full shrink-0 transition-colors ${
               form.autoLogHours ? 'bg-merit-blue-600' : 'bg-ink-300 dark:bg-secondary'
             }`}
           >
-            <span className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${
-              form.autoLogHours ? 'translate-x-5' : 'translate-x-1'
+            <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${
+              form.autoLogHours ? 'translate-x-5' : 'translate-x-0'
             }`} />
           </button>
-          <div>
+          <div className="min-w-0">
             <p className="text-foreground text-sm font-medium">Auto-log hours on completion</p>
             <p className="text-muted-foreground text-xs">
               Hours added for all checked-in volunteers when you mark the event complete

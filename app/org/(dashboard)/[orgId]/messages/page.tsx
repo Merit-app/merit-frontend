@@ -60,10 +60,14 @@ export default function MessagesPage() {
         filter,
         eventId: filter === 'event' ? selectedEvent : undefined,
       });
-      const { sent, failed } = (res as any).data;
+      const { sent, viaSms, viaEmail } = (res as any).data;
+      const channels = [
+        viaSms ? `${viaSms} text${viaSms !== 1 ? 's' : ''}` : null,
+        viaEmail ? `${viaEmail} email${viaEmail !== 1 ? 's' : ''}` : null,
+      ].filter(Boolean).join(', ');
       toast.success(
-        `Sent to ${sent} volunteer${sent !== 1 ? 's' : ''}` +
-        (failed > 0 ? ` (${failed} failed)` : ''),
+        `Reached ${sent} volunteer${sent !== 1 ? 's' : ''}` +
+        (channels ? ` (${channels} + in-app)` : ' (in-app)'),
       );
       setMessage('');
       refetch();
@@ -79,8 +83,8 @@ export default function MessagesPage() {
     return (
       <UpgradeGate
         orgId={orgId}
-        feature="Bulk SMS"
-        description="Send announcements to all your volunteers, event attendees, or recently active members with one tap."
+        feature="Bulk messaging"
+        description="Send announcements to all your volunteers, event attendees, or recently active members by text, email and in-app inbox with one tap."
       />
     );
   }
@@ -89,7 +93,7 @@ export default function MessagesPage() {
     <div className="max-w-2xl space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Messages</h1>
-        <p className="text-muted-foreground text-sm mt-1">Send SMS announcements to your volunteers</p>
+        <p className="text-muted-foreground text-sm mt-1">Reach your volunteers by text, email & in-app at once</p>
       </div>
 
       <div className="bg-card border border-border rounded-2xl p-5 space-y-4">
@@ -137,7 +141,7 @@ export default function MessagesPage() {
             className="w-full bg-muted border border-border text-foreground rounded-xl px-4 py-3 text-sm resize-none placeholder:text-muted-foreground focus:outline-none focus:border-ring transition-colors"
           />
           <div className="flex justify-between mt-1">
-            <p className="text-xs text-muted-foreground">Sent via SMS to volunteers&apos; phones</p>
+            <p className="text-xs text-muted-foreground">Sent via SMS, email &amp; in-app inbox</p>
             <p className="text-xs text-muted-foreground">{message.length}/300</p>
           </div>
         </div>

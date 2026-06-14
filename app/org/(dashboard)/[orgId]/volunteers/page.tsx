@@ -1,13 +1,54 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { orgVolunteersApi } from '@/lib/api';
 import { toast } from 'sonner';
-import { Search, Download, CheckCircle2, ChevronDown, ChevronRight, ExternalLink, Mail, Phone, GraduationCap, Users } from 'lucide-react';
+import { Search, Download, CheckCircle2, ChevronDown, ChevronRight, ExternalLink, Mail, Phone, GraduationCap, Users, Clock, CalendarCheck, Hourglass } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/ui/empty-state';
+import { CountUp } from '@/components/motion';
+
+function StatCard({
+  icon: Icon,
+  label,
+  value,
+  suffix,
+  decimals = 0,
+  accent,
+}: {
+  icon: typeof Users;
+  label: string;
+  value: number;
+  suffix?: string;
+  decimals?: number;
+  accent?: boolean;
+}) {
+  return (
+    <div
+      className={`rounded-2xl border p-4 transition-colors ${
+        accent && value > 0
+          ? 'border-amber-500/30 bg-amber-500/5'
+          : 'border-border bg-card'
+      }`}
+    >
+      <div className="flex items-center gap-2">
+        <div
+          className={`flex h-8 w-8 items-center justify-center rounded-lg ${
+            accent && value > 0 ? 'bg-amber-500/15 text-amber-500' : 'bg-muted text-muted-foreground'
+          }`}
+        >
+          <Icon className="h-4 w-4" />
+        </div>
+        <span className="text-xs font-medium text-muted-foreground">{label}</span>
+      </div>
+      <p className="mt-3 text-2xl font-bold text-foreground">
+        <CountUp value={value} decimals={decimals} suffix={suffix} />
+      </p>
+    </div>
+  );
+}
 
 function fmtDate(iso: string) {
   try { return new Date(iso).toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' }); }
@@ -60,6 +101,24 @@ export default function VolunteersPage() {
     !search || v.student?.name?.toLowerCase().includes(search.toLowerCase()),
   );
 
+  // Recap stats — all derived from the already-loaded volunteer list, no extra fetch.
+  const stats = useMemo(() => {
+    let verifiedHours = 0;
+    let pending = 0;
+    let totalSessions = 0;
+    let activeVolunteers = 0;
+    for (const v of volunteers) {
+      verifiedHours += Number(v.verifiedHours) || 0;
+      const sessions = Array.isArray(v.sessions) ? v.sessions : [];
+      totalSessions += sessions.length;
+      if (sessions.length > 0) activeVolunteers += 1;
+      pending += sessions.filter((s: any) => s.status === 'pending').length;
+    }
+    return { verifiedHours, pending, totalSessions, activeVolunteers };
+  }, [volunteers]);
+
+  const hoursDecimals = Number.isInteger(stats.verifiedHours) ? 0 : 1;
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -75,6 +134,25 @@ export default function VolunteersPage() {
           Export CSV
         </button>
       </div>
+
+      {/* Recap stats */}
+      {isLoading ? (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="rounded-2xl border border-border bg-card p-4">
+              <Skeleton className="h-8 w-8 rounded-lg" />
+              <Skeleton className="mt-3 h-7 w-16" />
+            </div>
+          ))}
+        </div>
+      ) : volunteers.length > 0 ? (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <StatCard icon={Users} label="Total volunteers" value={volunteers.length} />
+          <StatCard icon={CheckCircle2} label="Verified hours" value={stats.verifiedHours} suffix="h" decimals={hoursDecimals} />
+          <StatCard icon={Hourglass} label="Pending review" value={stats.pending} accent />
+          <StatCard icon={CalendarCheck} label="Sessions logged" value={stats.totalSessions} />
+        </div>
+      ) : null}
 
       <div className="relative">
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />

@@ -18,6 +18,7 @@ import {
   Trophy,
   GraduationCap,
   Users,
+  Inbox,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
@@ -28,6 +29,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 
 const primaryNav = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/inbox', label: 'Inbox', icon: Inbox },
   { href: '/hours', label: 'All sessions', icon: Clock },
   { href: '/organizations', label: 'Organizations', icon: Building2 },
   { href: '/scholarships', label: 'Scholarships', icon: GraduationCap },
