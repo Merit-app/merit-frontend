@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { orgEventsApi, ApiError } from '@/lib/api';
 import { toast } from 'sonner';
 import {
   Calendar, MapPin, Users, Clock, CheckCircle2,
-  ArrowLeft, Send, UserCheck, Loader2, Pencil,
+  ArrowLeft, Send, Loader2, Pencil, Check, ListChecks,
 } from 'lucide-react';
 import Link from 'next/link';
 import {
@@ -21,6 +21,7 @@ export default function EventDetailPage() {
   const qc = useQueryClient();
   const [confirmCompleteOpen, setConfirmCompleteOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const { data: res, isLoading } = useQuery({
     queryKey: ['org-event', orgId, eventId],
@@ -38,18 +39,21 @@ export default function EventDetailPage() {
     onError: () => toast.error('Failed to publish'),
   });
 
-  const confirmAttendance = useMutation({
-    mutationFn: (userId: string) => orgEventsApi.confirmAttendance(orgId, eventId, userId),
+  const logHours = useMutation({
+    mutationFn: (userIds: string[]) => orgEventsApi.confirmAttendanceMany(orgId, eventId, userIds),
     onSuccess: (r) => {
       const d = (r as any)?.data;
+      const n = d?.logged ?? 0;
       toast.success(
-        d?.alreadyLogged
-          ? 'Already logged — marked as attended.'
-          : `Confirmed! ${d?.hours ?? 0}h added to their dashboard.`,
+        n > 0
+          ? `Logged ${d?.hoursEach ?? 0}h for ${n} volunteer${n === 1 ? '' : 's'}.`
+          : 'Those volunteers already had their hours logged.',
       );
+      setSelected(new Set());
       qc.invalidateQueries({ queryKey: ['org-event', orgId, eventId] });
+      qc.invalidateQueries({ queryKey: ['org-events', orgId] });
     },
-    onError: (err) => toast.error(err instanceof ApiError ? err.message : 'Failed to confirm'),
+    onError: (err) => toast.error(err instanceof ApiError ? err.message : 'Failed to log hours'),
   });
 
   const completeEvent = useMutation({
@@ -72,6 +76,21 @@ export default function EventDetailPage() {
     },
     onError: (err) => toast.error(err instanceof ApiError ? err.message : 'Failed to update event'),
   });
+
+  // Seed the selection once per event: anyone already checked in (and not yet
+  // logged) starts pre-selected, so the org can just hit "Log hours".
+  const seededRef = useRef<string | null>(null);
+  useEffect(() => {
+    const ev: any = (res as any)?.data;
+    if (!ev || seededRef.current === eventId) return;
+    seededRef.current = eventId;
+    const sg: any[] = Array.isArray(ev.signups) ? ev.signups : [];
+    setSelected(new Set(
+      sg.filter((s) => s.status === 'checked_in' && !s.hours_logged_at)
+        .map((s) => s.users?.id)
+        .filter(Boolean),
+    ));
+  }, [res, eventId]);
 
   if (isLoading) {
     return (
@@ -101,6 +120,20 @@ export default function EventDetailPage() {
   // Attendance can be confirmed on the day of or after the event.
   const canConfirm = (isToday || !isUpcoming) && (event.status === 'published' || event.status === 'completed');
   const loggedCount = signups.filter((s) => s.hours_logged_at).length;
+
+  // Selection (for the batch "Log hours" flow). Only not-yet-logged are selectable.
+  const unlogged = allActive.filter((s) => !s.hours_logged_at);
+  const selectableIds: string[] = unlogged.map((s) => s.users?.id).filter(Boolean);
+  const allSelected = selectableIds.length > 0 && selectableIds.every((id) => selected.has(id));
+  const toggleOne = (id?: string) => {
+    if (!id) return;
+    setSelected((prev) => {
+      const n = new Set(prev);
+      if (n.has(id)) n.delete(id); else n.add(id);
+      return n;
+    });
+  };
+  const toggleAll = () => setSelected(allSelected ? new Set() : new Set(selectableIds));
 
   return (
     <div className="space-y-6 max-w-3xl">
@@ -168,7 +201,7 @@ export default function EventDetailPage() {
               className="flex items-center gap-2 px-4 py-2 rounded-xl bg-green-500/10 text-success border border-green-500/20 text-sm font-semibold hover:bg-green-500/20 disabled:opacity-50 transition-colors"
             >
               {completeEvent.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
-              Complete event + log hours
+              Mark event complete
             </button>
           )}
           {(event.status === 'draft' || event.status === 'published') && (
@@ -185,15 +218,26 @@ export default function EventDetailPage() {
 
       {/* Volunteer list */}
       <div className="bg-card border border-border rounded-2xl overflow-hidden">
-        <div className="p-4 border-b border-border flex items-center justify-between">
+        <div className="p-4 border-b border-border flex items-center justify-between gap-3">
           <h3 className="font-semibold text-foreground">Volunteers ({allActive.length})</h3>
           {canConfirm ? (
-            <span className="text-xs text-success font-medium bg-green-500/10 px-2.5 py-1 rounded-full">
-              {loggedCount}/{allActive.length} confirmed
-            </span>
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-xs text-success font-medium bg-green-500/10 px-2.5 py-1 rounded-full">
+                {loggedCount}/{allActive.length} logged
+              </span>
+              {selectableIds.length > 0 && (
+                <button
+                  onClick={toggleAll}
+                  className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-border bg-card text-foreground hover:bg-muted transition-colors"
+                >
+                  <ListChecks className="w-3.5 h-3.5" />
+                  {allSelected ? 'Deselect all' : 'Select all'}
+                </button>
+              )}
+            </div>
           ) : isUpcoming ? (
-            <span className="text-xs text-muted-foreground font-medium bg-muted px-2.5 py-1 rounded-full">
-              Confirm attendance on event day
+            <span className="text-xs text-muted-foreground font-medium bg-muted px-2.5 py-1 rounded-full shrink-0">
+              Log hours on event day
             </span>
           ) : null}
         </div>
@@ -205,9 +249,29 @@ export default function EventDetailPage() {
             {allActive.map((signup: any) => {
               const u = signup.users;
               const isLogged = !!signup.hours_logged_at;
-              const pending = confirmAttendance.isPending && confirmAttendance.variables === u?.id;
+              const isSelected = u?.id ? selected.has(u.id) : false;
+              const rowClickable = canConfirm && !isLogged;
               return (
-                <div key={signup.id} className="flex items-center gap-4 px-5 py-3">
+                <div
+                  key={signup.id}
+                  onClick={rowClickable ? () => toggleOne(u?.id) : undefined}
+                  className={`flex items-center gap-3 px-5 py-3 transition-colors ${
+                    rowClickable ? 'cursor-pointer hover:bg-muted/40' : ''
+                  } ${isSelected ? 'bg-merit-blue-500/5' : ''}`}
+                >
+                  {canConfirm && (
+                    isLogged ? (
+                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-success text-background">
+                        <Check className="h-3.5 w-3.5" />
+                      </span>
+                    ) : (
+                      <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-colors ${
+                        isSelected ? 'border-merit-blue-600 bg-merit-blue-600 text-white' : 'border-border'
+                      }`}>
+                        {isSelected && <Check className="h-3.5 w-3.5" />}
+                      </span>
+                    )
+                  )}
                   <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center font-bold text-muted-foreground text-sm shrink-0">
                     {u?.name?.[0] ?? '?'}
                   </div>
@@ -217,29 +281,34 @@ export default function EventDetailPage() {
                       {u?.school ?? ''}{u?.grade ? ` · Grade ${u.grade}` : ''}
                     </p>
                   </div>
-                  {isLogged ? (
+                  {isLogged && (
                     <span className="flex items-center gap-1.5 text-xs text-success font-medium bg-green-500/10 px-2.5 py-1 rounded-full shrink-0">
                       <CheckCircle2 className="w-3 h-3" />
                       {eventHours}h logged
                     </span>
-                  ) : canConfirm ? (
-                    <button
-                      onClick={() => confirmAttendance.mutate(u?.id)}
-                      disabled={confirmAttendance.isPending}
-                      className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-foreground text-background font-medium hover:opacity-90 disabled:opacity-50 transition-colors shrink-0"
-                    >
-                      {pending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UserCheck className="w-3.5 h-3.5" />}
-                      Confirm + log {eventHours}h
-                    </button>
-                  ) : signup.status === 'checked_in' ? (
-                    <span className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium bg-muted px-2.5 py-1 rounded-full shrink-0">
-                      <CheckCircle2 className="w-3 h-3" />
-                      Attended
-                    </span>
-                  ) : null}
+                  )}
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {/* Batch action bar */}
+        {canConfirm && unlogged.length > 0 && (
+          <div className="flex items-center justify-between gap-3 border-t border-border bg-muted/30 px-5 py-3">
+            <p className="text-xs text-muted-foreground">
+              {selected.size > 0
+                ? `${selected.size} selected · ${eventHours}h each`
+                : 'Select volunteers to log their hours'}
+            </p>
+            <button
+              onClick={() => logHours.mutate([...selected])}
+              disabled={selected.size === 0 || logHours.isPending}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-foreground text-background text-sm font-semibold hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shrink-0"
+            >
+              {logHours.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+              Log {eventHours}h{selected.size > 0 ? ` for ${selected.size}` : ''}
+            </button>
           </div>
         )}
 
@@ -264,9 +333,9 @@ export default function EventDetailPage() {
       <ConfirmDialog
         open={confirmCompleteOpen}
         onOpenChange={setConfirmCompleteOpen}
-        title="Complete this event?"
-        description={`${checkedIn.filter((s) => !s.hours_logged_at).length} checked-in volunteer${checkedIn.filter((s) => !s.hours_logged_at).length === 1 ? '' : 's'} will have their hours auto-logged (anyone already confirmed keeps theirs). This can't be undone.`}
-        confirmLabel="Complete + log hours"
+        title="Mark this event complete?"
+        description={`This closes the event. Any volunteers you've already logged hours for keep them; nothing else is changed. This can't be undone.`}
+        confirmLabel="Mark complete"
         onConfirm={() => completeEvent.mutateAsync()}
       />
 

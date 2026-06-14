@@ -721,6 +721,9 @@ export const orgEventsApi = {
   confirmAttendance: (orgId: string, eventId: string, userId: string) =>
     orgRequest<{ data: { confirmed: boolean; alreadyLogged: boolean; hours: number } }>(
       'POST', `/org/${orgId}/events/${eventId}/confirm/${userId}`, {}),
+  confirmAttendanceMany: (orgId: string, eventId: string, userIds: string[]) =>
+    orgRequest<{ data: { logged: number; alreadyLogged: number; hoursEach: number } }>(
+      'POST', `/org/${orgId}/events/${eventId}/confirm`, { userIds }),
   complete: (orgId: string, eventId: string) =>
     orgRequest<{ data: any }>('POST', `/org/${orgId}/events/${eventId}/complete`, {}),
   signup: (orgId: string, eventId: string) =>
