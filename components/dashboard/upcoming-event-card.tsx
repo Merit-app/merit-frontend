@@ -42,6 +42,8 @@ export function UpcomingEventCard() {
   const { data } = useQuery({
     queryKey: ['my-upcoming-events'],
     queryFn: () => studentEventsApi.myUpcoming(),
+    staleTime: 0,            // always consider stale
+    refetchOnMount: 'always', // refetch every time the dashboard mounts
   });
   const events: MyEvent[] = (data as any)?.data ?? [];
 
