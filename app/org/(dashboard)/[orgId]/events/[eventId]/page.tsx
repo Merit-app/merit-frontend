@@ -82,7 +82,7 @@ export default function EventDetailPage() {
   const isUpcoming = startDate > new Date();
   const isToday = startDate.toDateString() === new Date().toDateString();
 
-  const signups: any[] = event.signups ?? [];
+  const signups: any[] = Array.isArray(event.signups) ? event.signups : [];
   const confirmed = signups.filter((s) => s.status === 'signed_up');
   const checkedIn = signups.filter((s) => s.status === 'checked_in');
   const waitlisted = signups.filter((s) => s.status === 'waitlisted');
