@@ -56,6 +56,9 @@ export default function CreateEventPage() {
         maxVolunteers: form.maxVolunteers ? parseInt(form.maxVolunteers) : undefined,
         hoursValue: form.hoursValue ? parseFloat(form.hoursValue) : undefined,
         autoLogHours: form.autoLogHours,
+        // Capture the organizer's zone so invite emails/SMS show the same
+        // wall-clock time they entered (datetime-local has no tz of its own).
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       });
       const eventId = (res as any).data?.id;
       if (publish && eventId) {

@@ -12,19 +12,21 @@ interface MyEvent {
   location?: string | null;
   startTime: string;
   endTime: string;
+  timezone?: string | null;
   maxVolunteers?: number | null;
   hoursValue?: number | null;
   orgName: string;
   myStatus: 'signed_up' | 'waitlisted' | 'checked_in';
 }
 
-function whenLabel(startIso: string, endIso: string): { day: string; time: string; relative: string } {
+function whenLabel(startIso: string, endIso: string, tz?: string | null): { day: string; time: string; relative: string } {
   const start = new Date(startIso);
   const end = new Date(endIso);
-  const day = start.toLocaleDateString('en-CA', { weekday: 'long', month: 'long', day: 'numeric' });
+  const z = tz || undefined; // undefined → browser zone (legacy events)
+  const day = start.toLocaleDateString('en-CA', { weekday: 'long', month: 'long', day: 'numeric', timeZone: z });
   const time =
-    `${start.toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit' })} – ` +
-    `${end.toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit' })}`;
+    `${start.toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit', timeZone: z })} – ` +
+    `${end.toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit', timeZone: z })}`;
 
   const today = new Date();
   const isToday = start.toDateString() === today.toDateString();
@@ -46,7 +48,7 @@ export function UpcomingEventCard() {
   if (events.length === 0) return null;
 
   const [next, ...rest] = events;
-  const { day, time, relative } = whenLabel(next.startTime, next.endTime);
+  const { day, time, relative } = whenLabel(next.startTime, next.endTime, next.timezone);
   const isWaitlist = next.myStatus === 'waitlisted';
 
   return (

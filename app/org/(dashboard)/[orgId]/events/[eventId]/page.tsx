@@ -84,6 +84,7 @@ export default function EventDetailPage() {
 
   const startDate = new Date(event.start_time);
   const endDate = new Date(event.end_time);
+  const tz: string | undefined = event.timezone || undefined; // event's zone, else browser
   const isUpcoming = startDate > new Date();
   const isToday = startDate.toDateString() === new Date().toDateString();
 
@@ -129,13 +130,13 @@ export default function EventDetailPage() {
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div className="flex items-center gap-2 text-muted-foreground">
             <Calendar className="w-4 h-4 shrink-0" />
-            {startDate.toLocaleDateString('en-CA', { weekday: 'long', month: 'long', day: 'numeric' })}
+            {startDate.toLocaleDateString('en-CA', { weekday: 'long', month: 'long', day: 'numeric', timeZone: tz })}
           </div>
           <div className="flex items-center gap-2 text-muted-foreground">
             <Clock className="w-4 h-4 shrink-0" />
-            {startDate.toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit' })}
+            {startDate.toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit', timeZone: tz })}
             {' – '}
-            {endDate.toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit' })}
+            {endDate.toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit', timeZone: tz })}
           </div>
           {event.location && (
             <div className="flex items-center gap-2 text-muted-foreground">
@@ -331,6 +332,7 @@ function EditEventModal({
       endTime: new Date(form.endTime).toISOString(),
       maxVolunteers: form.maxVolunteers ? Number(form.maxVolunteers) : undefined,
       hoursValue: form.hoursValue ? Number(form.hoursValue) : undefined,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
   }
 

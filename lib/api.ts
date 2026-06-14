@@ -705,14 +705,14 @@ export const orgEventsApi = {
   create: (orgId: string, data: {
     title: string; description?: string; location?: string; locationUrl?: string;
     program?: string; startTime: string; endTime: string;
-    maxVolunteers?: number; hoursValue?: number; autoLogHours?: boolean;
+    maxVolunteers?: number; hoursValue?: number; autoLogHours?: boolean; timezone?: string;
   }) => orgRequest<{ data: any }>('POST', `/org/${orgId}/events`, data),
   get: (orgId: string, eventId: string) =>
     orgRequest<{ data: any }>('GET', `/org/${orgId}/events/${eventId}`),
   update: (orgId: string, eventId: string, data: {
     title?: string; description?: string; location?: string; locationUrl?: string;
     program?: string; startTime?: string; endTime?: string;
-    maxVolunteers?: number; hoursValue?: number; autoLogHours?: boolean;
+    maxVolunteers?: number; hoursValue?: number; autoLogHours?: boolean; timezone?: string;
   }) => orgRequest<{ data: any }>('PATCH', `/org/${orgId}/events/${eventId}`, data),
   publish: (orgId: string, eventId: string) =>
     orgRequest<{ data: any }>('POST', `/org/${orgId}/events/${eventId}/publish`, {}),

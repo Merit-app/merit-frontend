@@ -9,12 +9,13 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
-function fmtRange(startIso: string, endIso: string) {
+function fmtRange(startIso: string, endIso: string, tz?: string | null) {
   const s = new Date(startIso);
   const e = new Date(endIso);
-  const date = s.toLocaleDateString('en-CA', { weekday: 'long', month: 'long', day: 'numeric' });
-  const st = s.toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit' });
-  const et = e.toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit' });
+  const z = tz || undefined; // undefined → browser zone (legacy events)
+  const date = s.toLocaleDateString('en-CA', { weekday: 'long', month: 'long', day: 'numeric', timeZone: z });
+  const st = s.toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit', timeZone: z });
+  const et = e.toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit', timeZone: z });
   return { date, time: `${st} – ${et}` };
 }
 
@@ -35,6 +36,7 @@ export default function StudentEventPage() {
       const waitlisted = (r as any)?.data?.isWaitlisted;
       toast.success(waitlisted ? "You're on the waitlist — we'll text you if a spot opens." : "You're signed up! 🎉");
       qc.invalidateQueries({ queryKey: ['student-event', eventId] });
+      qc.invalidateQueries({ queryKey: ['my-upcoming-events'] });
     },
     onError: (err) => toast.error(err instanceof ApiError ? err.message : 'Could not sign you up'),
   });
@@ -59,7 +61,7 @@ export default function StudentEventPage() {
     );
   }
 
-  const { date, time } = fmtRange(event.startTime, event.endTime);
+  const { date, time } = fmtRange(event.startTime, event.endTime, event.timezone);
   const isSignedUp = event.mySignupStatus === 'signed_up' || event.mySignupStatus === 'checked_in';
   const isWaitlisted = event.mySignupStatus === 'waitlisted';
   const isFull = event.spotsLeft === 0 && !isSignedUp && !isWaitlisted;
