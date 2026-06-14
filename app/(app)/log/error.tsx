@@ -44,7 +44,7 @@ export default function AppError({
         </button>
         <Link
           href="/dashboard"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-card text-white text-sm font-medium hover:bg-muted transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-foreground text-background text-sm font-medium hover:bg-foreground/90 transition-colors"
         >
           <Home className="w-4 h-4" />
           Go to dashboard

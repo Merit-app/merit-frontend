@@ -181,7 +181,7 @@ export function ClaimModal({ orgId, orgName, orgWebsiteUrl, onClose }: ClaimModa
                 <button
                   type="submit"
                   disabled={isLoading || !form.workEmail}
-                  className="w-full bg-card text-white font-semibold py-3 rounded-xl text-sm hover:bg-muted disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+                  className="w-full bg-merit-blue-600 text-white font-semibold py-3 rounded-xl text-sm hover:bg-merit-blue-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
                 >
                   {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
                   {isLoading ? 'Submitting...' : 'Submit claim →'}
