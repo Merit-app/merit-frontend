@@ -718,6 +718,9 @@ export const orgEventsApi = {
     orgRequest<{ data: any }>('POST', `/org/${orgId}/events/${eventId}/publish`, {}),
   checkIn: (orgId: string, eventId: string, userId: string) =>
     orgRequest<{ data: any }>('POST', `/org/${orgId}/events/${eventId}/checkin/${userId}`, {}),
+  confirmAttendance: (orgId: string, eventId: string, userId: string) =>
+    orgRequest<{ data: { confirmed: boolean; alreadyLogged: boolean; hours: number } }>(
+      'POST', `/org/${orgId}/events/${eventId}/confirm/${userId}`, {}),
   complete: (orgId: string, eventId: string) =>
     orgRequest<{ data: any }>('POST', `/org/${orgId}/events/${eventId}/complete`, {}),
   signup: (orgId: string, eventId: string) =>
@@ -731,6 +734,8 @@ export const studentEventsApi = {
     request<{ data: any }>('GET', `/events/${eventId}`),
   signup: (eventId: string) =>
     request<{ data: any }>('POST', `/events/${eventId}/signup`, {}),
+  myUpcoming: () =>
+    request<{ data: any[] }>('GET', `/me/upcoming-events`),
 };
 
 export const orgReportsApi = {

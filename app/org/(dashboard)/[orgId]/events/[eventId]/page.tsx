@@ -38,13 +38,18 @@ export default function EventDetailPage() {
     onError: () => toast.error('Failed to publish'),
   });
 
-  const checkIn = useMutation({
-    mutationFn: (userId: string) => orgEventsApi.checkIn(orgId, eventId, userId),
-    onSuccess: () => {
-      toast.success('Checked in!');
+  const confirmAttendance = useMutation({
+    mutationFn: (userId: string) => orgEventsApi.confirmAttendance(orgId, eventId, userId),
+    onSuccess: (r) => {
+      const d = (r as any)?.data;
+      toast.success(
+        d?.alreadyLogged
+          ? 'Already logged — marked as attended.'
+          : `Confirmed! ${d?.hours ?? 0}h added to their dashboard.`,
+      );
       qc.invalidateQueries({ queryKey: ['org-event', orgId, eventId] });
     },
-    onError: (err) => toast.error(err instanceof ApiError ? err.message : 'Check-in failed'),
+    onError: (err) => toast.error(err instanceof ApiError ? err.message : 'Failed to confirm'),
   });
 
   const completeEvent = useMutation({
@@ -87,6 +92,14 @@ export default function EventDetailPage() {
   const checkedIn = signups.filter((s) => s.status === 'checked_in');
   const waitlisted = signups.filter((s) => s.status === 'waitlisted');
   const allActive = [...confirmed, ...checkedIn];
+
+  // Hours each confirmed attendee earns — explicit value, else event duration.
+  const eventHours = event.hours_value != null
+    ? Number(event.hours_value)
+    : Math.round(((endDate.getTime() - startDate.getTime()) / 3_600_000) * 10) / 10;
+  // Attendance can be confirmed on the day of or after the event.
+  const canConfirm = (isToday || !isUpcoming) && (event.status === 'published' || event.status === 'completed');
+  const loggedCount = signups.filter((s) => s.hours_logged_at).length;
 
   return (
     <div className="space-y-6 max-w-3xl">
@@ -173,11 +186,15 @@ export default function EventDetailPage() {
       <div className="bg-card border border-border rounded-2xl overflow-hidden">
         <div className="p-4 border-b border-border flex items-center justify-between">
           <h3 className="font-semibold text-foreground">Volunteers ({allActive.length})</h3>
-          {isToday && event.status === 'published' && (
-            <span className="text-xs text-warning font-medium bg-amber-500/10 px-2.5 py-1 rounded-full">
-              Day-of check-in active
+          {canConfirm ? (
+            <span className="text-xs text-success font-medium bg-green-500/10 px-2.5 py-1 rounded-full">
+              {loggedCount}/{allActive.length} confirmed
             </span>
-          )}
+          ) : isUpcoming ? (
+            <span className="text-xs text-muted-foreground font-medium bg-muted px-2.5 py-1 rounded-full">
+              Confirm attendance on event day
+            </span>
+          ) : null}
         </div>
 
         {allActive.length === 0 ? (
@@ -186,8 +203,8 @@ export default function EventDetailPage() {
           <div className="divide-y divide-border">
             {allActive.map((signup: any) => {
               const u = signup.users;
-              const isCheckedIn = signup.status === 'checked_in';
-              const showCheckIn = (isToday || !isUpcoming) && event.status === 'published';
+              const isLogged = !!signup.hours_logged_at;
+              const pending = confirmAttendance.isPending && confirmAttendance.variables === u?.id;
               return (
                 <div key={signup.id} className="flex items-center gap-4 px-5 py-3">
                   <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center font-bold text-muted-foreground text-sm shrink-0">
@@ -199,20 +216,25 @@ export default function EventDetailPage() {
                       {u?.school ?? ''}{u?.grade ? ` · Grade ${u.grade}` : ''}
                     </p>
                   </div>
-                  {isCheckedIn ? (
+                  {isLogged ? (
                     <span className="flex items-center gap-1.5 text-xs text-success font-medium bg-green-500/10 px-2.5 py-1 rounded-full shrink-0">
                       <CheckCircle2 className="w-3 h-3" />
-                      Checked in
+                      {eventHours}h logged
                     </span>
-                  ) : showCheckIn ? (
+                  ) : canConfirm ? (
                     <button
-                      onClick={() => checkIn.mutate(u?.id)}
-                      disabled={checkIn.isPending}
+                      onClick={() => confirmAttendance.mutate(u?.id)}
+                      disabled={confirmAttendance.isPending}
                       className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-foreground text-background font-medium hover:opacity-90 disabled:opacity-50 transition-colors shrink-0"
                     >
-                      <UserCheck className="w-3.5 h-3.5" />
-                      Check in
+                      {pending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UserCheck className="w-3.5 h-3.5" />}
+                      Confirm + log {eventHours}h
                     </button>
+                  ) : signup.status === 'checked_in' ? (
+                    <span className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium bg-muted px-2.5 py-1 rounded-full shrink-0">
+                      <CheckCircle2 className="w-3 h-3" />
+                      Attended
+                    </span>
                   ) : null}
                 </div>
               );
@@ -242,7 +264,7 @@ export default function EventDetailPage() {
         open={confirmCompleteOpen}
         onOpenChange={setConfirmCompleteOpen}
         title="Complete this event?"
-        description={`${checkedIn.length} checked-in volunteer${checkedIn.length === 1 ? '' : 's'} will have their hours auto-logged. This can't be undone.`}
+        description={`${checkedIn.filter((s) => !s.hours_logged_at).length} checked-in volunteer${checkedIn.filter((s) => !s.hours_logged_at).length === 1 ? '' : 's'} will have their hours auto-logged (anyone already confirmed keeps theirs). This can't be undone.`}
         confirmLabel="Complete + log hours"
         onConfirm={() => completeEvent.mutateAsync()}
       />
