@@ -753,7 +753,16 @@ export const orgReportsApi = {
   },
   impact: (orgId: string) =>
     orgRequest<{ data: any }>('GET', `/org/${orgId}/reports/impact`),
-  certificate: (orgId: string, userId: string, coordinatorName: string): Promise<Blob> => {
+  certificate: (
+    orgId: string,
+    userId: string,
+    opts: {
+      coordinatorName: string;
+      coordinatorTitle?: string;
+      certTitle?: string;
+      customMessage?: string;
+    },
+  ): Promise<Blob> => {
     const token = getOrgAccessToken();
     return fetch(`${BASE}/org/${orgId}/certificates`, {
       method: 'POST',
@@ -761,7 +770,7 @@ export const orgReportsApi = {
         'Content-Type': 'application/json',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-      body: JSON.stringify({ userId, coordinatorName }),
+      body: JSON.stringify({ userId, ...opts }),
     }).then((r) => {
       if (!r.ok) throw new ApiError(r.status, undefined, 'Certificate generation failed');
       return r.blob();
