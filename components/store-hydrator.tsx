@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useMeritStore } from '@/lib/store';
 import { useHydrationStore } from '@/lib/store';
-import { usersApi, mapUser } from '@/lib/api';
+import { usersApi, sessionsApi, mapUser, mapSession } from '@/lib/api';
 
 const BASE = (process.env.NEXT_PUBLIC_API_URL ?? '').trim().replace(/\/+$/, '');
 
@@ -11,6 +11,12 @@ const BASE = (process.env.NEXT_PUBLIC_API_URL ?? '').trim().replace(/\/+$/, '');
 // background tab regaining focus doesn't spam /users/me.
 const USER_REFRESH_THROTTLE_MS = 60_000;
 let lastUserRefresh = 0;
+
+// Throttle session re-pulls (shorter than user — hours change more often, and
+// this is what makes org-awarded / supervisor-verified hours appear without a
+// hard reload).
+const SESSIONS_REFRESH_THROTTLE_MS = 30_000;
+let lastSessionsRefresh = 0;
 
 /**
  * Pull the fresh user from the server and merge it into the store. This is what
@@ -28,6 +34,26 @@ async function refreshUser(force = false) {
     if (res?.data?.user) updateUser(mapUser(res.data.user));
   } catch {
     // Non-fatal — keep the cached user.
+  }
+}
+
+/**
+ * Re-pull the student's sessions and replace the cached list. The student is NOT
+ * the actor when an org awards hours or a supervisor verifies via SMS, so nothing
+ * else invalidates their cache — without this, those hours only appear after a
+ * hard reload. Called on boot, on window-focus (throttled), and polled by
+ * <SessionsRefresher/> on the dashboard/hours pages.
+ */
+export async function refreshSessions(force = false) {
+  const { isAuthed, accessToken, setSessions } = useMeritStore.getState();
+  if (!isAuthed || !accessToken) return;
+  if (!force && Date.now() - lastSessionsRefresh < SESSIONS_REFRESH_THROTTLE_MS) return;
+  lastSessionsRefresh = Date.now();
+  try {
+    const res = await sessionsApi.list({ perPage: 200 });
+    if (res?.data) setSessions(res.data.map(mapSession));
+  } catch {
+    // Non-fatal — keep the cached sessions.
   }
 }
 
@@ -78,13 +104,18 @@ export function StoreHydrator() {
 
       if (!cancelled) setHydrated();
 
-      // After the session is settled, pull the canonical user so a plan/role
-      // change made elsewhere is reflected without a logout/login.
+      // After the session is settled, pull the canonical user + sessions so a
+      // plan/role change or org-awarded/verified hours are reflected without a
+      // logout/login or hard reload.
       if (!cancelled) void refreshUser(true);
+      if (!cancelled) void refreshSessions(true);
     })();
 
-    // Re-sync the user when the tab regains focus (throttled).
-    const onFocus = () => void refreshUser();
+    // Re-sync the user + sessions when the tab regains focus (throttled).
+    const onFocus = () => {
+      void refreshUser();
+      void refreshSessions();
+    };
     window.addEventListener('focus', onFocus);
 
     return () => {

@@ -3,21 +3,18 @@
 import { useState } from 'react';
 import { schoolApi, ApiError } from '@/lib/api';
 import { Users, ClipboardCheck, FileDown, ShieldCheck, CheckCircle2, ArrowRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { ChapterMockup } from './chapter-mockup';
-import { Reveal, RevealGroup, RevealItem } from '@/components/motion';
-import { Section, Eyebrow, SectionHeading, Lead, MarketingCard, IconChip, cardTitleCls, cardBodyCls } from './_primitives';
+import { Reveal, RevealGroup, RevealItem, AnimatedProgress } from '@/components/motion';
+import { Section, Eyebrow, SectionHeading, Lead, BentoCard, IconChip, cardTitleCls, cardBodyCls } from './_primitives';
 
-const OUTCOMES = [
+/* Quiet supporting outcomes — the roster outcome is the loud anchor, built
+   separately below. */
+const QUIET_OUTCOMES = [
   {
     icon: Users,
     title: 'Provision your whole roster',
     body: 'Upload a CSV and invite every student at once — no one-by-one signups.',
-  },
-  {
-    icon: ClipboardCheck,
-    title: 'See who’s met their hours',
-    body: 'A live dashboard shows exactly who’s on track and who’s behind, by grad year.',
-    roster: true,
   },
   {
     icon: FileDown,
@@ -26,33 +23,49 @@ const OUTCOMES = [
   },
 ] as const;
 
-const ROSTER_SLICE = [
+/* Real product states — green=met, amber=at-risk are genuine; blue=on-track is
+   the same brand-blue hex, via the dark-remapped `blue-*` tokens so the pill
+   stays legible when the light band flips to dark mode. */
+const ROSTER_ROWS = [
   { name: 'Sarah Kim', pct: 100, status: 'met' as const },
-  { name: 'Jacob Liu', pct: 30, status: 'at_risk' as const },
+  { name: 'Maya Thompson', pct: 64, status: 'on_track' as const },
+  { name: 'Jacob Liu', pct: 28, status: 'at_risk' as const },
 ];
 
 const ROSTER_STYLE = {
   met: { bar: 'bg-green-500', pill: 'bg-green-50 text-green-700', label: 'Met' },
+  on_track: { bar: 'bg-blue-500', pill: 'bg-blue-50 text-blue-700', label: 'On track' },
   at_risk: { bar: 'bg-amber-500', pill: 'bg-amber-50 text-amber-700', label: 'At risk' },
 };
 
-function RosterSlice() {
+/* The anchor's embedded roster — bars fill 0→value on scroll-into-view via the
+   reduced-motion-safe AnimatedProgress primitive; bleeds to the card's edge. */
+function RosterAnchorSlice() {
   return (
-    <div className="mt-5 space-y-2.5 rounded-xl border border-border bg-background p-3.5">
-      {ROSTER_SLICE.map((r) => {
-        const st = ROSTER_STYLE[r.status];
-        return (
-          <div key={r.name} className="flex items-center gap-2.5 text-xs">
-            <span className="w-16 shrink-0 truncate font-medium text-foreground">{r.name}</span>
-            <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
-              <span className={`block h-full rounded-full ${st.bar}`} style={{ width: `${r.pct}%` }} />
-            </span>
-            <span className={`shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-medium ${st.pill}`}>
-              {st.label}
-            </span>
-          </div>
-        );
-      })}
+    <div className="-mx-6 -mb-6 mt-6 border-t border-border bg-background/60 px-6 py-5 sm:-mx-7 sm:-mb-7 sm:px-7">
+      <p className="mb-3 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+        Class of 2026 · live
+      </p>
+      <div className="space-y-3">
+        {ROSTER_ROWS.map((r, i) => {
+          const st = ROSTER_STYLE[r.status];
+          return (
+            <div key={r.name} className="flex items-center gap-3 text-xs">
+              <span className="w-24 shrink-0 truncate font-medium text-foreground">{r.name}</span>
+              <AnimatedProgress
+                value={r.pct}
+                delay={0.1 + i * 0.12}
+                className="h-1.5 flex-1"
+                barClassName={st.bar}
+                aria-label={`${r.name}: ${r.pct}% of required hours`}
+              />
+              <span className={cn('shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-medium', st.pill)}>
+                {st.label}
+              </span>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -116,29 +129,68 @@ export function SchoolSection() {
 
       {/* Outcomes + lead form */}
       <div className="mt-20 grid gap-12 sm:mt-28 lg:grid-cols-2 lg:items-start">
-        {/* Left: outcome cards */}
+        {/* Left: outcome bento — the roster card is the loud anchor (light blue
+            tint + embedded roster whose bars fill on scroll-in); the provision
+            and export outcomes stay quiet above and below it. */}
         <div>
           <RevealGroup className="space-y-4 sm:space-y-5">
-            {OUTCOMES.map(({ icon: Icon, title, body, ...rest }) => (
-              <RevealItem key={title}>
-                <MarketingCard interactive className="p-5 sm:p-6">
+            {/* Quiet — Provision */}
+            <RevealItem>
+              <BentoCard interactive glow="tr">
+                <div className="flex gap-3.5 p-5 sm:p-6">
+                  <IconChip className="mt-0.5 shrink-0">
+                    <Users className="h-4 w-4" />
+                  </IconChip>
+                  <div className="min-w-0">
+                    <h3 className={cardTitleCls(false)}>{QUIET_OUTCOMES[0].title}</h3>
+                    <p className={cardBodyCls(false)}>{QUIET_OUTCOMES[0].body}</p>
+                  </div>
+                </div>
+              </BentoCard>
+            </RevealItem>
+
+            {/* Anchor — See who's met their hours */}
+            <RevealItem>
+              <BentoCard anchor>
+                <div className="p-6 sm:p-7">
                   <div className="flex gap-3.5">
                     <IconChip className="mt-0.5 shrink-0">
-                      <Icon className="h-4 w-4" />
+                      <ClipboardCheck className="h-4 w-4" />
                     </IconChip>
                     <div className="min-w-0">
-                      <h3 className={cardTitleCls(false)}>{title}</h3>
-                      <p className={cardBodyCls(false)}>{body}</p>
+                      <h3 className="text-base font-semibold tracking-tight text-foreground sm:text-lg">
+                        See who&apos;s met their hours
+                      </h3>
+                      <p className={cardBodyCls(false)}>
+                        <span className="font-semibold text-foreground">A live dashboard.</span> See
+                        exactly who&apos;s on track and who&apos;s behind, by grad year — no
+                        spreadsheets.
+                      </p>
                     </div>
                   </div>
-                  {'roster' in rest && <RosterSlice />}
-                </MarketingCard>
-              </RevealItem>
-            ))}
+                  <RosterAnchorSlice />
+                </div>
+              </BentoCard>
+            </RevealItem>
+
+            {/* Quiet — Export */}
+            <RevealItem>
+              <BentoCard interactive glow="bl">
+                <div className="flex gap-3.5 p-5 sm:p-6">
+                  <IconChip className="mt-0.5 shrink-0">
+                    <FileDown className="h-4 w-4" />
+                  </IconChip>
+                  <div className="min-w-0">
+                    <h3 className={cardTitleCls(false)}>{QUIET_OUTCOMES[1].title}</h3>
+                    <p className={cardBodyCls(false)}>{QUIET_OUTCOMES[1].body}</p>
+                  </div>
+                </div>
+              </BentoCard>
+            </RevealItem>
           </RevealGroup>
 
           <Reveal delay={0.1}>
-            <div className="mt-6 flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
+            <div className="mt-6 flex items-center gap-2 rounded-md border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
               <ShieldCheck className="h-4 w-4 shrink-0 text-merit-blue-600" />
               Admin-controlled accounts · student consent built in · your students&apos; data stays yours.
             </div>
@@ -158,7 +210,7 @@ export function SchoolSection() {
 
         {/* Right: lead form */}
         <Reveal delay={0.05}>
-          <div className="rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-elevated)] sm:p-8">
+          <div className="rounded-md border border-border bg-card p-6 shadow-[var(--shadow-elevated)] sm:p-8">
             {submitted ? (
               <div className="flex flex-col items-center py-12 text-center">
                 <CheckCircle2 className="h-12 w-12 text-green-500" />
@@ -209,7 +261,7 @@ export function SchoolSection() {
                 {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
 
                 <button type="submit" disabled={submitting}
-                  className="w-full rounded-lg bg-merit-blue-600 py-2.5 text-sm font-semibold text-white shadow-md shadow-merit-blue-600/20 transition-all hover:bg-merit-blue-700 active:scale-[0.99] disabled:opacity-60">
+                  className="w-full rounded-md bg-merit-blue-600 py-2.5 text-sm font-semibold text-white shadow-md shadow-merit-blue-600/20 transition-all hover:bg-merit-blue-700 active:scale-[0.99] disabled:opacity-60">
                   {submitting ? 'Sending…' : 'Request early access'}
                 </button>
                 <p className="text-center text-xs text-muted-foreground">No credit card. Free for pilot schools.</p>
@@ -223,7 +275,7 @@ export function SchoolSection() {
 }
 
 const inputCls =
-  'w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground transition-[border-color,box-shadow] duration-150 focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/25';
+  'w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground transition-[border-color,box-shadow] duration-150 focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/25';
 
 function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
   return (

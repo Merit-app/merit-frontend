@@ -9,6 +9,7 @@ import { StatusBadge } from '@/components/hours/status-badge';
 import { TierBadge } from '@/components/hours/tier-badge';
 import { SessionDetailSheet } from '@/components/hours/session-detail-sheet';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { SessionsRefresher } from '@/components/sessions-refresher';
 import { useMeritStore } from '@/lib/store';
 import { sessionsApi, ApiError } from '@/lib/api';
 import { formatSessionDate } from '@/lib/utils';
@@ -153,6 +154,7 @@ export default function HoursPage() {
 
   return (
     <div className="px-4 py-4 md:px-8 md:py-6">
+      <SessionsRefresher />
       {/* Top bar */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-1 bg-muted p-1 rounded-lg">

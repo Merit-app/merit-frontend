@@ -19,7 +19,33 @@ export function MarketingNavbar() {
   // tab, because the dark hero and the light student-proof band share the
   // 'students' tab.
   const [dark, setDark] = useState(true);
+  // Auto-hide on scroll down, reveal on scroll up (always shown near the top).
+  const [hidden, setHidden] = useState(false);
   const reducedMotion = useReducedMotion();
+
+  useEffect(() => {
+    let lastY = window.scrollY;
+    let ticking = false;
+    const update = () => {
+      const y = window.scrollY;
+      if (y < 12) setHidden(false); // always reveal at the very top
+      else if (y > lastY + 6) setHidden(true); // scrolling down → hide
+      else if (y < lastY - 6) setHidden(false); // scrolling up → reveal
+      lastY = y;
+      ticking = false;
+    };
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // Reduced-motion users keep a plain always-visible sticky bar (no slide).
+  const effectiveHidden = reducedMotion ? false : hidden;
 
   // Track which audience section is in view for the tab indicator.
   useEffect(() => {
@@ -70,9 +96,11 @@ export function MarketingNavbar() {
   return (
     <nav
       data-dark={dark}
-      className="sticky top-0 z-50 border-b backdrop-blur-xl transition-colors duration-500
+      className={`sticky top-0 z-50 border-b backdrop-blur-xl will-change-transform
+        transition-[transform,background-color,border-color] duration-300
         data-[dark=false]:border-border/60 data-[dark=false]:bg-background/70
-        data-[dark=true]:border-white/10 data-[dark=true]:bg-black/70"
+        data-[dark=true]:border-white/10 data-[dark=true]:bg-black/70
+        ${effectiveHidden ? '-translate-y-full' : 'translate-y-0'}`}
     >
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-1.5 px-3 sm:h-16 sm:gap-4 sm:px-6">
         {/* Logo */}

@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { orgVolunteersApi } from '@/lib/api';
 import { toast } from 'sonner';
-import { Search, Download, CheckCircle2, ChevronDown, ChevronRight, ExternalLink, Mail, Phone, GraduationCap, Users, Clock, CalendarCheck, Hourglass } from 'lucide-react';
+import { Search, Download, CheckCircle2, ChevronDown, ChevronRight, ExternalLink, Mail, Phone, GraduationCap, Users, Clock, CalendarCheck, Hourglass, Plus, Minus } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/ui/empty-state';
 import { CountUp } from '@/components/motion';
@@ -60,6 +60,9 @@ export default function VolunteersPage() {
   const qc = useQueryClient();
   const [search, setSearch] = useState('');
   const [expanded, setExpanded] = useState<string | null>(null);
+  // Manual hour-adjustment form (only one volunteer is expanded at a time).
+  const [adjAmount, setAdjAmount] = useState('');
+  const [adjReason, setAdjReason] = useState('');
 
   const { data: volunteersRes, isLoading } = useQuery({
     queryKey: ['org-volunteers', orgId],
@@ -81,6 +84,34 @@ export default function VolunteersPage() {
     onSuccess: () => { toast.success('Disputed'); qc.invalidateQueries({ queryKey: ['org-volunteers', orgId] }); },
     onError: () => toast.error('Failed to dispute'),
   });
+
+  const adjustHours = useMutation({
+    mutationFn: (vars: { userId: string; hours: number; reason?: string }) =>
+      orgVolunteersApi.adjustHours(orgId, vars.userId, { hours: vars.hours, reason: vars.reason }),
+    onSuccess: (_d, vars) => {
+      toast.success(vars.hours >= 0 ? `Added ${vars.hours}h` : `Subtracted ${Math.abs(vars.hours)}h`);
+      setAdjAmount('');
+      setAdjReason('');
+      qc.invalidateQueries({ queryKey: ['org-volunteers', orgId] });
+      qc.invalidateQueries({ queryKey: ['org-dashboard', orgId] });
+    },
+    onError: (e: any) => toast.error(e?.message || 'Failed to adjust hours'),
+  });
+
+  const submitAdjust = (userId: string, sign: 1 | -1) => {
+    const n = parseFloat(adjAmount);
+    if (!Number.isFinite(n) || n <= 0) {
+      toast.error('Enter a number of hours');
+      return;
+    }
+    adjustHours.mutate({ userId, hours: sign * n, reason: adjReason.trim() || undefined });
+  };
+
+  const toggleExpanded = (id: string) => {
+    setExpanded(expanded === id ? null : id);
+    setAdjAmount('');
+    setAdjReason('');
+  };
 
   const handleExport = async () => {
     try {
@@ -193,7 +224,7 @@ export default function VolunteersPage() {
           filtered.map((v: any) => (
             <div key={v.student.id} className="bg-card border border-border rounded-2xl overflow-hidden">
               <button
-                onClick={() => setExpanded(expanded === v.student.id ? null : v.student.id)}
+                onClick={() => toggleExpanded(v.student.id)}
                 className="w-full flex items-center gap-4 p-4 hover:bg-muted/50 transition-colors text-left"
               >
                 <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center font-bold text-muted-foreground shrink-0">
@@ -292,6 +323,50 @@ export default function VolunteersPage() {
                   ))}
                   </div>
                   )}
+
+                  {/* Manual hour adjustment */}
+                  <div className="border-t border-border/50 bg-muted/20 px-4 py-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="mr-1 flex items-center gap-1.5 text-xs font-medium text-foreground">
+                        <Clock className="h-3.5 w-3.5 text-muted-foreground" /> Adjust hours
+                      </span>
+                      <input
+                        type="number"
+                        step="0.5"
+                        min="0"
+                        inputMode="decimal"
+                        value={adjAmount}
+                        onChange={(e) => setAdjAmount(e.target.value)}
+                        placeholder="Hours"
+                        className="w-20 rounded-lg border border-border bg-card px-2.5 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/25"
+                      />
+                      <input
+                        type="text"
+                        value={adjReason}
+                        onChange={(e) => setAdjReason(e.target.value)}
+                        placeholder="Reason (optional)"
+                        maxLength={200}
+                        className="min-w-[120px] flex-1 rounded-lg border border-border bg-card px-2.5 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/25"
+                      />
+                      <button
+                        onClick={() => submitAdjust(v.student.id, 1)}
+                        disabled={adjustHours.isPending}
+                        className="flex items-center gap-1 rounded-lg bg-green-500/10 px-2.5 py-1.5 text-xs font-medium text-success transition-colors hover:bg-green-500/20 disabled:opacity-50"
+                      >
+                        <Plus className="h-3.5 w-3.5" /> Add
+                      </button>
+                      <button
+                        onClick={() => submitAdjust(v.student.id, -1)}
+                        disabled={adjustHours.isPending}
+                        className="flex items-center gap-1 rounded-lg border border-border bg-card px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-50"
+                      >
+                        <Minus className="h-3.5 w-3.5" /> Subtract
+                      </button>
+                    </div>
+                    <p className="mt-1.5 text-[11px] text-muted-foreground">
+                      Records a verified session under your org — also updates the student&apos;s record.
+                    </p>
+                  </div>
                 </div>
               )}
             </div>

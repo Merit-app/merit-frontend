@@ -6,13 +6,16 @@
 /* ─── Merit Design Tokens ─────────────────────────────────────────────────── */
 
 @theme {
-  /* Primary — merit-blue */
+  /* Primary — merit-blue (standard Tailwind blue ramp) */
   --color-merit-blue-50:  #EFF6FF;
   --color-merit-blue-100: #DBEAFE;
   --color-merit-blue-200: #BFDBFE;
+  --color-merit-blue-300: #93C5FD;
+  --color-merit-blue-400: #60A5FA;
   --color-merit-blue-500: #3B82F6;
   --color-merit-blue-600: #2563EB;
   --color-merit-blue-700: #1D4ED8;
+  --color-merit-blue-800: #1E40AF;
   --color-merit-blue-900: #1E3A8A;
 
   /* Neutrals — ink */

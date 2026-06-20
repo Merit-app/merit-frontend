@@ -802,6 +802,12 @@ export const orgVolunteersApi = {
     orgRequest<{ data: any }>('POST', `/organizations/${orgId}/sessions/${sessionId}/verify`, {}),
   dispute: (orgId: string, sessionId: string) =>
     orgRequest<{ data: any }>('POST', `/organizations/${orgId}/sessions/${sessionId}/dispute`, {}),
+  adjustHours: (orgId: string, userId: string, body: { hours: number; reason?: string }) =>
+    orgRequest<{ data: { adjusted: boolean; session: any } }>(
+      'POST',
+      `/organizations/${orgId}/volunteers/${userId}/adjust-hours`,
+      body,
+    ),
   export: (orgId: string): Promise<Blob> => {
     const token = getOrgAccessToken();
     return fetch(`${BASE}/organizations/${orgId}/export`, {

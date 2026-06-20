@@ -9,7 +9,7 @@ import { DARK_BAND } from './_primitives';
 
 export function LandingPage() {
   return (
-    <div className="min-h-screen overflow-x-hidden bg-background">
+    <div className="min-h-screen overflow-x-clip bg-background">
       <MarketingNavbar />
 
       {/* Band rhythm — dark → light → dark → light → dark (Stripe-style). Each

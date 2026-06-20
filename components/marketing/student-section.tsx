@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { StudentDemo } from './student-demo';
 import { Reveal, RevealGroup, RevealItem, CountUp } from '@/components/motion';
-import { Section, Eyebrow, SectionHeading, Lead, MarketingCard } from './_primitives';
+import { Section, Eyebrow, SectionHeading, Lead, BentoCard } from './_primitives';
 
 const container: Variants = {
   hidden: { opacity: 0 },
@@ -135,10 +135,11 @@ export function StudentProofSection() {
         </Lead>
       </Reveal>
 
-      {/* Stats strip */}
-      <RevealGroup className="mx-auto mt-20 grid max-w-4xl grid-cols-2 gap-8 text-center sm:mt-28 md:grid-cols-4">
+      {/* Hairline stat strip — columns separated by thin vertical rules (no
+          boxes). Divide only at md+ so the 2-col mobile layout stays clean. */}
+      <RevealGroup className="mx-auto mt-20 grid max-w-4xl grid-cols-2 gap-x-6 gap-y-10 text-center sm:mt-28 md:grid-cols-4 md:gap-0 md:divide-x md:divide-border">
         {STATS.map((stat) => (
-          <RevealItem key={stat.label}>
+          <RevealItem key={stat.label} className="md:px-6">
             {'text' in stat ? (
               <p className="font-mono text-3xl font-semibold tracking-tight tabular-nums text-foreground sm:text-4xl">
                 {stat.text}
@@ -156,30 +157,60 @@ export function StudentProofSection() {
         ))}
       </RevealGroup>
 
-      {/* Testimonials */}
+      {/* Testimonials bento — one larger featured quote (soft blue tint) + two
+          quieter ones. Borderless, seamless fills. */}
       <div className="mx-auto mt-20 max-w-5xl sm:mt-28">
         <Reveal>
           <Eyebrow className="mb-12 text-center">From students who&apos;ve used it</Eyebrow>
         </Reveal>
-        <RevealGroup className="grid grid-cols-1 gap-5 sm:gap-6 md:grid-cols-3">
-          {TESTIMONIALS.map((t) => (
-            <RevealItem key={t.name}>
-              <MarketingCard interactive className="h-full">
-                <p className="text-sm leading-relaxed text-foreground sm:text-[15px]">&ldquo;{t.quote}&rdquo;</p>
-                <div className="mt-5 flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-merit-blue-50 text-xs font-bold text-merit-blue-600">
-                    {t.name[0]}
+        <RevealGroup className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+          {/* Featured */}
+          <RevealItem className="lg:col-span-2">
+            <BentoCard anchor className="h-full">
+              <div className="flex h-full flex-col p-7 sm:p-9">
+                <p className="text-lg font-medium leading-relaxed text-foreground sm:text-2xl">
+                  &ldquo;{TESTIMONIALS[0].quote}&rdquo;
+                </p>
+                <div className="mt-auto flex items-center gap-3 pt-8">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-merit-blue-50 text-sm font-bold text-merit-blue-600">
+                    {TESTIMONIALS[0].name[0]}
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-foreground">{t.name}</p>
+                    <p className="text-sm font-semibold text-foreground">{TESTIMONIALS[0].name}</p>
                     <p className="text-xs text-muted-foreground">
-                      {t.school} · {t.grade}
+                      {TESTIMONIALS[0].school} · {TESTIMONIALS[0].grade}
                     </p>
                   </div>
                 </div>
-              </MarketingCard>
-            </RevealItem>
-          ))}
+              </div>
+            </BentoCard>
+          </RevealItem>
+
+          {/* Two quiet */}
+          <div className="flex flex-col gap-5">
+            {TESTIMONIALS.slice(1).map((t, i) => (
+              <RevealItem key={t.name} className="flex-1">
+                <BentoCard interactive glow={i === 0 ? 'tr' : 'bl'} className="h-full">
+                  <div className="flex h-full flex-col p-6">
+                    <p className="text-sm leading-relaxed text-foreground sm:text-[15px]">
+                      &ldquo;{t.quote}&rdquo;
+                    </p>
+                    <div className="mt-auto flex items-center gap-3 pt-5">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-merit-blue-50 text-xs font-bold text-merit-blue-600">
+                        {t.name[0]}
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">{t.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {t.school} · {t.grade}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </BentoCard>
+              </RevealItem>
+            ))}
+          </div>
         </RevealGroup>
       </div>
 

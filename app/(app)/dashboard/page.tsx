@@ -12,6 +12,7 @@ import { StreakDisplay } from '@/components/dashboard/streak-display';
 import { InboxPreview } from '@/components/dashboard/inbox-preview';
 import { UpcomingEventCard } from '@/components/dashboard/upcoming-event-card';
 import { MilestoneCheckerClient } from '@/components/dashboard/milestone-checker-client';
+import { SessionsRefresher } from '@/components/sessions-refresher';
 import { buildMetadata } from '@/lib/seo';
 
 export const metadata: Metadata = buildMetadata({ title: 'Dashboard', noIndex: true });
@@ -19,6 +20,7 @@ export const metadata: Metadata = buildMetadata({ title: 'Dashboard', noIndex: t
 export default function DashboardPage() {
   return (
     <div className="w-full px-4 py-4 md:px-8 md:py-6 max-w-4xl mx-auto">
+      <SessionsRefresher />
       <MilestoneCheckerClient />
       <GreetingHeader />
       <StreakDisplay />
