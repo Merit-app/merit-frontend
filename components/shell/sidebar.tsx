@@ -19,6 +19,8 @@ import {
   GraduationCap,
   Users,
   Inbox,
+  ChevronDown,
+  ClipboardList,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
@@ -218,20 +220,90 @@ function ChapterNavLink({ active }: { active: boolean }) {
   return <NavItem href="/chapter" label="Chapter" icon={Users} active={active} />;
 }
 
-function MyChapterNavLink({ active }: { active: boolean }) {
-  // Shown to students who are a member of a chapter (probe /my-chapter once).
-  const [inChapter, setInChapter] = useState(false);
+const SCHOOL_SUBNAV = [
+  { href: '/my-chapter', label: 'Overview', icon: LayoutDashboard, exact: true },
+  { href: '/my-chapter/hours', label: 'Hours', icon: Clock },
+  { href: '/my-chapter/assignments', label: 'Assignments', icon: ClipboardList },
+] as const;
+
+function SchoolSection() {
+  // Shown to students who belong to a chapter. Mirrors the Organization block,
+  // but the header is a toggle that expands into the school's sub-pages.
+  const pathname = usePathname();
+  const [chapterName, setChapterName] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
+
   useEffect(() => {
     let cancelled = false;
     import('@/lib/api')
       .then(({ chapterApi }) => chapterApi.myChapter())
-      .then((r) => { if (!cancelled && r.data) setInChapter(true); })
+      .then((r) => { if (!cancelled && r.data) setChapterName((r.data as any).chapterName ?? 'My School'); })
       .catch(() => { /* not in a chapter */ });
     return () => { cancelled = true; };
   }, []);
 
-  if (!inChapter) return null;
-  return <NavItem href="/my-chapter" label="My Chapter" icon={GraduationCap} active={active} />;
+  // Auto-open when the user navigates into any school page.
+  useEffect(() => {
+    if (pathname.startsWith('/my-chapter')) setOpen(true);
+  }, [pathname]);
+
+  if (!chapterName) return null;
+
+  const sectionActive = pathname.startsWith('/my-chapter');
+
+  return (
+    <>
+      <div className="mx-1 mt-2 mb-1 h-px bg-muted" />
+      <p className="px-3 py-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">School</p>
+
+      <button
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className={cn(
+          'group relative flex w-full items-center gap-2.5 rounded-[6px] px-3 py-2 transition-colors duration-100',
+          'text-foreground hover:bg-muted text-[13px] font-medium',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merit-blue-600 focus-visible:ring-offset-1',
+          sectionActive && !open && 'bg-muted',
+        )}
+      >
+        <GraduationCap
+          size={16}
+          strokeWidth={sectionActive ? 2 : 1.75}
+          className={cn('shrink-0', sectionActive ? 'text-merit-blue-600' : 'text-muted-foreground group-hover:text-foreground')}
+        />
+        <span className="flex-1 truncate text-left">{chapterName}</span>
+        <span className="text-[9px] font-bold bg-merit-blue-600/10 text-merit-blue-600 px-1.5 py-0.5 rounded-full shrink-0">SCHOOL</span>
+        <ChevronDown size={14} className={cn('shrink-0 text-muted-foreground transition-transform duration-150', open && 'rotate-180')} />
+      </button>
+
+      {open && (
+        <div className="ml-[18px] mt-0.5 flex flex-col gap-0.5 border-l border-border pl-2">
+          {SCHOOL_SUBNAV.map((it) => {
+            const active = it.exact ? pathname === it.href : pathname === it.href || pathname.startsWith(`${it.href}/`);
+            return (
+              <Link
+                key={it.href}
+                href={it.href}
+                className={cn(
+                  'group relative flex items-center gap-2.5 rounded-[6px] px-3 py-1.5 text-[13px] transition-colors duration-100',
+                  'text-muted-foreground hover:bg-muted hover:text-foreground',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merit-blue-600 focus-visible:ring-offset-1',
+                  active && 'bg-muted text-foreground font-medium',
+                )}
+              >
+                <it.icon
+                  size={15}
+                  strokeWidth={active ? 2 : 1.75}
+                  className={cn('shrink-0', active ? 'text-merit-blue-600' : 'text-muted-foreground group-hover:text-foreground')}
+                />
+                {it.label}
+              </Link>
+            );
+          })}
+        </div>
+      )}
+    </>
+  );
 }
 
 export function Sidebar() {
@@ -283,8 +355,8 @@ export function Sidebar() {
           <NavItem key={href} href={href} label={label} icon={Icon} active={isActive(href)} />
         ))}
 
-        {/* Student's own chapter membership */}
-        {hydrated && <MyChapterNavLink active={isActive('/my-chapter')} />}
+        {/* Student's own chapter membership — collapsible School section */}
+        {hydrated && <SchoolSection />}
 
         {/* Chapter (coordinator) link — only shown to chapter coordinators */}
         {hydrated && <ChapterNavLink active={isActive('/chapter')} />}

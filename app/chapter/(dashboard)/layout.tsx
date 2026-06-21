@@ -19,11 +19,13 @@ import {
   GraduationCap,
   Building2,
   Menu,
+  ClipboardList,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
   { href: '/chapter/overview', label: 'Overview', icon: LayoutDashboard },
   { href: '/chapter/roster', label: 'Students', icon: Users },
+  { href: '/chapter/assignments', label: 'Assignments', icon: ClipboardList },
   { href: '/chapter/opportunities', label: 'Opportunities', icon: Megaphone },
   { href: '/chapter/partners', label: 'Partners', icon: Handshake },
   { href: '/chapter/messages', label: 'Messages', icon: MessageSquare },

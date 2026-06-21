@@ -631,7 +631,62 @@ export const chapterApi = {
   myOpportunities: () => request<{ data: any[] }>('GET', '/my-opportunities'),
   signupOpportunity: (id: string) => request<{ data: { status: string } }>('POST', `/opportunities/${id}/signup`),
   cancelOpportunity: (id: string) => request<{ data: any }>('DELETE', `/opportunities/${id}/signup`),
+
+  // Assignments (coordinator)
+  listAssignments: () => request<{ data: ChapterAssignmentSummary[] }>('GET', '/chapter/assignments'),
+  createAssignment: (body: { title: string; instructions?: string; dueDate?: string | null }) =>
+    request<{ data: { id: string } }>('POST', '/chapter/assignments', body),
+  getAssignmentDetail: (id: string) => request<{ data: AssignmentDetail }>('GET', `/chapter/assignments/${id}`),
+  deleteAssignment: (id: string) => request<{ data: { deleted: boolean } }>('DELETE', `/chapter/assignments/${id}`),
+  reviewSubmission: (submissionId: string, status: SubmissionStatus) =>
+    request<{ data: { reviewed: boolean; status: string } }>('POST', `/chapter/submissions/${submissionId}/review`, { status }),
+
+  // Assignments (student)
+  myAssignments: () => request<{ data: MyAssignment[] }>('GET', '/my-chapter/assignments'),
+  myAssignment: (id: string) => request<{ data: MyAssignmentDetail }>('GET', `/my-chapter/assignments/${id}`),
+  submitAssignment: (id: string, body: { note?: string; files: UploadFile[] }) =>
+    request<{ data: { submitted: boolean; submissionId: string; fileCount: number } }>('POST', `/my-chapter/assignments/${id}/submit`, body),
 };
+
+export type SubmissionStatus = 'submitted' | 'reviewed' | 'approved' | 'returned';
+export interface UploadFile { name: string; contentType: string; dataBase64: string }
+export interface AssignmentFile { id: string; name: string; contentType: string | null; sizeBytes: number | null; url: string | null }
+export interface ChapterAssignmentSummary {
+  id: string;
+  title: string;
+  instructions: string | null;
+  dueDate: string | null;
+  createdAt: string;
+  submissionCount: number;
+  reviewedCount: number;
+  studentCount: number;
+}
+export interface AssignmentSubmissionRow {
+  id: string;
+  student: { id: string; name: string; email: string | null; graduationYear: number | null; avatarUrl: string | null };
+  note: string | null;
+  status: SubmissionStatus;
+  submittedAt: string;
+  reviewedAt: string | null;
+  files: AssignmentFile[];
+}
+export interface AssignmentDetail {
+  assignment: { id: string; title: string; instructions: string | null; dueDate: string | null; createdAt: string };
+  submissions: AssignmentSubmissionRow[];
+  notSubmitted: { id: string; name: string; email: string | null }[];
+}
+export interface MyAssignment {
+  id: string;
+  title: string;
+  instructions: string | null;
+  dueDate: string | null;
+  createdAt: string;
+  submission: { id: string; status: SubmissionStatus; submittedAt: string; fileCount: number } | null;
+}
+export interface MyAssignmentDetail {
+  assignment: { id: string; title: string; instructions: string | null; dueDate: string | null; createdAt: string };
+  submission: { id: string; note: string | null; status: SubmissionStatus; submittedAt: string; reviewedAt: string | null; files: AssignmentFile[] } | null;
+}
 
 // ── Partner accept (org admin) ──
 export const partnerApi = {
