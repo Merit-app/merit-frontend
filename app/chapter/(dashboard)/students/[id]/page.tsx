@@ -15,6 +15,7 @@ export default function StudentDetailPage() {
   const id = params.id as string;
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<{ status?: number; message: string } | null>(null);
   const [confirmRemoveOpen, setConfirmRemoveOpen] = useState(false);
 
   async function handleRemove() {
@@ -30,9 +31,16 @@ export default function StudentDetailPage() {
 
   const load = useCallback(async () => {
     setLoading(true);
+    setLoadError(null);
     try {
       const res = await chapterApi.getStudent(id);
       setData(res.data);
+    } catch (err) {
+      // Don't swallow the real cause behind a generic "not found".
+      setLoadError({
+        status: err instanceof ApiError ? err.status : undefined,
+        message: err instanceof ApiError ? err.message : 'Could not load this student.',
+      });
     } finally {
       setLoading(false);
     }
@@ -56,7 +64,24 @@ export default function StudentDetailPage() {
       </div>
     );
   }
-  if (!data) return <div className="text-muted-foreground">Student not found.</div>;
+  if (!data) {
+    return (
+      <div className="max-w-xl space-y-4">
+        <Link href="/chapter/roster" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
+          <ArrowLeft className="h-4 w-4" /> Back to students
+        </Link>
+        <div className="rounded-xl border border-amber-300 bg-amber-50 p-5 dark:border-amber-900/50 dark:bg-amber-950/20">
+          <p className="font-medium text-foreground">Couldn&apos;t load this student</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {loadError?.status ? `Error ${loadError.status}: ` : ''}{loadError?.message ?? 'Unknown error.'}
+          </p>
+          <button onClick={load} className="mt-3 rounded-lg bg-merit-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-merit-blue-700">
+            Try again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const s = data.student;
   const pct = data.goal > 0 ? Math.min(100, Math.round((data.verifiedHours / data.goal) * 100)) : 0;
