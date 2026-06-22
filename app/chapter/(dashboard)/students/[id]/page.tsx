@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { chapterApi, ApiError } from '@/lib/api';
-import { ArrowLeft, CheckCircle2, AlertTriangle, Plus, Target, UserMinus } from 'lucide-react';
+import { chapterApi, ApiError, type StudentAssignmentRow, type SubmissionStatus } from '@/lib/api';
+import { ArrowLeft, CheckCircle2, AlertTriangle, Plus, Target, UserMinus, ClipboardList, FileText, Download, RotateCcw, CalendarDays } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { toast } from 'sonner';
@@ -179,6 +179,9 @@ export default function StudentDetailPage() {
         )}
       </div>
 
+      {/* Assignments */}
+      <AssignmentsSection studentId={id} />
+
       {/* Danger zone */}
       <div className="rounded-xl border border-red-200 bg-red-50/40 p-5 dark:border-red-900/40 dark:bg-red-950/10">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -226,6 +229,106 @@ function StatusPill({ status }: { status: string }) {
       {(status === 'at_risk' || status === 'overdue') && <AlertTriangle className="h-3.5 w-3.5" />}
       {b.label}
     </span>
+  );
+}
+
+const ASSIGN_STATUS: Record<SubmissionStatus | 'none', { label: string; cls: string }> = {
+  none: { label: 'Not submitted', cls: 'bg-muted text-muted-foreground' },
+  submitted: { label: 'Submitted', cls: 'bg-merit-blue-50 text-merit-blue-700 dark:bg-merit-blue-900/30 dark:text-merit-blue-300' },
+  reviewed: { label: 'Reviewed', cls: 'bg-merit-blue-50 text-merit-blue-700 dark:bg-merit-blue-900/30 dark:text-merit-blue-300' },
+  approved: { label: 'Approved', cls: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' },
+  returned: { label: 'Returned', cls: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300' },
+};
+
+function AssignmentsSection({ studentId }: { studentId: string }) {
+  const [items, setItems] = useState<StudentAssignmentRow[] | null>(null);
+  const [busyId, setBusyId] = useState<string | null>(null);
+
+  const load = useCallback(() => {
+    chapterApi.getStudentAssignments(studentId).then((r) => setItems(r.data)).catch(() => setItems([]));
+  }, [studentId]);
+  useEffect(() => { load(); }, [load]);
+
+  async function review(submissionId: string, status: SubmissionStatus) {
+    setBusyId(submissionId);
+    try { await chapterApi.reviewSubmission(submissionId, status); load(); }
+    catch { toast.error('Could not update'); }
+    finally { setBusyId(null); }
+  }
+
+  const submittedCount = (items ?? []).filter((a) => a.submission).length;
+
+  return (
+    <div className="rounded-xl border border-border bg-card p-5">
+      <div className="mb-3 flex items-center justify-between">
+        <div className="flex items-center gap-1.5">
+          <ClipboardList className="h-4 w-4 text-merit-blue-600" />
+          <h3 className="font-medium text-foreground">Assignments</h3>
+        </div>
+        {items && items.length > 0 && (
+          <span className="text-xs text-muted-foreground">{submittedCount}/{items.length} submitted</span>
+        )}
+      </div>
+
+      {items === null ? (
+        <div className="space-y-2"><Skeleton className="h-12 w-full" /><Skeleton className="h-12 w-full" /></div>
+      ) : items.length === 0 ? (
+        <p className="text-sm text-muted-foreground">No assignments posted to this chapter yet.</p>
+      ) : (
+        <ul className="space-y-2.5">
+          {items.map((a) => {
+            const sub = a.submission;
+            const st = ASSIGN_STATUS[sub?.status ?? 'none'];
+            const overdue = !sub && a.dueDate && new Date(a.dueDate) < new Date();
+            return (
+              <li key={a.id} className="rounded-lg border border-border p-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-foreground">{a.title}</p>
+                    <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
+                      {a.dueDate && (
+                        <span className={`inline-flex items-center gap-1 ${overdue ? 'text-red-600 dark:text-red-400' : ''}`}>
+                          <CalendarDays className="h-3 w-3" /> Due {new Date(a.dueDate).toLocaleDateString()}{overdue ? ' · overdue' : ''}
+                        </span>
+                      )}
+                      {sub && <span>Submitted {new Date(sub.submittedAt).toLocaleDateString()}</span>}
+                    </div>
+                  </div>
+                  <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${st.cls}`}>{st.label}</span>
+                </div>
+
+                {sub && sub.files.length > 0 && (
+                  <ul className="mt-2 flex flex-wrap gap-2">
+                    {sub.files.map((f) => (
+                      <li key={f.id}>
+                        <a href={f.url ?? '#'} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 py-1 text-xs font-medium text-foreground hover:border-merit-blue-300 hover:text-merit-blue-700">
+                          <FileText className="h-3.5 w-3.5" /> <span className="max-w-[160px] truncate">{f.name}</span> <Download className="h-3 w-3 text-muted-foreground" />
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                {sub && sub.note && <p className="mt-2 text-xs text-muted-foreground">&ldquo;{sub.note}&rdquo;</p>}
+
+                {sub && (
+                  <div className="mt-2.5 flex items-center gap-2">
+                    <button onClick={() => review(sub.id, 'approved')} disabled={busyId === sub.id || sub.status === 'approved'}
+                      className="inline-flex items-center gap-1 rounded-lg bg-green-600 px-2.5 py-1 text-xs font-medium text-white hover:bg-green-700 disabled:opacity-50">
+                      <CheckCircle2 className="h-3.5 w-3.5" /> Approve
+                    </button>
+                    <button onClick={() => review(sub.id, 'returned')} disabled={busyId === sub.id || sub.status === 'returned'}
+                      className="inline-flex items-center gap-1 rounded-lg border border-border px-2.5 py-1 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-50">
+                      <RotateCcw className="h-3.5 w-3.5" /> Return
+                    </button>
+                  </div>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
   );
 }
 

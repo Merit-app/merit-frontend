@@ -640,6 +640,8 @@ export const chapterApi = {
   deleteAssignment: (id: string) => request<{ data: { deleted: boolean } }>('DELETE', `/chapter/assignments/${id}`),
   reviewSubmission: (submissionId: string, status: SubmissionStatus) =>
     request<{ data: { reviewed: boolean; status: string } }>('POST', `/chapter/submissions/${submissionId}/review`, { status }),
+  getStudentAssignments: (studentId: string) =>
+    request<{ data: StudentAssignmentRow[] }>('GET', `/chapter/students/${studentId}/assignments`),
 
   // Assignments (student)
   myAssignments: () => request<{ data: MyAssignment[] }>('GET', '/my-chapter/assignments'),
@@ -685,6 +687,14 @@ export interface MyAssignment {
 }
 export interface MyAssignmentDetail {
   assignment: { id: string; title: string; instructions: string | null; dueDate: string | null; createdAt: string };
+  submission: { id: string; note: string | null; status: SubmissionStatus; submittedAt: string; reviewedAt: string | null; files: AssignmentFile[] } | null;
+}
+export interface StudentAssignmentRow {
+  id: string;
+  title: string;
+  instructions: string | null;
+  dueDate: string | null;
+  createdAt: string;
   submission: { id: string; note: string | null; status: SubmissionStatus; submittedAt: string; reviewedAt: string | null; files: AssignmentFile[] } | null;
 }
 
