@@ -337,7 +337,9 @@ function SchoolSection() {
   );
 }
 
-export function Sidebar() {
+/** The full nav body — shared by the desktop sidebar AND the mobile hamburger
+ *  sheet so the two are always identical. */
+export function SidebarNav() {
   const pathname = usePathname();
   const isOrgAdmin = useMeritStore((s) => s.isOrgAdmin);
   const hydrated = useHydrationStore((s) => s.hydrated);
@@ -347,6 +349,57 @@ export function Sidebar() {
     return pathname.startsWith(href);
   }
 
+  return (
+    <nav className="flex flex-1 flex-col gap-1 px-3 py-4 overflow-y-auto">
+      {/* Profile row — top of nav */}
+      <div className="mb-2">
+        <SidebarAvatar />
+      </div>
+
+      <div className="mx-1 mb-2 h-px bg-muted" />
+
+      {/* Log hours CTA — primary */}
+      <Link
+        href="/log"
+        className={cn(
+          'flex items-center gap-2.5 rounded-lg px-3 py-2.5 mb-1',
+          'bg-merit-blue-600 text-white text-[13px] font-medium',
+          'hover:bg-merit-blue-700 active:scale-[0.98] transition-all duration-100',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merit-blue-600 focus-visible:ring-offset-2'
+        )}
+      >
+        <Plus size={16} strokeWidth={2.5} />
+        Log hours
+      </Link>
+
+      {/* Primary nav */}
+      {primaryNav.map(({ href, label, icon: Icon }) => (
+        <NavItem key={href} href={href} label={label} icon={Icon} active={isActive(href)} />
+      ))}
+
+      {/* Student's own chapter membership — collapsible School section */}
+      {hydrated && <SchoolSection />}
+
+      {/* Chapter coordinator — its own designated section */}
+      {hydrated && <ChapterSection />}
+
+      {/* Org dashboard — only shown to org admins, links to new standalone platform */}
+      {hydrated && isOrgAdmin && (
+        <OrgDashboardLink />
+      )}
+
+      {/* Divider before secondary nav (each section above adds its own divider) */}
+      <div className="mx-1 my-2 h-px bg-muted" />
+
+      {/* Secondary nav */}
+      {secondaryNav.map(({ href, label, icon: Icon }) => (
+        <NavItem key={href} href={href} label={label} icon={Icon} active={isActive(href)} small />
+      ))}
+    </nav>
+  );
+}
+
+export function Sidebar() {
   return (
     <aside className="hidden md:flex fixed inset-y-0 left-0 z-30 w-60 flex-col bg-background border-r border-border">
       {/* Logo */}
@@ -359,52 +412,7 @@ export function Sidebar() {
         </Link>
       </div>
 
-      <nav className="flex flex-1 flex-col gap-1 px-3 py-4 overflow-y-auto">
-        {/* Profile row — top of nav */}
-        <div className="mb-2">
-          <SidebarAvatar />
-        </div>
-
-        <div className="mx-1 mb-2 h-px bg-muted" />
-
-        {/* Log hours CTA — primary */}
-        <Link
-          href="/log"
-          className={cn(
-            'flex items-center gap-2.5 rounded-lg px-3 py-2.5 mb-1',
-            'bg-merit-blue-600 text-white text-[13px] font-medium',
-            'hover:bg-merit-blue-700 active:scale-[0.98] transition-all duration-100',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merit-blue-600 focus-visible:ring-offset-2'
-          )}
-        >
-          <Plus size={16} strokeWidth={2.5} />
-          Log hours
-        </Link>
-
-        {/* Primary nav */}
-        {primaryNav.map(({ href, label, icon: Icon }) => (
-          <NavItem key={href} href={href} label={label} icon={Icon} active={isActive(href)} />
-        ))}
-
-        {/* Student's own chapter membership — collapsible School section */}
-        {hydrated && <SchoolSection />}
-
-        {/* Chapter coordinator — its own designated section */}
-        {hydrated && <ChapterSection />}
-
-        {/* Org dashboard — only shown to org admins, links to new standalone platform */}
-        {hydrated && isOrgAdmin && (
-          <OrgDashboardLink />
-        )}
-
-        {/* Divider before secondary nav (each section above adds its own divider) */}
-        <div className="mx-1 my-2 h-px bg-muted" />
-
-        {/* Secondary nav */}
-        {secondaryNav.map(({ href, label, icon: Icon }) => (
-          <NavItem key={href} href={href} label={label} icon={Icon} active={isActive(href)} small />
-        ))}
-      </nav>
+      <SidebarNav />
 
       {/* Upgrade prompt (free users only) */}
       <UpgradePrompt />

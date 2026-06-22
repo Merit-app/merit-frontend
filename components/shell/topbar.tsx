@@ -1,15 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { Search, Menu, Plus, LayoutDashboard, Clock, Building2, FileDown, Settings, CircleHelp } from 'lucide-react';
+import { Search, Menu } from 'lucide-react';
 import { NotificationBell } from '@/components/notifications/notification-bell';
 import Link from 'next/link';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
-import { useMeritStore } from '@/lib/store';
 import { useCommandPalette } from '@/hooks/use-command-palette';
 import { UserMenu } from './user-menu';
+import { SidebarNav } from './sidebar';
 import { ThemeToggle } from '@/components/theme-toggle';
 
 const PAGE_TITLES: Record<string, string> = {
@@ -34,16 +34,6 @@ function getPageTitle(pathname: string): string {
   return 'Merit';
 }
 
-const ALL_NAV = [
-  { href: '/log', label: 'Log hours', icon: Plus, primary: true },
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/hours', label: 'All sessions', icon: Clock },
-  { href: '/organizations', label: 'Organizations', icon: Building2 },
-  { href: '/export', label: 'Export', icon: FileDown },
-  { href: '/settings/profile', label: 'Settings', icon: Settings },
-  { href: '/help', label: 'Help', icon: CircleHelp },
-] as const;
-
 export function Topbar() {
   const pathname = usePathname();
   const { open } = useCommandPalette();
@@ -51,10 +41,8 @@ export function Topbar() {
 
   const title = getPageTitle(pathname);
 
-  function isActive(href: string) {
-    if (href === '/dashboard') return pathname === '/dashboard';
-    return pathname.startsWith(href);
-  }
+  // Close the mobile sheet whenever navigation changes the route.
+  useEffect(() => { setSidebarOpen(false); }, [pathname]);
 
   return (
     <>
@@ -98,11 +86,11 @@ export function Topbar() {
         </div>
       </header>
 
-      {/* Mobile sidebar sheet — slides from left */}
+      {/* Mobile sidebar sheet — slides from left, mirrors the desktop sidebar nav */}
       <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-        <SheetContent side="left" className="w-64 p-0 bg-background">
+        <SheetContent side="left" className="w-64 p-0 bg-background flex flex-col">
           {/* Logo */}
-          <div className="flex h-14 items-center px-5 border-b border-border">
+          <div className="flex h-14 items-center px-5 border-b border-border shrink-0">
             <Link href="/dashboard" onClick={() => setSidebarOpen(false)}>
               <span className="text-[18px] font-semibold tracking-tight text-foreground">
                 merit<span className="text-merit-blue-600">.</span>
@@ -111,43 +99,11 @@ export function Topbar() {
             </Link>
           </div>
 
-          {/* Nav */}
-          <nav className="flex flex-col gap-1 px-3 py-4">
-            {ALL_NAV.map((item) => { const { href, label, icon: Icon } = item; const primary = 'primary' in item && item.primary; return (
-              <Link
-                key={href}
-                href={href}
-                onClick={() => setSidebarOpen(false)}
-                className={cn(
-                  'relative flex items-center gap-2.5 rounded-[6px] px-3 py-2.5 text-[13px] font-medium transition-colors',
-                  primary
-                    ? 'bg-merit-blue-600 text-white hover:bg-merit-blue-700 mb-1'
-                    : isActive(href)
-                    ? 'bg-muted text-foreground'
-                    : 'text-foreground hover:bg-muted hover:text-foreground'
-                )}
-              >
-                {!primary && isActive(href) && (
-                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-merit-blue-600 rounded-full" />
-                )}
-                <Icon
-                  size={16}
-                  className={cn(
-                    'shrink-0',
-                    primary
-                      ? 'text-white'
-                      : isActive(href)
-                      ? 'text-merit-blue-600'
-                      : 'text-muted-foreground'
-                  )}
-                />
-                {label}
-              </Link>
-            );})}
-          </nav>
+          {/* Full nav — identical to the desktop sidebar */}
+          <SidebarNav />
 
           {/* User menu at bottom */}
-          <div className="absolute bottom-0 left-0 right-0 border-t border-border px-3 py-3">
+          <div className="border-t border-border px-3 py-3 shrink-0">
             <UserMenu />
           </div>
         </SheetContent>
