@@ -7,6 +7,7 @@ import { useMeritStore, useHydrationStore } from '@/lib/store';
 import { adminApi, authApi, ApiError } from '@/lib/api';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { NotificationBell } from '@/components/notifications/notification-bell';
+import { ChapterOnboardingModal } from '@/components/chapter/onboarding-modal';
 import {
   LayoutDashboard,
   Users,
@@ -46,6 +47,7 @@ export default function ChapterDashboardLayout({ children }: { children: React.R
   const [chapterName, setChapterName] = useState<string>('Chapter');
   const [state, setState] = useState<'checking' | 'ok' | 'denied'>('checking');
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   const isTokenValid =
     isAuthed &&
@@ -64,6 +66,12 @@ export default function ChapterDashboardLayout({ children }: { children: React.R
       .then((res) => {
         setChapterName((res.data as any)?.name ?? 'Chapter');
         setState('ok');
+        // First-time coordinator walkthrough (once per device).
+        try {
+          if (!localStorage.getItem('merit_chapter_onboarding_done')) {
+            setTimeout(() => setShowOnboarding(true), 800);
+          }
+        } catch { /* ignore */ }
       })
       .catch((err) => {
         if (err instanceof ApiError && (err.status === 403 || err.status === 404)) {
@@ -168,6 +176,16 @@ export default function ChapterDashboardLayout({ children }: { children: React.R
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
+      {/* First-time coordinator walkthrough */}
+      {showOnboarding && (
+        <ChapterOnboardingModal
+          onComplete={() => {
+            try { localStorage.setItem('merit_chapter_onboarding_done', '1'); } catch { /* ignore */ }
+            setShowOnboarding(false);
+          }}
+        />
+      )}
+
       {/* Sidebar — desktop */}
       <aside className="hidden lg:flex w-64 bg-card border-r border-border flex-col shrink-0">
         {sidebarContent}
