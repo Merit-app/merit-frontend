@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Plus, Clock, Building2, MoreHorizontal, FileDown, Settings, CircleHelp, X, Award, Bookmark, Trophy, Inbox } from 'lucide-react';
+import { LayoutDashboard, Plus, Clock, Building2, MoreHorizontal, FileDown, Settings, CircleHelp, X, Award, Bookmark, Trophy, Inbox, School, Users } from 'lucide-react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { useMeritStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
@@ -27,14 +27,32 @@ const MORE_NAV = [
 export function MobileNav() {
   const pathname = usePathname();
   const [moreOpen, setMoreOpen] = useState(false);
+  const [inChapter, setInChapter] = useState(false);
+  const [isCoordinator, setIsCoordinator] = useState(false);
   const user = useMeritStore((s) => s.user);
+
+  // Probe once so chapter/school entry points appear in "More" for the right users
+  // (the desktop sidebar's School/Chapter sections are hidden on mobile).
+  useEffect(() => {
+    let cancelled = false;
+    import('@/lib/api').then(({ chapterApi, adminApi }) => {
+      chapterApi.myChapter().then((r) => { if (!cancelled && r.data) setInChapter(true); }).catch(() => {});
+      adminApi.getChapter().then(() => { if (!cancelled) setIsCoordinator(true); }).catch(() => {});
+    });
+    return () => { cancelled = true; };
+  }, []);
 
   function isActive(href: string) {
     if (href === '/dashboard') return pathname === '/dashboard';
     return pathname.startsWith(href);
   }
 
-  const moreActive = MORE_NAV.some(({ href }) => pathname.startsWith(href));
+  const moreLinks = [
+    ...(inChapter ? [{ href: '/my-chapter', label: 'My School', icon: School }] : []),
+    ...(isCoordinator ? [{ href: '/chapter/overview', label: 'Chapter', icon: Users }] : []),
+    ...MORE_NAV,
+  ];
+  const moreActive = moreLinks.some(({ href }) => pathname.startsWith(href));
 
   return (
     <>
@@ -112,7 +130,7 @@ export function MobileNav() {
 
           {/* Nav links */}
           <div className="py-2">
-            {MORE_NAV.map(({ href, label, icon: Icon }) => (
+            {moreLinks.map(({ href, label, icon: Icon }) => (
               <Link
                 key={href}
                 href={href}

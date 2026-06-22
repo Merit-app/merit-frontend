@@ -21,6 +21,7 @@ import {
   Inbox,
   ChevronDown,
   ClipboardList,
+  School,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
@@ -202,22 +203,52 @@ function OrgDashboardLink() {
   );
 }
 
-function ChapterNavLink({ active }: { active: boolean }) {
-  // The User type has no chapter flag, so we probe the coordinator endpoint once.
-  // 200 → user is a coordinator, show the link; 403/404 → hide it.
-  const [isCoordinator, setIsCoordinator] = useState(false);
+function ChapterSection() {
+  // Shown to chapter coordinators. Its own designated block (mirrors the Org
+  // section): we probe the coordinator endpoint once — 200 = coordinator.
+  const pathname = usePathname();
+  const [chapterName, setChapterName] = useState<string | null>(null);
   useEffect(() => {
     let cancelled = false;
     // Lazy import to avoid a hard dependency cycle with the API client.
     import('@/lib/api')
       .then(({ adminApi }) => adminApi.getChapter())
-      .then(() => { if (!cancelled) setIsCoordinator(true); })
+      .then((r) => { if (!cancelled) setChapterName((r.data as any)?.name ?? 'Chapter'); })
       .catch(() => { /* not a coordinator — leave hidden */ });
     return () => { cancelled = true; };
   }, []);
 
-  if (!isCoordinator) return null;
-  return <NavItem href="/chapter" label="Chapter" icon={Users} active={active} />;
+  if (!chapterName) return null;
+  const isActive = pathname.startsWith('/chapter');
+
+  return (
+    <>
+      <div className="mx-1 mt-2 mb-1 h-px bg-muted" />
+      <p className="px-3 py-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Chapter</p>
+
+      {/* Separate route tree (/chapter/*) — full nav like the Org block. */}
+      <a
+        href="/chapter/overview"
+        className={cn(
+          'group relative flex items-center gap-2.5 rounded-[6px] px-3 py-2 transition-colors duration-100',
+          'text-foreground hover:bg-muted hover:text-foreground text-[13px] font-medium',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-merit-blue-600 focus-visible:ring-offset-1',
+          isActive && 'bg-muted text-foreground',
+        )}
+      >
+        {isActive && (
+          <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-merit-blue-600 rounded-full" />
+        )}
+        <Users
+          size={16}
+          strokeWidth={isActive ? 2 : 1.75}
+          className={cn('shrink-0', isActive ? 'text-merit-blue-600' : 'text-muted-foreground group-hover:text-foreground')}
+        />
+        <span className="flex-1 truncate">{chapterName}</span>
+        <span className="text-[9px] font-bold bg-merit-blue-600/10 text-merit-blue-600 px-1.5 py-0.5 rounded-full shrink-0">COORD</span>
+      </a>
+    </>
+  );
 }
 
 const SCHOOL_SUBNAV = [
@@ -266,7 +297,7 @@ function SchoolSection() {
           sectionActive && !open && 'bg-muted',
         )}
       >
-        <GraduationCap
+        <School
           size={16}
           strokeWidth={sectionActive ? 2 : 1.75}
           className={cn('shrink-0', sectionActive ? 'text-merit-blue-600' : 'text-muted-foreground group-hover:text-foreground')}
@@ -358,17 +389,16 @@ export function Sidebar() {
         {/* Student's own chapter membership — collapsible School section */}
         {hydrated && <SchoolSection />}
 
-        {/* Chapter (coordinator) link — only shown to chapter coordinators */}
-        {hydrated && <ChapterNavLink active={isActive('/chapter')} />}
+        {/* Chapter coordinator — its own designated section */}
+        {hydrated && <ChapterSection />}
 
         {/* Org dashboard — only shown to org admins, links to new standalone platform */}
         {hydrated && isOrgAdmin && (
           <OrgDashboardLink />
         )}
 
-        {/* Divider before secondary nav (hidden when org section already has one) */}
-        {(!hydrated || !isOrgAdmin) && <div className="mx-1 my-2 h-px bg-muted" />}
-        {hydrated && isOrgAdmin && <div className="mx-1 mt-2 h-px bg-muted" />}
+        {/* Divider before secondary nav (each section above adds its own divider) */}
+        <div className="mx-1 my-2 h-px bg-muted" />
 
         {/* Secondary nav */}
         {secondaryNav.map(({ href, label, icon: Icon }) => (
