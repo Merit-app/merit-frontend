@@ -28,6 +28,9 @@ export interface Session {
   verifiedAt?: string;    // ISO datetime string
   notes?: string;
   selfReported?: boolean;
+  // false = logged but the supervisor text was NOT sent yet ("Not sent yet").
+  // Only meaningful while status==='pending'. Defaults true (already sent).
+  verificationSent?: boolean;
 }
 
 export interface Organization {

@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Loader2, CheckCircle2, Clock } from 'lucide-react';
+import { Loader2, CheckCircle2, Clock, FileClock } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
@@ -73,7 +74,9 @@ export default function LogPage() {
   const [org, setOrg] = useState<Organization | null>(null);
   const [orgError, setOrgError] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loadingKind, setLoadingKind] = useState<null | 'now' | 'later'>(null);
   const [success, setSuccess] = useState(false);
+  const [deferredSuccess, setDeferredSuccess] = useState(false);
   const [selfTrackedSuccess, setSelfTrackedSuccess] = useState(false);
   const [submittedSupervisor, setSubmittedSupervisor] = useState('');
   const [showEmail, setShowEmail] = useState(false);
@@ -126,9 +129,9 @@ export default function LogPage() {
 
   // ── Submit handlers ───────────────────────────────────────────────────────
 
-  async function onSubmitVerified(data: VerifiedFormData) {
+  async function onSubmitVerified(data: VerifiedFormData, sendLater = false) {
     if (!org) { setOrgError(true); return; }
-    setLoading(true);
+    setLoadingKind(sendLater ? 'later' : 'now');
     try {
       const orgPayload = org.id ? { orgId: org.id } : { newOrg: { name: org.name } };
       const res = await sessionsApi.create({
@@ -140,14 +143,20 @@ export default function LogPage() {
         supervisorPhone: data.supervisorPhone || undefined,
         supervisorEmail: data.supervisorEmail || undefined,
         selfReported: false,
+        sendLater,
       });
       const session = mapSession(res.data.session);
       addSession(session);
       setSubmittedSupervisor(data.supervisorName);
       localStorage.removeItem(DRAFT_STORAGE_KEY);
       localStorage.removeItem(DRAFT_RESTORED_SHOWN_KEY);
-      setSuccess(true);
-      toast.success('Session logged successfully');
+      if (sendLater) {
+        setDeferredSuccess(true);
+        toast.success('Saved — not sent yet');
+      } else {
+        setSuccess(true);
+        toast.success('Session logged successfully');
+      }
     } catch (err) {
       if (err instanceof ApiError) {
         if (err.code === 'invalid_phone') {
@@ -159,7 +168,7 @@ export default function LogPage() {
         toast.error('Could not reach the server. Check your connection.');
       }
     } finally {
-      setLoading(false);
+      setLoadingKind(null);
     }
   }
 
@@ -199,6 +208,7 @@ export default function LogPage() {
     setOrg(null);
     setOrgError(false);
     setSuccess(false);
+    setDeferredSuccess(false);
     setSelfTrackedSuccess(false);
     setSubmittedSupervisor('');
   }
@@ -209,6 +219,35 @@ export default function LogPage() {
     return (
       <div className="px-4 py-4 md:px-8 md:py-6">
         <SuccessState supervisorName={submittedSupervisor} onLogAnother={handleLogAnother} />
+      </div>
+    );
+  }
+
+  if (deferredSuccess) {
+    return (
+      <div className="px-4 py-4 md:px-8 md:py-6 max-w-md">
+        <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-500/5 p-6 space-y-4">
+          <div className="w-12 h-12 rounded-full bg-slate-200 dark:bg-slate-600/30 flex items-center justify-center">
+            <FileClock className="w-6 h-6 text-slate-600 dark:text-slate-300" />
+          </div>
+          <h2 className="text-xl font-bold text-foreground">Saved — not sent yet</h2>
+          <p className="text-sm text-muted-foreground">
+            Your hours are logged. We haven&apos;t texted {submittedSupervisor || 'your supervisor'} yet — send the
+            request whenever you&apos;re ready from <span className="font-medium text-foreground">All sessions → By organization</span>,
+            where you can fire off a whole batch in one tap.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button onClick={handleLogAnother} className="bg-merit-blue-600 hover:bg-merit-blue-700 text-white">
+              Log more hours
+            </Button>
+            <Link
+              href="/hours"
+              className="inline-flex items-center justify-center rounded-md border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-background transition-colors"
+            >
+              Go to my organizations
+            </Link>
+          </div>
+        </div>
       </div>
     );
   }
@@ -511,18 +550,39 @@ export default function LogPage() {
 
           {/* Submit */}
           {mode === 'verified' ? (
-            <Button
-              type="button"
-              onClick={verifiedForm.handleSubmit(onSubmitVerified)}
-              disabled={loading}
-              className="bg-merit-blue-600 hover:bg-merit-blue-700 active:scale-[0.98] text-white font-medium px-8 transition-all w-full sm:w-auto"
-            >
-              {loading ? (
-                <><Loader2 size={14} className="mr-2 animate-spin" />Sending...</>
-              ) : (
-                'Send for verification'
-              )}
-            </Button>
+            <div className="space-y-2">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button
+                  type="button"
+                  onClick={verifiedForm.handleSubmit((d) => onSubmitVerified(d, false))}
+                  disabled={loadingKind !== null}
+                  className="bg-merit-blue-600 hover:bg-merit-blue-700 active:scale-[0.98] text-white font-medium px-8 transition-all w-full sm:w-auto"
+                >
+                  {loadingKind === 'now' ? (
+                    <><Loader2 size={14} className="mr-2 animate-spin" />Sending...</>
+                  ) : (
+                    'Send for verification'
+                  )}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={verifiedForm.handleSubmit((d) => onSubmitVerified(d, true))}
+                  disabled={loadingKind !== null}
+                  className="border-border text-foreground hover:bg-background font-medium px-8 w-full sm:w-auto"
+                >
+                  {loadingKind === 'later' ? (
+                    <><Loader2 size={14} className="mr-2 animate-spin" />Saving...</>
+                  ) : (
+                    'Save & send later'
+                  )}
+                </Button>
+              </div>
+              <p className="text-[12px] text-muted-foreground">
+                <span className="font-medium text-foreground">Save &amp; send later</span> logs the hours now and holds the
+                text — send it (or a whole batch) anytime from <span className="font-medium text-foreground">All sessions → By organization</span>.
+              </p>
+            </div>
           ) : (
             <Button
               type="button"

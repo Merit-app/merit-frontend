@@ -10,6 +10,7 @@ import { TierBadge } from '@/components/hours/tier-badge';
 import { SessionDetailSheet } from '@/components/hours/session-detail-sheet';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { SessionsRefresher } from '@/components/sessions-refresher';
+import { HoursByOrg } from '@/components/hours/hours-by-org';
 import { useMeritStore } from '@/lib/store';
 import { sessionsApi, ApiError } from '@/lib/api';
 import { formatSessionDate } from '@/lib/utils';
@@ -17,27 +18,32 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import type { Session, SessionStatus } from '@/lib/types';
 
-type FilterTab = 'all' | SessionStatus;
+// 'notsent' and 'pending' are both stored as status='pending' — split by whether
+// the supervisor text has gone out yet.
+type FilterTab = 'all' | 'verified' | 'notsent' | 'pending' | 'disputed';
 type SortKey = 'date' | 'org' | 'hours' | 'status';
 type SortDir = 'asc' | 'desc';
+type View = 'list' | 'byorg';
 
 const FILTER_TABS: { key: FilterTab; label: string }[] = [
   { key: 'all',      label: 'All' },
   { key: 'verified', label: 'Verified' },
-  { key: 'pending',  label: 'Pending' },
+  { key: 'notsent',  label: 'Not sent' },
+  { key: 'pending',  label: 'Awaiting reply' },
   { key: 'disputed', label: 'Disputed' },
 ];
 
 const PREF_KEY = 'hours-list-prefs';
 
-function loadPrefs(): { filter: FilterTab; sortKey: SortKey; sortDir: SortDir } {
-  if (typeof window === 'undefined') return { filter: 'all', sortKey: 'date', sortDir: 'desc' };
+function loadPrefs(): { filter: FilterTab; sortKey: SortKey; sortDir: SortDir; view: View } {
+  const fallback = { filter: 'all' as FilterTab, sortKey: 'date' as SortKey, sortDir: 'desc' as SortDir, view: 'list' as View };
+  if (typeof window === 'undefined') return fallback;
   try {
     const raw = localStorage.getItem(PREF_KEY);
-    if (!raw) return { filter: 'all', sortKey: 'date', sortDir: 'desc' };
-    return JSON.parse(raw);
+    if (!raw) return fallback;
+    return { ...fallback, ...JSON.parse(raw) };
   } catch {
-    return { filter: 'all', sortKey: 'date', sortDir: 'desc' };
+    return fallback;
   }
 }
 
@@ -49,6 +55,7 @@ export default function HoursPage() {
   const prefs = useMemo(() => loadPrefs(), []);
 
   const [filter, setFilter] = useState<FilterTab>(prefs.filter);
+  const [view, setView] = useState<View>(prefs.view);
   const [query, setQuery] = useState('');
   const [sortKey, setSortKey] = useState<SortKey>(prefs.sortKey);
   const [sortDir, setSortDir] = useState<SortDir>(prefs.sortDir);
@@ -61,8 +68,8 @@ export default function HoursPage() {
   // Persist sort/filter prefs
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    localStorage.setItem(PREF_KEY, JSON.stringify({ filter, sortKey, sortDir }));
-  }, [filter, sortKey, sortDir]);
+    localStorage.setItem(PREF_KEY, JSON.stringify({ filter, sortKey, sortDir, view }));
+  }, [filter, sortKey, sortDir, view]);
 
   // Open sheet from URL param
   useEffect(() => {
@@ -80,7 +87,13 @@ export default function HoursPage() {
 
   const filtered = useMemo(() => {
     let rows = sessions;
-    if (filter !== 'all') rows = rows.filter((s) => s.status === filter);
+    if (filter !== 'all') {
+      rows = rows.filter((s) => {
+        if (filter === 'notsent') return s.status === 'pending' && s.verificationSent === false && !s.selfReported;
+        if (filter === 'pending') return s.status === 'pending' && s.verificationSent !== false;
+        return s.status === filter;
+      });
+    }
     if (query) {
       const q = query.toLowerCase();
       rows = rows.filter(
@@ -155,15 +168,44 @@ export default function HoursPage() {
   return (
     <div className="px-4 py-4 md:px-8 md:py-6">
       <SessionsRefresher />
-      {/* Top bar */}
-      <div className="flex items-center justify-between mb-6">
+      {/* View toggle + Log button */}
+      <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-1 bg-muted p-1 rounded-lg">
+          {([['list', 'By date'], ['byorg', 'By organization']] as [View, string][]).map(([key, label]) => (
+            <button
+              key={key}
+              onClick={() => setView(key)}
+              className={cn(
+                'px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors',
+                view === key ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <Link
+          href="/log"
+          className="flex items-center gap-1.5 bg-merit-blue-600 hover:bg-merit-blue-700 text-white text-[13px] font-medium px-3.5 py-2 rounded-lg transition-colors"
+        >
+          <Plus size={14} />
+          Log session
+        </Link>
+      </div>
+
+      {view === 'byorg' ? (
+        <HoursByOrg sessions={sessions} onOpenSession={(s) => { setSelectedSession(s); setSheetOpen(true); }} />
+      ) : (
+      <>
+      {/* Filter tabs + search */}
+      <div className="flex items-center justify-between gap-3 mb-6">
+        <div className="flex items-center gap-1 bg-muted p-1 rounded-lg overflow-x-auto scrollbar-none">
           {FILTER_TABS.map(({ key, label }) => (
             <button
               key={key}
               onClick={() => setFilter(key)}
               className={cn(
-                'px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors',
+                'px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors whitespace-nowrap',
                 filter === key ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
               )}
             >
@@ -171,24 +213,14 @@ export default function HoursPage() {
             </button>
           ))}
         </div>
-
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
-            <Input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search sessions..."
-              className="pl-9 w-56 h-9 text-[13px]"
-            />
-          </div>
-          <Link
-            href="/log"
-            className="flex items-center gap-1.5 bg-merit-blue-600 hover:bg-merit-blue-700 text-white text-[13px] font-medium px-3.5 py-2 rounded-lg transition-colors"
-          >
-            <Plus size={14} />
-            Log session
-          </Link>
+        <div className="relative shrink-0">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search sessions..."
+            className="pl-9 w-44 sm:w-56 h-9 text-[13px]"
+          />
         </div>
       </div>
 
@@ -309,13 +341,15 @@ export default function HoursPage() {
                   <span className="text-[12px] text-muted-foreground truncate">{session.activity}</span>
                   <span className="text-[13px] font-medium text-foreground tabular-nums">{hoursStr} hrs</span>
                   <TierBadge tier={session.tier} />
-                  <StatusBadge status={session.status} selfReported={session.selfReported} />
+                  <StatusBadge status={session.status} selfReported={session.selfReported} verificationSent={session.verificationSent} />
                   <span className="text-muted-foreground text-[18px] leading-none select-none">›</span>
                 </div>
               );
             })}
           </div>
         </div>
+      )}
+      </>
       )}
 
       <SessionDetailSheet

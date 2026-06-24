@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
-import { Trash2, RefreshCw, Pencil, X, Link2 } from 'lucide-react';
+import { Trash2, RefreshCw, Pencil, X, Link2, Send } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -174,10 +174,12 @@ function EditForm({
 
 export function SessionDetailSheet({ session, open, onClose }: Props) {
   const deleteSession = useMeritStore((s) => s.deleteSession);
+  const updateSession = useMeritStore((s) => s.updateSession);
   const [mode, setMode] = useState<'view' | 'edit'>('view');
   const [currentSession, setCurrentSession] = useState<Session | null>(session);
   const [deleting, setDeleting] = useState(false);
   const [resending, setResending] = useState(false);
+  const [sending, setSending] = useState(false);
 
   // Keep currentSession in sync when prop changes
   if (session && session !== currentSession && mode === 'view') {
@@ -202,6 +204,31 @@ export function SessionDetailSheet({ session, open, onClose }: Props) {
       setResending(false);
     }
   }
+
+  // First-time send for a "Not sent yet" session.
+  async function handleSendNow() {
+    setSending(true);
+    try {
+      const res = await sessionsApi.sendVerifications({ sessionIds: [s.id] });
+      if (res.data.sent > 0) {
+        updateSession(s.id, { verificationSent: true });
+        setCurrentSession((prev) => (prev ? { ...prev, verificationSent: true } : prev));
+        toast.success(`Verification sent to ${s.supervisor}.`);
+      } else {
+        toast.error('Could not send — check the supervisor contact and try again.');
+      }
+    } catch (err) {
+      if (err instanceof ApiError) {
+        toast.error(err.message || 'Failed to send. Try again.');
+      } else {
+        toast.error('Could not reach the server.');
+      }
+    } finally {
+      setSending(false);
+    }
+  }
+
+  const notSent = s.status === 'pending' && s.verificationSent === false && !s.selfReported;
 
   async function handleDelete() {
     if (!confirm(`Delete this session at ${s.org}? This can't be undone.`)) return;
@@ -280,7 +307,7 @@ export function SessionDetailSheet({ session, open, onClose }: Props) {
               <Row label="Date" value={formatLongDate(s.date)} />
               <Row label="Hours" value={`${hoursStr} hrs`} />
               <Row label="Activity" value={s.activity} />
-              <Row label="Status" value={<StatusBadge status={s.status} />} />
+              <Row label="Status" value={<StatusBadge status={s.status} selfReported={s.selfReported} verificationSent={s.verificationSent} />} />
               <Row label="Verification tier" value={<TierBadge tier={s.tier} />} />
               <Row label="Supervisor" value={s.supervisor} />
               <Row label="Supervisor phone" value={formatPhone(s.supervisorPhone)} />
@@ -298,7 +325,17 @@ export function SessionDetailSheet({ session, open, onClose }: Props) {
             {/* Footer actions */}
             <div className="px-6 py-4 border-t border-border flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                {s.status === 'pending' && (
+                {notSent ? (
+                  <Button
+                    size="sm"
+                    onClick={handleSendNow}
+                    disabled={sending}
+                    className="bg-merit-blue-600 hover:bg-merit-blue-700 text-white font-medium text-[13px]"
+                  >
+                    <Send size={13} className="mr-1.5" />
+                    {sending ? 'Sending...' : 'Send for verification'}
+                  </Button>
+                ) : s.status === 'pending' && !s.selfReported ? (
                   <Button
                     variant="outline"
                     size="sm"
@@ -309,7 +346,7 @@ export function SessionDetailSheet({ session, open, onClose }: Props) {
                     <RefreshCw size={13} className={`mr-1.5 ${resending ? 'animate-spin' : ''}`} />
                     {resending ? 'Sending...' : 'Resend verification'}
                   </Button>
-                )}
+                ) : null}
                 <Button
                   variant="outline"
                   size="sm"

@@ -126,6 +126,7 @@ export function mapSession(raw: any): Session {
     verifiedAt: raw.verified_at ?? undefined,
     notes: raw.notes ?? undefined,
     selfReported: raw.self_reported ?? false,
+    verificationSent: raw.verification_sent ?? true,
   };
 }
 
@@ -183,12 +184,16 @@ export const sessionsApi = {
     newOrg?: { name: string; city?: string; state?: string; website?: string };
     date: string; hours: number; activity: string;
     supervisorName?: string; supervisorPhone?: string; supervisorEmail?: string;
-    selfReported?: boolean; trackerNote?: string;
+    selfReported?: boolean; sendLater?: boolean; trackerNote?: string;
   }) => request<{ data: { session: any } }>('POST', '/sessions', body),
   update: (id: string, body: { activity?: string; supervisorName?: string; supervisorPhone?: string; supervisorEmail?: string }) =>
     request<{ data: any }>('PATCH', `/sessions/${id}`, body),
   delete: (id: string) => request<{ data: any }>('DELETE', `/sessions/${id}`),
   resend: (id: string) => request<{ data: any }>('POST', `/sessions/${id}/resend-verification`),
+  // Fire the supervisor text for deferred ("Not sent yet") sessions — by explicit
+  // ids and/or scoped to one org. Returns { sent, skipped }.
+  sendVerifications: (body: { sessionIds?: string[]; orgId?: string }) =>
+    request<{ data: { sent: number; skipped: number } }>('POST', '/sessions/send-verifications', body),
 };
 
 // ─── Organizations API ────────────────────────────────────────────────────────
