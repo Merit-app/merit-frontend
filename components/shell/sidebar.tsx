@@ -310,7 +310,7 @@ function SchoolSection() {
       {open && (
         <div className="ml-[18px] mt-0.5 flex flex-col gap-0.5 border-l border-border pl-2">
           {SCHOOL_SUBNAV.map((it) => {
-            const active = it.exact ? pathname === it.href : pathname === it.href || pathname.startsWith(`${it.href}/`);
+            const active = ('exact' in it && it.exact) ? pathname === it.href : pathname === it.href || pathname.startsWith(`${it.href}/`);
             return (
               <Link
                 key={it.href}

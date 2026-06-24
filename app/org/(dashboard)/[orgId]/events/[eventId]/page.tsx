@@ -342,7 +342,7 @@ export default function EventDetailPage() {
         title="Mark this event complete?"
         description={`This closes the event. Any volunteers you've already logged hours for keep them; nothing else is changed. This can't be undone.`}
         confirmLabel="Mark complete"
-        onConfirm={() => completeEvent.mutateAsync()}
+        onConfirm={async () => { await completeEvent.mutateAsync(); }}
       />
 
       <EditEventModal
