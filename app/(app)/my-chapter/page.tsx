@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { chapterApi } from '@/lib/api';
-import { GraduationCap, CheckCircle2, AlertTriangle, CalendarDays, Clock, MapPin, Users, Eye, ShieldCheck, LogOut } from 'lucide-react';
+import { chapterApi, sessionsApi, mapSession, type MyAssignment } from '@/lib/api';
+import { GraduationCap, CheckCircle2, AlertTriangle, CalendarDays, Clock, MapPin, Users, Eye, ShieldCheck, LogOut, ClipboardList, ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AnimatedProgress, CountUp } from '@/components/motion';
@@ -137,11 +137,16 @@ export default function MyChapterPage() {
         </div>
       )}
 
+      <AssignmentsCard />
+
       <Opportunities />
 
       <Link href="/log" className="block rounded-xl bg-merit-blue-600 px-5 py-3 text-center text-sm font-semibold text-white hover:bg-merit-blue-700">
         Log hours
       </Link>
+
+      {/* Sharing control — surfaces "Choose what your school sees" */}
+      <SharingCard />
 
       {/* Privacy & control */}
       <div className="rounded-xl border border-border bg-card p-5">
@@ -151,7 +156,7 @@ export default function MyChapterPage() {
         </div>
         <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
           <li>• Your name, email, and graduation year</li>
-          <li>• Your verified service hours and the sessions behind them</li>
+          <li>• Only the verified hours you choose to share</li>
           <li>• Whether you’ve met your requirement</li>
         </ul>
         <p className="mt-2 text-xs text-muted-foreground">They cannot see your password, log in as you, or edit your account.</p>
@@ -223,5 +228,84 @@ function Opportunities() {
         })}
       </div>
     </div>
+  );
+}
+
+function AssignmentsCard() {
+  const [asg, setAsg] = useState<MyAssignment[] | null>(null);
+  useEffect(() => {
+    chapterApi.myAssignments().then((r) => setAsg(r.data)).catch(() => setAsg([]));
+  }, []);
+
+  if (!asg || asg.length === 0) return null;
+
+  return (
+    <div className="rounded-xl border border-border bg-card p-5">
+      <div className="mb-3 flex items-center justify-between">
+        <h3 className="flex items-center gap-2 font-medium text-foreground">
+          <ClipboardList className="h-4 w-4 text-merit-blue-500" /> Assignments from your school
+        </h3>
+        <Link href="/my-chapter/assignments" className="text-sm text-merit-blue-600 hover:underline">View all</Link>
+      </div>
+      <ul className="divide-y divide-border">
+        {asg.slice(0, 3).map((a) => (
+          <li key={a.id} className="flex items-center justify-between gap-3 py-2.5">
+            <Link href={`/my-chapter/assignments/${a.id}`} className="min-w-0 truncate text-sm font-medium text-foreground hover:underline">
+              {a.title}
+            </Link>
+            <div className="flex shrink-0 items-center gap-3 text-xs">
+              {a.dueDate && <span className="text-muted-foreground">due {new Date(a.dueDate).toLocaleDateString()}</span>}
+              <span className={`rounded-full px-2 py-0.5 font-medium ${
+                a.submission
+                  ? 'bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-300'
+                  : 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
+              }`}>
+                {a.submission ? 'Submitted' : 'To do'}
+              </span>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function SharingCard() {
+  const [counts, setCounts] = useState<{ shared: number; hidden: number } | null>(null);
+
+  useEffect(() => {
+    sessionsApi.list({ limit: 500 }).then((r) => {
+      const verified = (r.data ?? []).map(mapSession).filter((s) => s.status === 'verified');
+      const orgShared = new Map<string, boolean>();
+      for (const s of verified) {
+        const key = s.orgSlug || s.org || 'other';
+        orgShared.set(key, (orgShared.get(key) ?? true) && s.sharedWithChapter !== false);
+      }
+      let shared = 0, hidden = 0;
+      orgShared.forEach((v) => (v ? shared++ : hidden++));
+      setCounts({ shared, hidden });
+    }).catch(() => setCounts(null));
+  }, []);
+
+  return (
+    <Link
+      href="/my-chapter/hours"
+      className="group flex items-center justify-between rounded-xl border border-border bg-card p-5 transition-all hover:border-merit-blue-300 hover:shadow-[var(--shadow-elevated)]"
+    >
+      <div className="flex items-start gap-3">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-merit-blue-50">
+          <Eye className="h-4 w-4 text-merit-blue-600" />
+        </div>
+        <div>
+          <h3 className="font-medium text-foreground">Choose what your school sees</h3>
+          <p className="text-sm text-muted-foreground">
+            {counts
+              ? `Sharing ${counts.shared} organization${counts.shared === 1 ? '' : 's'}${counts.hidden > 0 ? ` · ${counts.hidden} hidden` : ''}`
+              : 'Control which verified hours are shared.'}
+          </p>
+        </div>
+      </div>
+      <ChevronRight className="h-5 w-5 text-muted-foreground transition-colors group-hover:text-merit-blue-600" />
+    </Link>
   );
 }
