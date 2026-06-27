@@ -6,6 +6,7 @@ import { ChevronDown, Send, Building2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { StatusBadge } from './status-badge';
+import { SharedIndicator } from './shared-indicator';
 import { useMeritStore } from '@/lib/store';
 import { sessionsApi, ApiError } from '@/lib/api';
 import { formatSessionDate, cn } from '@/lib/utils';
@@ -257,6 +258,9 @@ function OrgCard({ group, onOpenSession }: { group: OrgGroup; onOpenSession?: (s
                     <span className="text-[12px] text-foreground truncate flex-1">{s.activity || '—'}</span>
                     <span className="text-[12px] font-medium text-foreground tabular-nums shrink-0">{hrs(s.hours)} hrs</span>
                     <StatusBadge status={s.status} selfReported={s.selfReported} verificationSent={s.verificationSent} />
+                    {s.status === 'verified' && !s.selfReported && (
+                      <SharedIndicator shared={s.sharedWithChapter !== false} />
+                    )}
                   </button>
                 </div>
               );

@@ -127,6 +127,7 @@ export function mapSession(raw: any): Session {
     notes: raw.notes ?? undefined,
     selfReported: raw.self_reported ?? false,
     verificationSent: raw.verification_sent ?? true,
+    sharedWithChapter: raw.shared_with_chapter ?? true,
   };
 }
 
@@ -194,6 +195,9 @@ export const sessionsApi = {
   // ids and/or scoped to one org. Returns { sent, skipped }.
   sendVerifications: (body: { sessionIds?: string[]; orgId?: string }) =>
     request<{ data: { sent: number; skipped: number } }>('POST', '/sessions/send-verifications', body),
+  // Choose what the student's school can see — toggle a whole org or specific sessions.
+  setShared: (body: { sessionIds?: string[]; orgId?: string; shared: boolean }) =>
+    request<{ data: { updated: number } }>('POST', '/sessions/share', body),
 };
 
 // ─── Organizations API ────────────────────────────────────────────────────────

@@ -31,6 +31,8 @@ export interface Session {
   // false = logged but the supervisor text was NOT sent yet ("Not sent yet").
   // Only meaningful while status==='pending'. Defaults true (already sent).
   verificationSent?: boolean;
+  // false = student has hidden this session from their school. Defaults true.
+  sharedWithChapter?: boolean;
 }
 
 export interface Organization {
