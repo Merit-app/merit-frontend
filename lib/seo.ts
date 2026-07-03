@@ -1,6 +1,6 @@
 export const siteConfig = {
   name: 'Merit',
-  domain: 'https://meritco.app',
+  domain: 'https://www.meritco.app',
   tagline: 'Track volunteer hours. Get verified. Export a signed PDF.',
   description:
     'Merit is the easiest way for students to track volunteer hours, ' +

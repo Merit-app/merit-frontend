@@ -40,26 +40,26 @@ async function getSessionVerification(sessionId: string): Promise<VerificationDa
   }
 }
 
-// ─── Status config ────────────────────────────────────────────────────────
+// ─── Status config (semantic tokens → dark-mode correct) ────────────────────
 
 const STATUS_CONFIG = {
   verified: {
     icon: CheckCircle2,
     label: 'Verified',
-    wrapperClass: 'bg-green-50 border-green-200 text-green-700',
-    iconClass: 'text-green-500',
+    wrapperClass: 'bg-success/10 border-success/30 text-success',
+    iconClass: 'text-success',
   },
   pending: {
     icon: Clock,
     label: 'Pending Verification',
-    wrapperClass: 'bg-amber-50 border-amber-200 text-amber-700',
-    iconClass: 'text-amber-500',
+    wrapperClass: 'bg-warning/10 border-warning/30 text-warning',
+    iconClass: 'text-warning',
   },
   disputed: {
     icon: XCircle,
     label: 'Disputed',
-    wrapperClass: 'bg-red-50 border-red-200 text-red-700',
-    iconClass: 'text-red-500',
+    wrapperClass: 'bg-destructive/10 border-destructive/30 text-destructive',
+    iconClass: 'text-destructive',
   },
 } as const;
 
@@ -76,12 +76,12 @@ export default async function VerifyPage({
   // ── Not found ──
   if (!session) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="min-h-screen bg-background text-foreground flex flex-col">
         <Header />
         <div className="flex-1 flex flex-col items-center justify-center p-6 gap-4">
-          <XCircle className="w-16 h-16 text-red-300" />
-          <h1 className="text-xl font-semibold text-gray-900">Record not found</h1>
-          <p className="text-gray-500 text-center max-w-sm">
+          <XCircle className="w-16 h-16 text-destructive/40" />
+          <h1 className="text-xl font-semibold text-foreground">Record not found</h1>
+          <p className="text-muted-foreground text-center max-w-sm">
             This session may have been deleted or the link is incorrect.
           </p>
         </div>
@@ -131,10 +131,10 @@ export default async function VerifyPage({
   ].filter((row): row is { label: string; value: string } => Boolean(row.value));
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
       <Header />
 
-      <main className="flex-1 flex items-start justify-center p-6 pt-12">
+      <main className="flex-1 flex items-start justify-center p-6 pt-12 pb-[max(2rem,env(safe-area-inset-bottom))]">
         <div className="w-full max-w-lg space-y-5">
 
           {/* ── Status badge ── */}
@@ -149,32 +149,32 @@ export default async function VerifyPage({
           </div>
 
           {/* ── Session details card ── */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <h2 className="font-semibold text-gray-900 mb-4">Session Record</h2>
-            <div className="divide-y divide-gray-100">
+          <div className="bg-card rounded-xl border border-border p-6">
+            <h2 className="font-semibold text-foreground mb-4">Session Record</h2>
+            <div className="divide-y divide-border">
               {detailRows.map((row) => (
                 <div key={row.label} className="flex justify-between py-3 text-sm gap-4">
-                  <span className="text-gray-500 shrink-0">{row.label}</span>
-                  <span className="text-gray-900 font-medium text-right">{row.value}</span>
+                  <span className="text-muted-foreground shrink-0">{row.label}</span>
+                  <span className="text-foreground font-medium text-right">{row.value}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* ── Merit seal ── */}
-          <div className="flex items-start gap-3 p-4 bg-white rounded-xl border border-gray-200 text-sm text-gray-500">
-            <ShieldCheck className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
+          <div className="flex items-start gap-3 p-4 bg-card rounded-xl border border-border text-sm text-muted-foreground">
+            <ShieldCheck className="w-5 h-5 text-merit-blue-600 shrink-0 mt-0.5" />
             <span>
               This record is stored securely on Merit and has not been altered.{' '}
               Record ID:{' '}
-              <code className="text-xs font-mono text-gray-400 break-all">{session.id}</code>
+              <code className="text-xs font-mono text-muted-foreground/70 break-all">{session.id}</code>
             </span>
           </div>
 
           {/* ── Footer ── */}
-          <p className="text-center text-xs text-gray-400 pb-8">
+          <p className="text-center text-xs text-muted-foreground pb-8">
             Powered by{' '}
-            <a href="https://meritco.app" className="underline hover:text-gray-600">
+            <a href="https://www.meritco.app" className="underline hover:text-foreground">
               Merit
             </a>
             {' '}— Student volunteer hour verification
@@ -190,11 +190,11 @@ export default async function VerifyPage({
 
 function Header() {
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-      <a href="https://meritco.app" className="font-bold text-gray-900 text-lg tracking-tight">
-        merit.
+    <header className="bg-card border-b border-border px-6 py-4 flex items-center justify-between">
+      <a href="https://www.meritco.app" className="font-bold text-foreground text-lg tracking-tight">
+        merit<span className="text-merit-blue-600">.</span>
       </a>
-      <span className="text-sm text-gray-400">Session Verification</span>
+      <span className="text-sm text-muted-foreground">Session Verification</span>
     </header>
   );
 }

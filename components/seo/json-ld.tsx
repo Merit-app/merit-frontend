@@ -7,7 +7,7 @@ export function WebAppJsonLd() {
           '@context': 'https://schema.org',
           '@type': 'WebApplication',
           name: 'Merit',
-          url: 'https://meritco.app',
+          url: 'https://www.meritco.app',
           description:
             'Student volunteer hour tracking app with SMS verification ' +
             'and signed PDF export.',
@@ -30,7 +30,7 @@ export function WebAppJsonLd() {
           creator: {
             '@type': 'Organization',
             name: 'Merit',
-            url: 'https://meritco.app',
+            url: 'https://www.meritco.app',
           },
         }),
       }}
@@ -117,8 +117,8 @@ export function OrganizationJsonLd() {
           '@context': 'https://schema.org',
           '@type': 'Organization',
           name: 'Merit',
-          url: 'https://meritco.app',
-          logo: 'https://meritco.app/favicon.svg',
+          url: 'https://www.meritco.app',
+          logo: 'https://www.meritco.app/favicon.svg',
           contactPoint: {
             '@type': 'ContactPoint',
             email: 'hello@meritco.app',

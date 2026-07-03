@@ -688,7 +688,7 @@ function PrivacyToggleSection({
 
   function copyLink() {
     if (!username) return;
-    navigator.clipboard.writeText(`https://meritco.app/u/${username}`);
+    navigator.clipboard.writeText(`https://www.meritco.app/u/${username}`);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }

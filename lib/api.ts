@@ -38,6 +38,13 @@ async function orgRequest<T>(method: string, path: string, body?: unknown, isPub
 }
 
 async function makeRequest(method: string, path: string, body?: unknown, token?: string | null): Promise<Response> {
+  // Fail loudly if the API base URL is missing. Without this, an unset
+  // NEXT_PUBLIC_API_URL silently sends every request to the frontend origin
+  // (relative path) where it 404s — a confusing "could not reach server" that
+  // looks like a backend outage. A clear error points straight at the misconfig.
+  if (!BASE) {
+    throw new ApiError(0, 'api_url_missing', 'App is misconfigured (NEXT_PUBLIC_API_URL is not set). Please try again later.');
+  }
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   if (token) headers['Authorization'] = `Bearer ${token}`;
   return fetch(`${BASE}${path}`, { method, headers, body: body !== undefined ? JSON.stringify(body) : undefined });
@@ -198,6 +205,35 @@ export const sessionsApi = {
   // Choose what the student's school can see — toggle a whole org or specific sessions.
   setShared: (body: { sessionIds?: string[]; orgId?: string; shared: boolean }) =>
     request<{ data: { updated: number } }>('POST', '/sessions/share', body),
+};
+
+// ─── Supervisor verification (public magic-link) ───────────────────────────────
+// Powers the /verify?token= confirmation page a supervisor lands on from the
+// verification email. Both calls are public (no auth) — the token IS the auth.
+
+export type VerificationLookup =
+  | { state: 'invalid' }
+  | { state: 'already_responded' }
+  | { state: 'expired' }
+  | {
+      state: 'pending';
+      studentName: string;
+      supervisorName: string | null;
+      orgName: string;
+      hours: number;
+      date: string | null;
+    };
+
+export const verificationsApi = {
+  lookup: (token: string) =>
+    request<{ data: VerificationLookup }>('GET', `/verifications/lookup?token=${encodeURIComponent(token)}`, undefined, true),
+  confirm: (token: string, response: 'YES' | 'NO' | 'STOP') =>
+    request<{ data: { handled: string; tier?: string } }>(
+      'POST',
+      '/verifications/confirm-magic-link',
+      { token, response },
+      true,
+    ),
 };
 
 // ─── Organizations API ────────────────────────────────────────────────────────

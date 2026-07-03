@@ -75,7 +75,7 @@ export async function generateMetadata({
     title: `${profile.name ?? username} — Volunteer Hours`,
     description: `${profile.name ?? username} has logged ${profile.stats?.verifiedHours ?? 0} verified volunteer hours on Merit.`,
     path: `/u/${username}`,
-    image: `https://meritco.app/api/og/profile/${username}`,
+    image: `https://www.meritco.app/api/og/profile/${username}`,
   });
 }
 

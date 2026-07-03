@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next';
 
-const BASE_URL = 'https://meritco.app';
+const BASE_URL = 'https://www.meritco.app';
 const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? '').replace(/\/$/, '');
 
 async function getPublicProfiles(): Promise<{ username: string; updatedAt: string }[]> {

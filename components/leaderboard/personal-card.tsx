@@ -39,7 +39,7 @@ export function PersonalCard({
   const cardUrl =
     typeof window !== 'undefined'
       ? `${window.location.origin}/leaderboard/u/${username}`
-      : `https://meritco.app/leaderboard/u/${username}`
+      : `https://www.meritco.app/leaderboard/u/${username}`
 
   const copyLink = () => {
     navigator.clipboard.writeText(cardUrl).then(() => {

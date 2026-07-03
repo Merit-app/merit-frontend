@@ -2,7 +2,7 @@
 export const metadata: Metadata = { title: 'Help — Merit', robots: { index: false, follow: false } };
 
 import Link from 'next/link';
-import { MessageCircle, FileText, Mail } from 'lucide-react';
+import { FileText, Mail } from 'lucide-react';
 
 const FAQS = [
   {
@@ -60,10 +60,6 @@ export default function HelpPage() {
             <Mail size={15} className="text-muted-foreground shrink-0" />
             hello@merit.app
           </a>
-          <div className="flex items-center gap-3 text-[13px] text-muted-foreground">
-            <MessageCircle size={15} className="text-muted-foreground shrink-0" />
-            Live chat coming soon
-          </div>
           <Link
             href="/export"
             className="flex items-center gap-3 text-[13px] text-foreground hover:text-merit-blue-600 transition-colors"

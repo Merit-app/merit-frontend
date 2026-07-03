@@ -1,7 +1,8 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Settings, LogOut, CreditCard, Palette } from 'lucide-react';
+import { useTheme } from 'next-themes';
+import { Settings, LogOut, CreditCard, Moon, Sun } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,8 +21,10 @@ interface UserMenuProps {
 
 export function UserMenu({ compact }: UserMenuProps) {
   const router = useRouter();
+  const { resolvedTheme, setTheme } = useTheme();
   const user = useMeritStore((s) => s.user);
   const logout = useMeritStore((s) => s.logout);
+  const isDark = resolvedTheme === 'dark';
 
   function handleLogout() {
     logout();
@@ -83,9 +86,13 @@ export function UserMenu({ compact }: UserMenuProps) {
           <CreditCard size={14} className="mr-2 text-muted-foreground" />
           Plan &amp; billing
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => toast.info('Theme options coming soon.')}>
-          <Palette size={14} className="mr-2 text-muted-foreground" />
-          Theme
+        <DropdownMenuItem
+          onSelect={(e) => { e.preventDefault(); setTheme(isDark ? 'light' : 'dark'); }}
+        >
+          {isDark
+            ? <Sun size={14} className="mr-2 text-muted-foreground" />
+            : <Moon size={14} className="mr-2 text-muted-foreground" />}
+          {isDark ? 'Light mode' : 'Dark mode'}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem

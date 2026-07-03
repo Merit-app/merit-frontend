@@ -12,8 +12,8 @@ import { useMeritStore } from '@/lib/store';
 import { usePlan } from '@/lib/hooks/use-plan';
 import { cn } from '@/lib/utils';
 
-const VERIFY_BASE_URL = 'https://meritco.app/verify';
-const VERIFY_ORG_BASE = 'https://meritco.app/verify/org';
+const VERIFY_BASE_URL = 'https://www.meritco.app/verify';
+const VERIFY_ORG_BASE = 'https://www.meritco.app/verify/org';
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 type Template = 'classic' | 'modern' | 'nhs-formal';

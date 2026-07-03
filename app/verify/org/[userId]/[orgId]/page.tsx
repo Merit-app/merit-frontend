@@ -60,9 +60,9 @@ function fmtShort(iso: string): string {
 }
 
 const STATUS_BADGE = {
-  verified: { icon: CheckCircle2, label: 'Verified', cls: 'text-green-600' },
-  pending:  { icon: Clock,        label: 'Pending',  cls: 'text-amber-500' },
-  disputed: { icon: XCircle,      label: 'Disputed', cls: 'text-red-500' },
+  verified: { icon: CheckCircle2, label: 'Verified', cls: 'text-success' },
+  pending:  { icon: Clock,        label: 'Pending',  cls: 'text-warning' },
+  disputed: { icon: XCircle,      label: 'Disputed', cls: 'text-destructive' },
 } as const;
 
 // ─── Page ─────────────────────────────────────────────────────────────────
@@ -77,12 +77,12 @@ export default async function OrgVerifyPage({
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="min-h-screen bg-background text-foreground flex flex-col">
         <Header />
         <div className="flex-1 flex flex-col items-center justify-center p-6 gap-4">
-          <XCircle className="w-16 h-16 text-red-300" />
-          <h1 className="text-xl font-semibold text-gray-900">Record not found</h1>
-          <p className="text-gray-500 text-center max-w-sm">
+          <XCircle className="w-16 h-16 text-destructive/40" />
+          <h1 className="text-xl font-semibold text-foreground">Record not found</h1>
+          <p className="text-muted-foreground text-center max-w-sm">
             These records may have been deleted or the link is incorrect.
           </p>
         </div>
@@ -94,15 +94,15 @@ export default async function OrgVerifyPage({
   const hoursStr = (n: number) => (n % 1 === 0 ? `${n}` : n.toFixed(1));
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
       <Header />
 
-      <main className="flex-1 flex items-start justify-center p-6 pt-12">
+      <main className="flex-1 flex items-start justify-center p-6 pt-12 pb-[max(2rem,env(safe-area-inset-bottom))]">
         <div className="w-full max-w-2xl space-y-5">
 
           {/* ── Verified banner ── */}
-          <div className="flex items-center gap-4 p-5 rounded-xl border bg-green-50 border-green-200 text-green-700">
-            <ShieldCheck className="w-9 h-9 shrink-0 text-green-500" />
+          <div className="flex items-center gap-4 p-5 rounded-xl border bg-success/10 border-success/30 text-success">
+            <ShieldCheck className="w-9 h-9 shrink-0 text-success" />
             <div>
               <p className="font-semibold text-lg leading-tight">
                 {hoursStr(summary.verifiedHours)} verified {summary.verifiedHours === 1 ? 'hour' : 'hours'}
@@ -122,9 +122,9 @@ export default async function OrgVerifyPage({
           </div>
 
           {/* ── Who / where ── */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <h2 className="font-semibold text-gray-900 mb-4">Record summary</h2>
-            <div className="divide-y divide-gray-100">
+          <div className="bg-card rounded-xl border border-border p-6">
+            <h2 className="font-semibold text-foreground mb-4">Record summary</h2>
+            <div className="divide-y divide-border">
               {([
                 { label: 'Student',      value: student.name },
                 { label: 'School',       value: student.school },
@@ -136,27 +136,27 @@ export default async function OrgVerifyPage({
                 .filter((r): r is { label: string; value: string } => Boolean(r.value))
                 .map((r) => (
                   <div key={r.label} className="flex justify-between py-3 text-sm gap-4">
-                    <span className="text-gray-500 shrink-0">{r.label}</span>
-                    <span className="text-gray-900 font-medium text-right">{r.value}</span>
+                    <span className="text-muted-foreground shrink-0">{r.label}</span>
+                    <span className="text-foreground font-medium text-right">{r.value}</span>
                   </div>
                 ))}
             </div>
           </div>
 
           {/* ── Session breakdown ── */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <h2 className="font-semibold text-gray-900 mb-4">
-              Sessions <span className="text-gray-400 font-normal">({sessions.length})</span>
+          <div className="bg-card rounded-xl border border-border p-6">
+            <h2 className="font-semibold text-foreground mb-4">
+              Sessions <span className="text-muted-foreground font-normal">({sessions.length})</span>
             </h2>
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-border">
               {sessions.map((sess) => {
                 const badge = STATUS_BADGE[sess.status] ?? STATUS_BADGE.pending;
                 const BadgeIcon = badge.icon;
                 return (
                   <div key={sess.id} className="flex items-center gap-3 py-3 text-sm">
-                    <span className="text-gray-400 w-28 shrink-0">{fmtShort(sess.date)}</span>
-                    <span className="flex-1 text-gray-900 truncate">{sess.activity ?? 'Volunteer session'}</span>
-                    <span className="text-gray-900 font-medium shrink-0">{hoursStr(sess.hours)}h</span>
+                    <span className="text-muted-foreground w-28 shrink-0">{fmtShort(sess.date)}</span>
+                    <span className="flex-1 text-foreground truncate">{sess.activity ?? 'Volunteer session'}</span>
+                    <span className="text-foreground font-medium shrink-0">{hoursStr(sess.hours)}h</span>
                     <span className={`flex items-center gap-1 shrink-0 ${badge.cls}`}>
                       <BadgeIcon className="w-4 h-4" />
                       <span className="hidden sm:inline text-xs">{badge.label}</span>
@@ -168,14 +168,14 @@ export default async function OrgVerifyPage({
           </div>
 
           {/* ── Seal ── */}
-          <div className="flex items-start gap-3 p-4 bg-white rounded-xl border border-gray-200 text-sm text-gray-500">
-            <ShieldCheck className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
+          <div className="flex items-start gap-3 p-4 bg-card rounded-xl border border-border text-sm text-muted-foreground">
+            <ShieldCheck className="w-5 h-5 text-merit-blue-600 shrink-0 mt-0.5" />
             <span>This record is stored securely on Merit and reflects the student&apos;s current hours at this organization.</span>
           </div>
 
-          <p className="text-center text-xs text-gray-400 pb-8">
+          <p className="text-center text-xs text-muted-foreground pb-8">
             Powered by{' '}
-            <a href="https://meritco.app" className="underline hover:text-gray-600">Merit</a>
+            <a href="https://www.meritco.app" className="underline hover:text-foreground">Merit</a>
             {' '}— Student volunteer hour verification
           </p>
         </div>
@@ -186,18 +186,20 @@ export default async function OrgVerifyPage({
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4">
-      <p className="text-2xl font-bold text-gray-900">{value}</p>
-      <p className="text-xs text-gray-500 mt-0.5">{label}</p>
+    <div className="bg-card rounded-xl border border-border p-4">
+      <p className="text-2xl font-bold text-foreground">{value}</p>
+      <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
     </div>
   );
 }
 
 function Header() {
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-      <a href="https://meritco.app" className="font-bold text-gray-900 text-lg tracking-tight">merit.</a>
-      <span className="text-sm text-gray-400">Hours Verification</span>
+    <header className="bg-card border-b border-border px-6 py-4 flex items-center justify-between">
+      <a href="https://www.meritco.app" className="font-bold text-foreground text-lg tracking-tight">
+        merit<span className="text-merit-blue-600">.</span>
+      </a>
+      <span className="text-sm text-muted-foreground">Hours Verification</span>
     </header>
   );
 }
