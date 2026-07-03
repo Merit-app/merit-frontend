@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { MarketingNavbar } from './navbar';
+import { SmoothScroll } from './smooth-scroll';
 import { HeroSection, StudentProofSection } from './student-section';
 import { OrgSection } from './org-section';
 import { SchoolSection } from './school-section';
@@ -10,6 +11,7 @@ import { DARK_BAND } from './_primitives';
 export function LandingPage() {
   return (
     <div className="min-h-screen overflow-x-clip bg-background">
+      <SmoothScroll />
       <MarketingNavbar />
 
       {/* Band rhythm — dark → light → dark → light → dark (Stripe-style). Each

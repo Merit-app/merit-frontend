@@ -178,6 +178,34 @@
 html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Stop iOS auto-inflating text in landscape, and kill the rubber-band
+     overscroll that reveals the WebView's edge in the native app. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  overscroll-behavior-y: none;
+}
+
+/* No grey tap-flash on touch — focus/active states are styled explicitly. */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* App chrome should not feel like a web page: suppress the long-press
+   callout/selection on nav, buttons and labels. Real content keeps selection
+   via .select-text (activity notes, signed names, copyable credentials). */
+nav,
+button,
+[role='button'],
+label,
+.app-chrome {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.select-text,
+.select-text * {
+  -webkit-user-select: text;
+  user-select: text;
 }
 
 body {
@@ -253,6 +281,55 @@ body {
   letter-spacing: 0.06em;
 }
 
+/* Landing hero scale — bigger, more confident than the app type. Fluid so it
+   reads well from 375px → 1440px without a wall of breakpoints. */
+.text-hero {
+  font-size: clamp(2.5rem, 7vw, 5rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+}
+.text-hero-sub {
+  font-size: clamp(1.05rem, 2.2vw, 1.35rem);
+  line-height: 1.5;
+}
+.text-section-title {
+  font-size: clamp(1.75rem, 4vw, 3rem);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.08;
+}
+
+/* ─── Deterministic avatar hues (kills inline #DBEAFE) ─────────────────────────
+   6 tasteful hues, each with a dark-mode variant so initials stay legible in
+   both themes. UserAvatar hashes the name → one of these. */
+.avatar-hue-0 { background: #EFF6FF; color: #1D4ED8; } /* blue   */
+.avatar-hue-1 { background: #F0FDF4; color: #15803D; } /* green  */
+.avatar-hue-2 { background: #FFF7ED; color: #C2410C; } /* orange */
+.avatar-hue-3 { background: #FAF5FF; color: #7E22CE; } /* violet */
+.avatar-hue-4 { background: #FEF2F2; color: #BE123C; } /* rose   */
+.avatar-hue-5 { background: #ECFEFF; color: #0E7490; } /* cyan   */
+.dark .avatar-hue-0 { background: #1c3257; color: #93c5fd; }
+.dark .avatar-hue-1 { background: #163a25; color: #86efac; }
+.dark .avatar-hue-2 { background: #3a2413; color: #fdba74; }
+.dark .avatar-hue-3 { background: #2c1f45; color: #d8b4fe; }
+.dark .avatar-hue-4 { background: #3a1a22; color: #fda4af; }
+.dark .avatar-hue-5 { background: #103038; color: #67e8f9; }
+
+/* ─── Landing depth utilities ─────────────────────────────────────────────────
+   Subtle blueprint grid + soft radial glow for immersive marketing sections.
+   Purely decorative — always pair with aria-hidden containers. */
+.bg-grid-faint {
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, currentColor 8%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, currentColor 8%, transparent) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+.mask-radial-fade {
+  -webkit-mask-image: radial-gradient(ellipse 60% 60% at 50% 40%, #000 30%, transparent 75%);
+  mask-image: radial-gradient(ellipse 60% 60% at 50% 40%, #000 30%, transparent 75%);
+}
+
 /* ─── Focus ring ───────────────────────────────────────────────────────────── */
 
 :focus-visible {
@@ -269,6 +346,32 @@ textarea:focus-visible,
 select:focus,
 select:focus-visible {
   outline: none;
+}
+
+/* ─── Safe-area insets (notch / home indicator) ────────────────────────────────
+   Real values only report when viewport-fit=cover is set (see app/layout.tsx).
+   On the desktop web the env() values resolve to 0, so these are no-ops there and
+   only take effect inside the native WebView. */
+
+.pt-safe { padding-top: env(safe-area-inset-top); }
+.pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+.pl-safe { padding-left: env(safe-area-inset-left); }
+.pr-safe { padding-right: env(safe-area-inset-right); }
+
+/* Offset helpers for content that sits under a fixed bar: bar height + the inset. */
+.pt-safe-topbar { padding-top: calc(3.5rem + env(safe-area-inset-top)); }
+.pb-safe-nav { padding-bottom: calc(3.5rem + env(safe-area-inset-bottom)); }
+
+/* For a fixed/sticky top bar: reserve its own row PLUS the status-bar inset, and
+   push the bar's flex content below the inset. Keeps the visible row at 3.5rem. */
+.bar-safe-top {
+  min-height: calc(3.5rem + env(safe-area-inset-top));
+  padding-top: env(safe-area-inset-top);
+}
+/* For a fixed bottom bar: reserve its row plus the home-indicator inset. */
+.bar-safe-bottom {
+  min-height: calc(3.5rem + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* ─── Scrollbar (subtle) ───────────────────────────────────────────────────── */

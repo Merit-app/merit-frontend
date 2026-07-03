@@ -1,10 +1,13 @@
 'use client';
 
-import { motion, type Variants } from 'framer-motion';
+import { useRef } from 'react';
+import { motion, useScroll, useTransform, useReducedMotion, type Variants } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { StudentDemo } from './student-demo';
+import { HeroBackdrop } from './hero-backdrop';
 import { Reveal, RevealGroup, RevealItem, CountUp } from '@/components/motion';
+import { Tilt } from '@/components/motion/tilt';
 import { Section, Eyebrow, SectionHeading, Lead, BentoCard } from './_primitives';
 
 const container: Variants = {
@@ -27,66 +30,84 @@ const item: Variants = {
 /* ============================================================== Hero (dark) */
 
 export function HeroSection() {
+  const reduce = useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+  // Parallax: the copy drifts up + fades as you scroll past; the demo rises a
+  // touch slower than the page, so it feels like a layered plane (Framer/Stripe).
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
+  const copyY = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : -70]);
+  const copyOpacity = useTransform(scrollYProgress, [0, 0.7], [1, reduce ? 1 : 0.15]);
+  const demoY = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : -30]);
+
   return (
     <Section
       id="students"
       theme="dark"
-      spotlight
-      padding="pt-16 pb-24 sm:pt-24 sm:pb-32"
+      backdrop={<HeroBackdrop />}
+      padding="pt-20 pb-24 sm:pt-28 sm:pb-32"
       className="scroll-mt-16"
     >
-      <motion.div variants={container} initial="hidden" animate="visible">
-        {/* Hero copy */}
-        <div className="mx-auto mb-14 max-w-3xl text-center sm:mb-16">
-          <motion.div
-            variants={item}
-            className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-zinc-300"
-          >
-            <span className="h-1.5 w-1.5 rounded-full bg-merit-blue-400" />
-            Trusted by students across BC
-          </motion.div>
+      <div ref={ref}>
+        <motion.div variants={container} initial="hidden" animate="visible">
+          {/* Hero copy */}
+          <motion.div style={{ y: copyY, opacity: copyOpacity }} className="mx-auto mb-14 max-w-3xl text-center sm:mb-16">
+            <motion.div
+              variants={item}
+              className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-xs font-medium text-zinc-300 backdrop-blur-sm"
+            >
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-merit-blue-400 opacity-75" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-merit-blue-400" />
+              </span>
+              Trusted by students across BC
+            </motion.div>
 
-          <motion.div variants={item}>
-            <SectionHeading as="h1" variant="display" className="mb-6">
+            <motion.h1 variants={item} className="text-hero mb-6 text-white">
               Service hours
               <br />
-              <span className="text-merit-blue-400">you can actually prove.</span>
-            </SectionHeading>
+              <span className="bg-gradient-to-r from-merit-blue-400 via-merit-blue-300 to-indigo-300 bg-clip-text text-transparent">
+                you can actually prove.
+              </span>
+            </motion.h1>
+
+            <motion.div variants={item}>
+              <Lead className="mx-auto mb-8 max-w-2xl">
+                Log volunteer hours, get them verified by SMS, and export beautiful signed PDFs for
+                college applications and graduation requirements.
+              </Lead>
+            </motion.div>
+
+            <motion.div variants={item} className="flex flex-wrap items-center justify-center gap-3">
+              <Link
+                href="/signup"
+                className="group relative flex items-center gap-2 overflow-hidden rounded-full bg-merit-blue-600 px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-merit-blue-600/30 transition-all hover:-translate-y-0.5 hover:bg-merit-blue-500 active:translate-y-0 active:scale-[0.98]"
+              >
+                {/* sheen */}
+                <span aria-hidden className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+                <span className="relative">Start free</span>
+                <ArrowRight className="relative h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              </Link>
+              <Link
+                href="/login"
+                className="rounded-full px-7 py-3.5 text-base font-medium text-zinc-300 transition-colors hover:bg-white/5 hover:text-white"
+              >
+                Sign in
+              </Link>
+            </motion.div>
+
+            <motion.p variants={item} className="mt-4 text-xs text-zinc-500">
+              Free forever for students. No credit card.
+            </motion.p>
           </motion.div>
 
-          <motion.div variants={item}>
-            <Lead className="mx-auto mb-8 max-w-2xl">
-              Log volunteer hours, get them verified by SMS, and export beautiful signed PDFs for
-              college applications and graduation requirements.
-            </Lead>
+          {/* Phone demo — 3D-tilt + parallax, dark chrome for near-black legibility */}
+          <motion.div variants={item} style={{ y: demoY }}>
+            <Tilt max={6} lift={20} className="mx-auto">
+              <StudentDemo tone="dark" />
+            </Tilt>
           </motion.div>
-
-          <motion.div variants={item} className="flex flex-wrap items-center justify-center gap-3">
-            <Link
-              href="/signup"
-              className="flex items-center gap-2 rounded-full bg-merit-blue-600 px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-merit-blue-600/25 transition-all hover:-translate-y-0.5 hover:bg-merit-blue-500 active:translate-y-0 active:scale-[0.98]"
-            >
-              Start free
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-            <Link
-              href="/login"
-              className="rounded-full px-7 py-3.5 text-base font-medium text-zinc-300 transition-colors hover:bg-white/5 hover:text-white"
-            >
-              Sign in
-            </Link>
-          </motion.div>
-
-          <motion.p variants={item} className="mt-4 text-xs text-zinc-500">
-            Free forever for students. No credit card.
-          </motion.p>
-        </div>
-
-        {/* Phone demo — dark chrome so labels/caption stay legible on near-black */}
-        <motion.div variants={item}>
-          <StudentDemo tone="dark" />
         </motion.div>
-      </motion.div>
+      </div>
     </Section>
   );
 }

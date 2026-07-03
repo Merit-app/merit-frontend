@@ -33,6 +33,8 @@ interface SectionProps extends React.HTMLAttributes<HTMLElement> {
   theme?: BandTheme;
   /** Renders a single deep-blue spotlight fading into the band (hero/dark). */
   spotlight?: boolean;
+  /** Full-bleed decorative layer rendered behind the container (e.g. HeroBackdrop). */
+  backdrop?: React.ReactNode;
   /** Class for the inner max-w container. */
   containerClassName?: string;
   /** Override the standard band padding (e.g. the hero wants less top). */
@@ -47,6 +49,7 @@ interface SectionProps extends React.HTMLAttributes<HTMLElement> {
 export function Section({
   theme = 'light',
   spotlight = false,
+  backdrop,
   padding = 'py-24 sm:py-32',
   className,
   containerClassName,
@@ -66,6 +69,7 @@ export function Section({
         style={dark ? { backgroundColor: DARK_BAND } : undefined}
         {...props}
       >
+        {backdrop}
         {spotlight && (
           <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-[560px] overflow-hidden">
             <div className="absolute left-1/2 top-[-220px] h-[480px] w-[820px] -translate-x-1/2 rounded-full bg-merit-blue-500/[0.16] blur-[130px]" />
