@@ -3,21 +3,18 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Plus, Clock, Building2, MoreHorizontal, FileDown, Settings, CircleHelp, X, Award, Bookmark, Trophy, Inbox, School, Users } from 'lucide-react';
+import { LayoutDashboard, Plus, Clock, Compass, Store, MoreHorizontal, FileDown, Settings, CircleHelp, Award, Bookmark, Trophy, Inbox, School, Users, GraduationCap } from 'lucide-react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { UserAvatar } from '@/components/ui/user-avatar';
 import { useMeritStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
-
-const PRIMARY_NAV = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/hours', label: 'Sessions', icon: Clock },
-  { href: '/organizations', label: 'Orgs', icon: Building2 },
-] as const;
+import { useHaptics } from '@/hooks/use-haptics';
 
 const MORE_NAV = [
   { href: '/inbox', label: 'Inbox', icon: Inbox },
   { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
   { href: '/saved', label: 'Saved', icon: Bookmark },
+  { href: '/scholarships', label: 'Scholarships', icon: GraduationCap },
   { href: '/badges', label: 'Badges', icon: Award },
   { href: '/export', label: 'Export', icon: FileDown },
   { href: '/settings/profile', label: 'Settings', icon: Settings },
@@ -30,6 +27,11 @@ export function MobileNav() {
   const [inChapter, setInChapter] = useState(false);
   const [isCoordinator, setIsCoordinator] = useState(false);
   const user = useMeritStore((s) => s.user);
+  const isOrgAdmin = useMeritStore((s) => s.isOrgAdmin);
+  const adminOrgs = useMeritStore((s) => s.adminOrgs);
+  const currentOrgId = useMeritStore((s) => s.currentOrgId);
+  const orgAdminId = currentOrgId ?? adminOrgs?.[0]?.id ?? null;
+  const haptic = useHaptics();
 
   // Probe once so chapter/school entry points appear in "More" for the right users
   // (the desktop sidebar's School/Chapter sections are hidden on mobile).
@@ -47,7 +49,11 @@ export function MobileNav() {
     return pathname.startsWith(href);
   }
 
+  // Management surfaces (the org you RUN, your school/chapter) sit at the top of
+  // "More", above the personal utility links. The bottom-bar "Explore" tab is the
+  // public org marketplace — a different thing from "My Organization" here.
   const moreLinks = [
+    ...(isOrgAdmin && orgAdminId ? [{ href: `/org/${orgAdminId}/dashboard`, label: 'My Organization', icon: Store }] : []),
     ...(inChapter ? [{ href: '/my-chapter', label: 'My School', icon: School }] : []),
     ...(isCoordinator ? [{ href: '/chapter/overview', label: 'Chapter', icon: Users }] : []),
     ...MORE_NAV,
@@ -57,7 +63,7 @@ export function MobileNav() {
   return (
     <>
       <nav
-        className="flex md:hidden fixed bottom-0 left-0 right-0 z-30 h-14 items-stretch bg-card"
+        className="flex lg:hidden fixed bottom-0 left-0 right-0 z-30 bar-safe-bottom items-stretch bg-card"
         style={{ borderTop: '0.5px solid var(--color-ink-200)' }}
       >
         {/* Dashboard */}
@@ -69,6 +75,7 @@ export function MobileNav() {
         {/* Log — primary CTA, center */}
         <Link
           href="/log"
+          onClick={() => haptic('medium')}
           className="flex flex-1 flex-col items-center justify-center gap-0.5 focus-visible:outline-none"
           aria-label="Log hours"
         >
@@ -85,12 +92,12 @@ export function MobileNav() {
           <span className="text-[10px] font-semibold text-merit-blue-600">Log</span>
         </Link>
 
-        {/* Orgs */}
-        <NavItem href="/organizations" label="Orgs" icon={Building2} active={isActive('/organizations')} />
+        {/* Explore — the public org marketplace (distinct from "My Organization" in More) */}
+        <NavItem href="/organizations" label="Explore" icon={Compass} active={isActive('/organizations')} />
 
         {/* More */}
         <button
-          onClick={() => setMoreOpen(true)}
+          onClick={() => { haptic('light'); setMoreOpen(true); }}
           className="flex flex-1 flex-col items-center justify-center gap-1 focus-visible:outline-none"
           aria-label="More"
         >
@@ -114,12 +121,7 @@ export function MobileNav() {
         <SheetContent side="bottom" className="rounded-t-2xl px-0 pb-safe">
           {/* User info */}
           <div className="flex items-center gap-3 px-5 pb-4 pt-5 border-b border-border">
-            <span
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold"
-              style={{ background: '#DBEAFE', color: '#1D4ED8' }}
-            >
-              {user.firstName[0]}{user.lastName[0]}
-            </span>
+            <UserAvatar name={`${user.firstName} ${user.lastName}`.trim()} size="sm" />
             <div className="min-w-0">
               <p className="text-[13px] font-semibold text-foreground leading-none truncate">
                 {user.firstName} {user.lastName}
@@ -164,9 +166,11 @@ function NavItem({
   icon: React.ElementType;
   active: boolean;
 }) {
+  const haptic = useHaptics();
   return (
     <Link
       href={href}
+      onClick={() => haptic('light')}
       className="flex flex-1 flex-col items-center justify-center gap-1 focus-visible:outline-none"
     >
       <Icon size={20} className={active ? 'text-merit-blue-600' : 'text-muted-foreground'} />

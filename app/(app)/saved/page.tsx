@@ -80,20 +80,20 @@ export default function SavedPage() {
         </p>
       </div>
 
-      {/* Tabs */}
-      <div className="flex items-center gap-1 bg-muted p-1 rounded-xl w-fit mb-8">
+      {/* Tabs — full width so all three fit on-screen without horizontal clipping */}
+      <div className="flex items-center gap-1 bg-muted p-1 rounded-xl w-full max-w-md mb-8">
         {TABS.map(({ key, label, icon: Icon, count }) => (
           <button
             key={key}
             onClick={() => setActiveTab(key)}
             className={cn(
-              'flex items-center gap-2 px-4 py-2 rounded-lg text-[13px] font-medium transition-colors',
+              'flex flex-1 min-w-0 items-center justify-center gap-1.5 whitespace-nowrap px-2 py-2 rounded-lg text-[13px] font-medium transition-colors',
               activeTab === key
                 ? 'bg-card text-foreground shadow-sm'
                 : 'text-muted-foreground hover:text-foreground',
             )}
           >
-            <Icon className="w-4 h-4" />
+            <Icon className="hidden w-4 h-4 shrink-0 sm:block" />
             {label}
             {!loading && count > 0 && (
               <span className={cn(
