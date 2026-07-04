@@ -208,8 +208,8 @@ export default function ScholarshipsPage() {
             ))}
           </div>
         ) : scholarships.length === 0 ? (
-          <div className="bg-card border border-border rounded-2xl p-14 text-center">
-            <GraduationCap className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+          <div className="bg-card border border-border rounded-2xl p-8 text-center">
+            <GraduationCap className="w-9 h-9 text-muted-foreground/60 mx-auto mb-3" />
             <p className="text-[14px] font-semibold text-foreground mb-1">No scholarships found</p>
             <p className="text-small text-muted-foreground">Try adjusting your search or filters.</p>
           </div>

@@ -363,12 +363,12 @@ export default function LeaderboardPage() {
         </div>
       )}
 
-      {/* School missing notice */}
+      {/* School missing notice — informational nudge, not a warning */}
       {type === 'school' && !user?.school && (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
-          <p className="text-sm text-amber-800">
+        <div className="rounded-xl border border-merit-blue-100 bg-merit-blue-50/60 p-4 dark:border-merit-blue-500/20 dark:bg-merit-blue-500/10">
+          <p className="text-sm text-foreground">
             Add your school in{' '}
-            <a href="/settings/profile" className="underline font-medium">
+            <a href="/settings/profile" className="font-medium text-merit-blue-600 underline">
               Settings → Profile
             </a>{' '}
             to see your school leaderboard.
@@ -376,12 +376,12 @@ export default function LeaderboardPage() {
         </div>
       )}
 
-      {/* City missing notice */}
+      {/* City missing notice — informational nudge, not a warning */}
       {type === 'local' && !user?.city && (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
-          <p className="text-sm text-amber-800">
+        <div className="rounded-xl border border-merit-blue-100 bg-merit-blue-50/60 p-4 dark:border-merit-blue-500/20 dark:bg-merit-blue-500/10">
+          <p className="text-sm text-foreground">
             Add your city in{' '}
-            <a href="/settings/profile" className="underline font-medium">
+            <a href="/settings/profile" className="font-medium text-merit-blue-600 underline">
               Settings → Profile
             </a>{' '}
             to see your local leaderboard.
@@ -574,24 +574,26 @@ export default function LeaderboardPage() {
               ))}
             </div>
           ) : belowThreshold ? (
-            /* FIX 5a: below threshold — show count + waiting message instead of empty state */
-            <div className="rounded-xl border border-amber-200 bg-amber-50 p-6 text-center space-y-2">
-              <Trophy className="w-8 h-8 text-amber-500 mx-auto" />
-              <p className="font-semibold text-amber-900">
-                {totalParticipants} {totalParticipants === 1 ? 'student' : 'students'} so far — need {MIN_THRESHOLD} to show rankings
+            /* Below threshold — encouraging (not a warning), compact + proportional. */
+            <div className="rounded-2xl border border-merit-blue-100 bg-merit-blue-50/60 p-5 text-center dark:border-merit-blue-500/20 dark:bg-merit-blue-500/10">
+              <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-merit-blue-100 dark:bg-merit-blue-500/20">
+                <Trophy className="h-5 w-5 text-merit-blue-600 dark:text-merit-blue-300" />
+              </div>
+              <p className="font-semibold text-foreground">
+                {totalParticipants} {totalParticipants === 1 ? 'student' : 'students'} so far
               </p>
-              <p className="text-sm text-amber-700">
+              <p className="mx-auto mt-1 max-w-xs text-sm text-muted-foreground">
                 {type === 'school'
-                  ? 'Spread the word at your school!'
+                  ? `Spread the word at your school — rankings unlock at ${MIN_THRESHOLD}.`
                   : type === 'local'
-                    ? 'Be among the first in your city!'
-                    : 'Keep logging hours — rankings appear once there are enough participants.'}
+                    ? `Be among the first in your city — rankings unlock at ${MIN_THRESHOLD}.`
+                    : `Keep logging hours — rankings appear once ${MIN_THRESHOLD} students join.`}
               </p>
             </div>
           ) : entries.length === 0 ? (
-            <div className="rounded-xl border p-12 text-center space-y-2">
-              <Trophy className="w-9 h-9 text-muted-foreground mx-auto" />
-              <p className="font-medium">No entries yet</p>
+            <div className="rounded-2xl border border-border p-8 text-center space-y-2">
+              <Trophy className="w-8 h-8 text-muted-foreground/50 mx-auto" />
+              <p className="font-medium text-foreground">No entries yet</p>
               <p className="text-sm text-muted-foreground">
                 {type === 'school'
                   ? "No one from your school has verified hours yet. Be the first!"

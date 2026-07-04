@@ -111,9 +111,9 @@ export default function SavedPage() {
 
       {/* ── Empty (all tabs, nothing saved) ─────────────────────────────────── */}
       {!loading && totalSaved === 0 && (
-        <div className="flex flex-col items-center py-24 text-center">
-          <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-            <Bookmark size={28} className="text-muted-foreground" />
+        <div className="flex flex-col items-center py-16 text-center">
+          <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center mb-4">
+            <Bookmark size={24} className="text-muted-foreground" />
           </div>
           <p className="text-[16px] font-semibold text-foreground mb-2">Nothing saved yet</p>
           <p className="text-[13px] text-muted-foreground max-w-xs mb-6">
@@ -159,7 +159,7 @@ export default function SavedPage() {
               ))}
             </div>
           ) : orgs.length === 0 && activeTab === 'organizations' ? (
-            <div className="bg-card border border-border rounded-2xl p-12 text-center">
+            <div className="bg-card border border-border rounded-2xl p-8 text-center">
               <Building2 className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
               <p className="text-[14px] font-semibold text-foreground mb-1">No saved organizations</p>
               <p className="text-small text-muted-foreground mb-4">Bookmark organizations you want to volunteer at.</p>
@@ -209,7 +209,7 @@ export default function SavedPage() {
               ))}
             </div>
           ) : scholarships.length === 0 && activeTab === 'scholarships' ? (
-            <div className="bg-card border border-border rounded-2xl p-12 text-center">
+            <div className="bg-card border border-border rounded-2xl p-8 text-center">
               <GraduationCap className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
               <p className="text-[14px] font-semibold text-foreground mb-1">No saved scholarships</p>
               <p className="text-small text-muted-foreground mb-4">Bookmark scholarships you want to apply for.</p>

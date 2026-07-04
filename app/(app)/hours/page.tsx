@@ -248,8 +248,8 @@ export default function HoursPage() {
 
       {/* Table */}
       {filtered.length === 0 ? (
-        <div className="flex flex-col items-center py-20 text-center">
-          <Clock size={32} className="text-muted-foreground mb-3" />
+        <div className="flex flex-col items-center py-16 text-center">
+          <Clock size={30} className="text-muted-foreground/60 mb-3" />
           <p className="text-[15px] font-semibold text-foreground mb-1">No sessions found.</p>
           <p className="text-small text-muted-foreground mb-4">
             {query || filter !== 'all'
