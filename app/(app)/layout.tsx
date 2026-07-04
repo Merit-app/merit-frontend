@@ -134,9 +134,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <Sidebar />
       <CommandPalette />
 
-      <div className="flex flex-col flex-1 md:ml-60 overflow-hidden">
+      <div className="flex flex-col flex-1 lg:ml-60 overflow-hidden">
         <Topbar />
-        <main className="flex-1 overflow-y-auto pt-14 pb-14 md:pb-0">
+        {/* overflow-x-hidden is load-bearing: overflow-y-auto alone makes overflow-x
+            compute to `auto`, creating an unbounded horizontal scroll context that
+            stops flex-wrap rows (pills, tags) from ever wrapping — so content bleeds
+            off the right edge on mobile. Clipping X constrains width → wrapping works. */}
+        <main className="flex-1 overflow-y-auto overflow-x-hidden pt-[calc(3.5rem+env(safe-area-inset-top))] pb-[calc(3.5rem+env(safe-area-inset-bottom))] lg:pb-0">
           <PageTransition>{children}</PageTransition>
         </main>
       </div>

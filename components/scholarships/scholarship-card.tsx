@@ -80,7 +80,7 @@ export function ScholarshipCard({ scholarship: s, isSaved = false, invalidateKey
     onError: () => toast.error('Could not save scholarship'),
   });
 
-  const visibleCategories = s.categories.slice(0, 3);
+  const visibleCategories = s.categories.slice(0, 2);
 
   return (
     <div className="group relative bg-card border border-border rounded-2xl overflow-hidden hover:shadow-md hover:border-merit-blue-200 dark:hover:border-merit-blue-800 transition-all duration-150 flex flex-col">
